@@ -1,0 +1,17 @@
+{
+    "mcpServers": {
+        "openscad": {
+            "command": "path/to/env/bin/python",
+            "args": [
+                "path/to/openscad_mcp/openscad_fastmcp_server.py"
+            ],
+            "env": {
+                "PYTHONUNBUFFERED": "1",
+                "OPENSCAD_OUTPUT_DIR": "path/to/openscad_mcp/output",
+                "FAISS_INDEX_PATH": "path/to/openscad_mcp/faiss_index",
+                "OPENSCAD_EXECUTABLE": "path/to/openscad",
+                "OPENSCAD_USER_LIBRARY_PATH": "path/to/openscad/libraries"
+            }
+        }
+    }
+}
