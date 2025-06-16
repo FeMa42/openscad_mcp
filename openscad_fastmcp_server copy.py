@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Enhanced OpenSCAD MCP Server with API-Based Embeddings Support
+Enhanced OpenSCAD MCP Server with Library Support
 """
 
 import os
@@ -15,23 +15,7 @@ from PIL import Image as PILImage
 from io import BytesIO
 
 from fastmcp import FastMCP, Image
-
-# API-based embeddings imports
-try:
-    from langchain_openai import OpenAIEmbeddings
-    OPENAI_AVAILABLE = True
-except ImportError:
-    OPENAI_AVAILABLE = False
-    print("Warning: langchain-openai not installed. Install with: pip install langchain-openai")
-
-# Fallback to local embeddings if API not available
-try:
-    from langchain_huggingface import HuggingFaceEmbeddings
-    LOCAL_EMBEDDINGS_AVAILABLE = True
-except ImportError:
-    LOCAL_EMBEDDINGS_AVAILABLE = False
-    print("Warning: langchain-huggingface not available")
-
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 
 # Configure logging to stderr ONLY
@@ -53,21 +37,13 @@ generation_id = str(uuid.uuid4())
 # Configuration
 OPENSCAD_EXECUTABLE = os.environ.get('OPENSCAD_EXECUTABLE', 'openscad')
 OUTPUT_DIR = os.environ.get('OPENSCAD_OUTPUT_DIR', 'scad_output')
-FAISS_INDEX_PATH = os.environ.get(
-    'FAISS_INDEX_PATH', 'faiss_index_api_v1')  # Updated default path
+FAISS_INDEX_PATH = os.environ.get('FAISS_INDEX_PATH', 'faiss_index')
 OPENSCAD_LIBRARY_PATH = os.environ.get(
     'OPENSCAD_USER_LIBRARY_PATH',
     str(Path.home() / "Documents" / "OpenSCAD" / "libraries")
 )
 
-# Embedding configuration
-EMBEDDING_PROVIDER = os.environ.get(
-    'EMBEDDING_PROVIDER', 'openai')  # 'openai', 'local', or 'auto'
-OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
-OPENAI_EMBEDDING_MODEL = os.environ.get(
-    'OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small')
-
-# Library configurations (same as before)
+# Library configurations
 AVAILABLE_LIBRARIES = {
     "BOSL": {
         "description": "Belfry OpenSCAD Library - tools, shapes, and helpers",
@@ -188,107 +164,24 @@ T(pitchcircle(z)*4)rotate(180){
 }
 
 
-class EmbeddingManager:
-    """Manages different embedding providers"""
-
-    @staticmethod
-    def create_openai_embeddings(api_key: str = None, model: str = "text-embedding-3-small"):
-        """Create OpenAI embeddings"""
-        if not OPENAI_AVAILABLE:
-            raise ImportError(
-                "OpenAI embeddings not available. Install: pip install langchain-openai")
-
-        if api_key:
-            os.environ["OPENAI_API_KEY"] = api_key
-
-        if not os.environ.get("OPENAI_API_KEY"):
-            raise ValueError(
-                "OpenAI API key not found. Set OPENAI_API_KEY environment variable.")
-
-        return OpenAIEmbeddings(
-            model=model,
-            show_progress_bar=False  # Disable for server usage
-        )
-
-    @staticmethod
-    def create_lightweight_local_embeddings():
-        """Create lightweight local embeddings as fallback"""
-        if not LOCAL_EMBEDDINGS_AVAILABLE:
-            raise ImportError(
-                "Local embeddings not available. Install: pip install sentence-transformers")
-
-        return HuggingFaceEmbeddings(
-            model_name="all-MiniLM-L6-v2",  # Small, fast model
-            model_kwargs={'device': 'cpu'},
-            encode_kwargs={'normalize_embeddings': True}
-        )
-
-    @staticmethod
-    def get_embeddings_model(provider: str = 'auto', api_key: str = None, model: str = None):
-        """Get the appropriate embeddings model"""
-
-        if provider == 'openai' or (provider == 'auto' and OPENAI_AVAILABLE and OPENAI_API_KEY):
-            try:
-                model_name = model or OPENAI_EMBEDDING_MODEL
-                logger.info(f"Using OpenAI embeddings: {model_name}")
-                return EmbeddingManager.create_openai_embeddings(api_key, model_name)
-            except Exception as e:
-                logger.warning(f"Failed to create OpenAI embeddings: {e}")
-                if provider == 'openai':  # If explicitly requested OpenAI, fail
-                    raise
-
-        if provider == 'local' or provider == 'auto':
-            try:
-                logger.info("Using lightweight local embeddings")
-                return EmbeddingManager.create_lightweight_local_embeddings()
-            except Exception as e:
-                logger.error(f"Failed to create local embeddings: {e}")
-                if provider == 'local':  # If explicitly requested local, fail
-                    raise
-
-        raise RuntimeError(f"No embeddings available for provider: {provider}")
-
-
 def init_knowledge_base():
-    """Initialize the knowledge base with API-based embeddings"""
+    """Initialize the knowledge base"""
     global db, retriever
     try:
         logger.info("Loading OpenSCAD knowledge base...")
-        logger.info(f"FAISS index path: {FAISS_INDEX_PATH}")
-        logger.info(f"Embedding provider: {EMBEDDING_PROVIDER}")
-
-        # Create embeddings model
-        embeddings = EmbeddingManager.get_embeddings_model(
-            provider=EMBEDDING_PROVIDER,
-            api_key=OPENAI_API_KEY,
-            model=OPENAI_EMBEDDING_MODEL
+        embeddings = HuggingFaceEmbeddings(
+            model_name="Salesforce/SFR-Embedding-2_R",
+            model_kwargs={'device': 'cpu'}
         )
-
-        # Load the FAISS index
-        if not Path(FAISS_INDEX_PATH).exists():
-            logger.error(f"FAISS index not found at: {FAISS_INDEX_PATH}")
-            logger.info(
-                "Please build the knowledge base first using the updated build_knowledge_base.py")
-            return
-
         db = FAISS.load_local(
             FAISS_INDEX_PATH,
             embeddings,
             allow_dangerous_deserialization=True
         )
-
-        # Increased k for better results
-        retriever = db.as_retriever(search_kwargs={'k': 5})
+        retriever = db.as_retriever(search_kwargs={'k': 3})
         logger.info("Knowledge base loaded successfully!")
-
-        # Test the retriever
-        test_results = retriever.invoke("OpenSCAD cube")
-        logger.info(
-            f"Knowledge base test successful - found {len(test_results)} results")
-
     except Exception as e:
         logger.warning(f"Knowledge base not loaded: {e}")
-        logger.info("The documentation search feature will not be available")
 
 
 def detect_available_libraries() -> Dict[str, Dict]:
@@ -322,56 +215,6 @@ def detect_available_libraries() -> Dict[str, Dict]:
 
 # Initialize available libraries
 INSTALLED_LIBRARIES = detect_available_libraries()
-
-# Tool: Search documentation
-
-
-@mcp.tool()
-def openscad_doc_search(query: str) -> str:
-    """
-    Search the OpenSCAD documentation for relevant information.
-    
-    Use this tool to find information about OpenSCAD commands, techniques,
-    best practices, and examples from the documentation.
-    
-    Args:
-        query: Search query (e.g., "how to create rounded corners", "boolean operations")
-    
-    Returns:
-        Relevant documentation snippets and examples
-    """
-    if not retriever:
-        return "Documentation search is not available. Knowledge base failed to load."
-
-    try:
-        # Search for relevant documents
-        results = retriever.invoke(query)
-
-        if not results:
-            return f"No relevant documentation found for: {query}"
-
-        # Format results
-        response = f"Found {len(results)} relevant documentation entries for '{query}':\n\n"
-
-        for i, doc in enumerate(results, 1):
-            content = doc.page_content.strip()
-            source = doc.metadata.get('filename', 'Unknown source')
-            file_type = doc.metadata.get('file_type', 'unknown')
-
-            # Truncate very long content
-            if len(content) > 500:
-                content = content[:500] + "..."
-
-            response += f"## Result {i} (from {source}, {file_type})\n"
-            response += f"{content}\n\n"
-            response += "-" * 50 + "\n\n"
-
-        return response
-
-    except Exception as e:
-        logger.error(f"Error during documentation search: {e}")
-        return f"Error searching documentation: {str(e)}"
-
 
 # Tool: List available libraries
 @mcp.tool()
@@ -426,7 +269,6 @@ def validate_camera_params(camera_str: str) -> str:
         raise ValueError(
             f"Invalid camera parameters: {camera_str}. Error: {e}")
 
-
 # Enhanced render tool that can auto-detect library usage
 @mcp.tool()
 def render_scad(code: str, iteration: int = 0, auto_fix_libraries: bool = True, camera: Optional[str] = None) -> Image:
@@ -473,7 +315,7 @@ def render_scad(code: str, iteration: int = 0, auto_fix_libraries: bool = True, 
             validated_camera = validate_camera_params(camera)
             cmd.extend(['--camera', validated_camera])
             logger.info(f"Using camera parameters: {validated_camera}")
-
+        
         result = subprocess.run(
             cmd,
             capture_output=True,
@@ -558,7 +400,6 @@ def fix_library_includes(code: str) -> str:
 
     return '\n'.join(fixed_lines)
 
-
 # Enhanced instructions resource that includes library info
 @mcp.resource("openscad://instructions")
 def get_instructions() -> str:
@@ -582,10 +423,8 @@ def get_instructions() -> str:
         library_section += f"No additional libraries found. Install libraries in: {OPENSCAD_LIBRARY_PATH}\n"
 
     library_section += "\nUse the `list_openscad_libraries()` tool for detailed library information.\n"
-    library_section += "\nUse the `openscad_doc_search()` tool to search documentation for specific topics.\n"
 
     return base_instructions + library_section
-
 
 # Resource for BOSL-specific examples
 @mcp.resource("openscad://examples/bosl")
@@ -603,22 +442,18 @@ def get_bosl_examples() -> str:
 
 def main():
     """Run the enhanced FastMCP server"""
-    logger.info(
-        "Starting Enhanced OpenSCAD FastMCP Server with API Embeddings...")
+    logger.info("Starting Enhanced OpenSCAD FastMCP Server...")
     logger.info(f"Output directory: {OUTPUT_DIR}")
     logger.info(f"Library path: {OPENSCAD_LIBRARY_PATH}")
-    logger.info(f"FAISS index path: {FAISS_INDEX_PATH}")
-    logger.info(f"Embedding provider: {EMBEDDING_PROVIDER}")
     logger.info(f"Found libraries: {list(INSTALLED_LIBRARIES.keys())}")
 
-    # Initialize knowledge base
     init_knowledge_base()
 
     logger.info("Available tools:")
-    logger.info(
-        "  - render_scad: Render OpenSCAD code with auto library detection")
+    logger.info("  - render_scad: Render with auto library detection")
     logger.info("  - list_openscad_libraries: List installed libraries")
-    logger.info("  - openscad_doc_search: Search documentation (API-powered)")
+    logger.info("  - openscad_doc_search: Search documentation")
+    logger.info("  - validate_scad: Syntax validation")
 
     mcp.run()
 

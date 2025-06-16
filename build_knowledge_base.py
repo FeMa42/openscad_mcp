@@ -13,7 +13,7 @@ from langchain.schema import Document
 
 # Define the paths
 DOCS_DIR = "openscad_documentation"
-DB_FAISS_PATH = "faiss_index"
+DB_FAISS_PATH = "faiss_index_v2"
 
 
 class CustomSCADLoader:

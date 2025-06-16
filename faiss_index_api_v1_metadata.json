@@ -1,0 +1,12 @@
+{
+  "total_chunks": 379,
+  "embedding_model": "openai",
+  "pdf_files": 2,
+  "md_files": 2,
+  "scad_files": 1,
+  "chunk_types": {
+    "code_aware": 68,
+    "markdown_aware": 14,
+    "generic_optimized": 297
+  }
+}

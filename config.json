@@ -10,7 +10,9 @@
                 "OPENSCAD_OUTPUT_DIR": "path/to/openscad_mcp/output",
                 "FAISS_INDEX_PATH": "path/to/openscad_mcp/faiss_index",
                 "OPENSCAD_EXECUTABLE": "path/to/openscad",
-                "OPENSCAD_USER_LIBRARY_PATH": "path/to/openscad/libraries"
+                "OPENSCAD_USER_LIBRARY_PATH": "path/to/openscad/libraries",
+                "EMBEDDING_PROVIDER": "local",
+                "OPENAI_EMBEDDING_MODEL": "text-embedding-3-small"
             }
         }
     }
