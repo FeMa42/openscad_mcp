@@ -1,6 +1,33 @@
-fast-mcp
-langchain-huggingface>=0.1.0
-langchain-community>=0.3.0
-faiss-cpu>=1.7.4
+# requirements.txt - Updated for comprehensive document processing
 pillow>=10.0.0
+fastmcp>=2.8.0
+
+# Core LangChain components (install in this order)
+langchain-core>=0.3.0
+langchain-community>=0.3.0
+
+# Text processing (separate package to avoid circular imports)
+langchain-text-splitters>=0.3.0
+
+# Modern document processing with comprehensive file type support
+langchain-unstructured>=0.1.0
+# unstructured[pdf]>=0.10.0  # Added: PDF processing support
+# Alternative for maximum file type support:
+unstructured[all-docs]>=0.10.0  # Uncomment for comprehensive document support
+
+# Embeddings options (choose one or both)
+langchain-openai>=0.2.0
+langchain-huggingface>=0.1.0
+
+# Vector stores and utilities
+faiss-cpu>=1.7.4
 sentence-transformers>=2.2.0
+
+# Additional utilities
+python-dotenv>=1.0.0
+tqdm>=4.65.0
+numpy>=1.24.0
+
+# PDF processing dependencies (if not using unstructured[pdf])
+# pypdf>=3.0.0
+# pdfplumber>=0.7.0
