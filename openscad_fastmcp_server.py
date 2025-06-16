@@ -59,6 +59,8 @@ OPENSCAD_LIBRARY_PATH = os.environ.get(
     'OPENSCAD_USER_LIBRARY_PATH',
     str(Path.home() / "Documents" / "OpenSCAD" / "libraries")
 )
+OPENSCAD_INFO_DIR = os.environ.get(
+    'OPENSCAD_INFO_DIR', 'openscad_info')
 
 # Embedding configuration
 EMBEDDING_PROVIDER = os.environ.get(
@@ -218,7 +220,7 @@ class EmbeddingManager:
                 "Local embeddings not available. Install: pip install sentence-transformers")
 
         return HuggingFaceEmbeddings(
-            model_name="all-MiniLM-L6-v2",  # Small, fast model
+            model_name="Salesforce/SFR-Embedding-2_R",  # BAAI/bge-base-en-v1.5
             model_kwargs={'device': 'cpu'},
             encode_kwargs={'normalize_embeddings': True}
         )
@@ -433,8 +435,10 @@ def render_scad(code: str, iteration: int = 0, auto_fix_libraries: bool = True, 
     """
     Render OpenSCAD code and return the rendered image.
     
-    Automatically detects library usage and adds proper include paths.
-    The code should include quality settings like $fa=1; $fs=0.4;
+    Can automatically detect library usage and helps to add proper include paths.
+    The code should follow the OpenSCAD best practices and include quality settings like $fa=1; $fs=0.4;
+    Check the `get_instructions()` tool for more information. Very useful 
+    for getting a good overview on how to use this MCP server.
     
     Args:
         code: The OpenSCAD code to render
@@ -461,6 +465,19 @@ def render_scad(code: str, iteration: int = 0, auto_fix_libraries: bool = True, 
         scad_file.write_text(code)
         logger.debug(f"Wrote SCAD file: {scad_file}")
 
+        # create stl file and check if it was created
+        stl_file = output_dir / "output.stl"
+        subprocess.run(
+            [OPENSCAD_EXECUTABLE, '-o', str(stl_file), str(scad_file)],
+            capture_output=True,
+            text=True,
+            timeout=60
+        )
+        if stl_file.exists():
+            logger.info(f"STL file created: {stl_file}")
+        else:
+            logger.error(f"STL file was not created: {stl_file}")
+        
         # Render with library path
         cmd = [
             OPENSCAD_EXECUTABLE,
@@ -480,7 +497,7 @@ def render_scad(code: str, iteration: int = 0, auto_fix_libraries: bool = True, 
             text=True,
             timeout=60
         )
-
+        
         if result.returncode != 0:
             error_msg = result.stderr if result.stderr else result.stdout
             logger.error(f"OpenSCAD rendering failed: {error_msg}")
@@ -560,10 +577,14 @@ def fix_library_includes(code: str) -> str:
 
 
 # Enhanced instructions resource that includes library info
-@mcp.resource("openscad://instructions")
+# @mcp.resource("openscad://instructions")
+@mcp.tool()
 def get_instructions() -> str:
-    """OpenSCAD best practices and guidelines with library information"""
-    instructions_path = Path("instructions.txt")
+    """OpenSCAD best practices and guidelines with library information.
+    Check the `get_instructions()` tool for more information. Very useful 
+    for getting a good overview on how to use this MCP server.
+    """
+    instructions_path = Path(OPENSCAD_INFO_DIR) / "instructions.txt"
     base_instructions = ""
 
     if instructions_path.exists():
@@ -588,17 +609,54 @@ def get_instructions() -> str:
 
 
 # Resource for BOSL-specific examples
-@mcp.resource("openscad://examples/bosl")
+# @mcp.resource("openscad://examples/bosl")
+@mcp.tool()
 def get_bosl_examples() -> str:
     """BOSL library examples"""
     if "BOSL" not in INSTALLED_LIBRARIES:
         return "BOSL library not installed. Install it in: " + OPENSCAD_LIBRARY_PATH
 
-    bosl_instructions_path = Path("bosl_instructions.txt")
+    bosl_instructions_path = Path(OPENSCAD_INFO_DIR) / "bosl_instructions.txt"
     if bosl_instructions_path.exists():
         return bosl_instructions_path.read_text()
     else:
         return "BOSL library not installed. Install it in: " + OPENSCAD_LIBRARY_PATH
+
+
+@mcp.tool()
+def get_gear_parameter() -> str:
+    """OpenSCAD Parameterizable Gears Library Reference and parameter examples for DIN gears"""
+
+    gears_library_path = Path(OPENSCAD_INFO_DIR) / "gears_library.txt"
+    if gears_library_path.exists():
+        text = ""
+        for line in gears_library_path.read_text().split("\n"):
+            if line.startswith("{"):
+                text += line + "\n"
+            else:
+                text += line + "\n"
+        return text
+    else:
+        return "Instructions for gears not found. Add it in: " + OPENSCAD_INFO_DIR + "/gears_library.txt"
+
+
+@mcp.tool()
+def get_gear_generation_instructions() -> str:
+    """Detailed instructions for gear generation."""
+
+    gears_instructions_path = Path(
+        OPENSCAD_INFO_DIR) / "gears_instructions.txt"
+    if gears_instructions_path.exists():
+        text = ""
+        for line in gears_instructions_path.read_text().split("\n"):
+            if line.startswith("{"):
+                text += line + "\n"
+            else:
+                text += line + "\n"
+        return text
+    else:
+        return "Instructions for gears not found. Add it in: " + OPENSCAD_INFO_DIR + "/gears_instructions.txt"
+
 
 
 def main():

@@ -197,6 +197,7 @@ class ModernDocumentProcessor:
         elif LOCAL_EMBEDDINGS_AVAILABLE:
             print("Using local embeddings")
             return HuggingFaceEmbeddings(
+                # "Salesforce/SFR-Embedding-Code-2B_R", # "Salesforce/SFR-Embedding-2_R",  # BAAI/bge-base-en-v1.5
                 model_name="BAAI/bge-base-en-v1.5",
                 model_kwargs={'device': 'cpu'},
                 encode_kwargs={'normalize_embeddings': True}
@@ -396,15 +397,23 @@ if __name__ == "__main__":
     )
 
     if vector_store:
-        # Test the vector store
+        # Test the vector store with better debugging
         print("\n🔍 TESTING VECTOR STORE")
         print("-" * 40)
         try:
             results = vector_store.similarity_search(
                 "OpenSCAD cube example", k=3)
             for i, doc in enumerate(results):
-                print(f"Result {i+1}: {doc.page_content[:100]}...")
+                content = doc.page_content.strip()
+                lines = content.split('\n')
+                first_line = next((line.strip() for line in lines if line.strip()), 'No content found')
+                
+                print(f"Result {i+1}:")
                 print(f"  Source: {doc.metadata.get('filename', 'unknown')}")
+                print(f"  Content type: {doc.metadata.get('content_type', 'unknown')}")
+                print(f"  Content length: {len(content)} characters")
+                print(f"  Content preview: {content[:200]}...")
+                print(f"  First non-empty line: {first_line}")
                 print()
         except Exception as e:
             print(f"Test failed: {e}")

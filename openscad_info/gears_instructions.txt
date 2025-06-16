@@ -1,0 +1,294 @@
+# OpenSCAD Gear Generation Agent Guide
+
+## Overview
+This guide helps OpenSCAD agents generate replacement gears using the MCP server with parameterizable_gears library. Follow this workflow to ask the right questions, gather proper measurements, and generate functional gears.
+
+## 🔧 Available Tools Quick Reference
+
+### Essential MCP Tools for Gear Generation
+```
+get_gear_parameter()      # Get gear parameter examples and DIN standards
+list_openscad_libraries() # Check if parameterizable_gears is available
+openscad_doc_search()     # Search for specific gear documentation
+render_scad()             # Render and visualize gear designs
+get_instructions()        # OpenSCAD best practices
+```
+
+## 📋 Gear Generation Workflow
+
+### Step 1: Initial Assessment
+**First, always call:**
+```
+get_gear_parameter()
+```
+This provides you with:
+- Complete gear library reference with all 12 gear types
+- DIN standard modules and pressure angles
+- OpenSCAD module names and parameters for each gear type
+- Working parameter examples for 3D printing
+- Application guidance and minimum teeth requirements
+- Gear ratio formulas and relationships
+
+### Step 2: User Information Gathering
+Ask these questions in **this exact order** for optimal results:
+
+#### Critical Measurements (Always Required)
+1. **"Can you tell me what type of gear you need to replace?"**
+   - Options: spur_gear (most common), herringbone_gear, rack, rack_and_pinion, annular_spur_gear, planetary_gear, bevel_gear, bevel_gears, worm, worm_drive
+   - If unsure, assume spur_gear (straight teeth)
+   - Refer to gear library reference for detailed descriptions
+
+2. **"How many teeth does your broken gear have?"**
+   - Count carefully, mark starting tooth with chalk
+   - This determines gear ratio and size
+
+3. **"What is the outside diameter of the gear in mm?"**
+   - Measure across the gear with calipers
+   - Most accurate measurement for determining module
+
+4. **"What is the thickness (face width) of the gear in mm?"**
+   - Axial length of the teeth
+   - Critical for strength calculations
+
+5. **"What is the center hole (bore) diameter in mm?"**
+   - Include any keyway or spline details
+   - Affects mounting requirements
+
+#### Application Context (Required for Proper Design)
+6. **"What is this gear used for?"** 
+   - Examples: toy mechanism, machine repair, prototype, functional part
+   - Determines load requirements and material selection
+
+7. **"What gear does it mesh with?"**
+   - Number of teeth on mating gear
+   - Helps verify compatibility
+
+8. **"Do you know the center distance between the gear centers?"**
+   - Used for verification calculations
+   - If unknown, can be calculated
+
+#### 3D Printing Specific
+9. **"What 3D printing material will you use?"**
+   - PLA: Good for prototypes, limited temperature
+   - PETG: Better durability
+   - Nylon: Best for functional gears
+   - ABS: Heat resistant option
+
+10. **"What is your printer's nozzle diameter?"**
+    - Usually 0.4mm, affects minimum feature sizes
+
+### Step 3: Parameter Calculation and Validation
+**Calculate key parameters:**
+```javascript
+// Module calculation (metric system)
+module = outside_diameter / (teeth + 2)
+
+// Validate against DIN 780 standard modules:
+// Fine: 0.05-0.16, Small: 0.2-0.6, Medium: 0.7-1.5, Large: 2-6, Heavy: 8-25, Extra: 32-60
+
+// Pitch diameter
+pitch_diameter = module * teeth
+
+// Center distance (for external gears)
+center_distance = module * (teeth1 + teeth2) / 2
+
+// Verify minimum teeth (avoid undercutting)
+min_teeth_20deg = 13
+min_teeth_25deg = 9  // Preferred for 3D printing
+min_teeth_14_5deg = 17
+
+// For planetary gears - critical relationship
+ring_teeth = sun_teeth + 2 * planet_teeth
+```
+
+### Step 4: Generate OpenSCAD Code
+**Use this template structure:**
+
+```openscad
+// Quality settings - ALWAYS include at top
+$fa = 1;
+$fs = 0.4;
+
+// Use parameterizable_gears library
+use <parameterizable_gears/gears.scad>
+
+// Parameters (calculated from user inputs)
+Module = [calculated_module];          // Tooth size
+teeth = [user_provided];              // Number of teeth  
+width = [user_provided];              // Face width
+bore = [user_provided];               // Center hole diameter
+pressure_angle = 25;                  // 25° preferred for 3D printing
+helix_angle = 0;                      // 0° for spur gears
+hub_diameter = [calculated];          // Usually bore + 4-6mm
+hub_thickness = [calculated];         // Usually width + 2-4mm
+optimized = false;                    // Start with solid design
+
+// Generate the gear
+stirnrad(
+    modul = Module,
+    zahnzahl = teeth,
+    breite = width,
+    bohrung = bore,
+    nabendicke = hub_thickness,
+    nabendurchmesser = hub_diameter,
+    eingriffswinkel = pressure_angle,
+    schraegungswinkel = helix_angle,
+    optimiert = optimized
+);
+```
+
+### Step 5: Render and Iterate
+1. **Call `render_scad()` with the generated code**
+2. **Examine the rendered result**
+3. **Ask user for feedback**: "Does this look correct? Any adjustments needed?"
+4. **Iterate based on feedback**
+
+## 🎯 Gear Type Specific Guidelines
+
+### Spur Gears (Most Common - 80% of applications)
+- Use `stirnrad()` function
+- Set `schraegungswinkel = 0` (helix angle)
+- Standard pressure angle: 20° or 25° (prefer 25° for 3D printing)
+- **Module call:** `stirnrad(modul, zahnzahl, breite, bohrung, nabendicke, nabendurchmesser, eingriffswinkel, schraegungswinkel, optimiert)`
+
+### Helical Gears (Smooth Operation)
+- Use `stirnrad()` function with helix angle
+- Set `schraegungswinkel` between 15-30°
+- Ask: "What is the helix angle of your gear?" (use roll-and-trace method)
+- Creates axial thrust - requires thrust bearings
+
+### Herringbone Gears (No Axial Thrust)
+- Use `pfeilrad()` function
+- Set `schraegungswinkel` between 15-30°
+- Eliminates axial thrust forces
+- More complex manufacturing - consider for high-power applications
+
+### Planetary Gears (High Reduction)
+- Use `planetengetriebe()` function
+- **Critical relationship:** Ring teeth = Sun teeth + 2 × Planet teeth
+- Ask for: sun teeth, planet teeth, number of planets (3-6 typical)
+- **Validation:** Verify (Ring + Sun) ÷ Planet_count = integer
+
+### Internal/Annular Gears
+- Use `hohlrad()` function for spur type
+- Use `pfeilhohlrad()` for herringbone type
+- Higher tooth count than mating external gear
+- Ask for rim width from root circle
+
+### Rack and Pinion
+- Use `zahnstange_und_rad()` function for complete system
+- Use `zahnstange()` for rack only
+- Ask for rack length and height
+- Module must match mating pinion exactly
+
+### Bevel Gears (Right-angle drives)
+- Use `kegelrad()` for single gear
+- Use `kegelradpaar()` for matched pair
+- Ask for: cone angle (typically 45° for 90° shafts), tooth width
+- Complex geometry - suggest professional manufacturing for critical applications
+
+### Worm Gears (High Reduction)
+- Use `schnecke()` for worm only
+- Use `schneckenradsatz()` for complete system
+- Ask for: lead angle (0.5-30°), number of worm starts (1-4)
+- **Reduction ratio:** Gear_teeth ÷ Worm_starts
+- Self-locking when lead angle < 5°
+
+## ⚠️ Critical Validation Checks
+
+### Before Generating Code:
+1. **Minimum teeth check**: Ensure teeth ≥ 9 for 25° pressure angle, ≥ 13 for 20°
+2. **Module reasonableness**: Typical range 0.5-5.0mm for most applications
+3. **Size validation**: Calculated outside diameter should match user measurement ±5%
+
+### After Rendering:
+1. **Visual inspection**: "Does the tooth shape look correct?"
+2. **Size verification**: "Does the size look right compared to your broken gear?"
+3. **Feature clarity**: "Are the teeth well-defined and not too small?"
+
+## 🔍 Troubleshooting Guide
+
+### Common Issues and Solutions:
+
+**"Teeth look too small/large"**
+- Recalculate module: `module = outside_diameter / (teeth + 2)`
+- Check if user counted teeth correctly
+
+**"Gear looks too thick/thin"**
+- Adjust `width` parameter
+- For thin gears, consider adding hub thickness for strength
+
+**"Center hole too small/large"**
+- Adjust `bore` parameter
+- Add 0.1-0.2mm clearance for 3D printing
+
+**"Library not found error"**
+- Call `list_openscad_libraries()` to verify installation
+- Check if parameterizable_gears is available
+
+**"Rendering fails"**
+- Check for syntax errors
+- Ensure all parameters are positive numbers
+- Verify library include statements
+
+## 📚 Knowledge Base Queries
+
+Use `openscad_doc_search()` for these common queries:
+- "gear module calculation"
+- "gear pressure angle selection" 
+- "3D printing gear design"
+- "parameterizable gears library"
+- "gear tooth undercutting"
+
+## 🎨 Design Optimization Tips
+
+### For 3D Printing Success:
+1. **Use 25° pressure angle** (stronger teeth)
+2. **Add chamfers** to tooth tips (0.2mm)
+3. **Orient flat on build bed** (teeth in XY plane)
+4. **Include 0.15mm clearance** for meshing gears
+5. **Consider material shrinkage** (especially for Nylon)
+
+### For Functional Applications:
+1. **Add hub thickness** for mounting strength
+2. **Use `optimized = true`** for lightening holes (larger gears)
+3. **Consider gear ratio** for mating gear compatibility
+4. **Include safety factor** (1.5-2.0x calculated loads)
+
+## 📋 Final Checklist
+
+Before delivering final gear design:
+- ✅ All user measurements incorporated
+- ✅ Module calculated correctly
+- ✅ Minimum teeth requirements met
+- ✅ Rendered successfully without errors
+- ✅ Visual inspection confirms proper tooth shape
+- ✅ User confirms size and appearance
+- ✅ 3D printing considerations addressed
+- ✅ Code includes quality settings ($fa, $fs)
+- ✅ Proper library includes/uses
+
+## 🚀 Example Interaction Flow
+
+```
+1. get_gears_examples()          # Load gear library info
+2. Ask user questions 1-10       # Gather requirements
+3. Calculate parameters          # Module, diameters, etc.
+4. Generate OpenSCAD code       # Using stirnrad() function
+5. render_scad(code)            # Visualize result
+6. Review with user             # Get feedback
+7. Iterate if needed            # Adjust parameters
+8. Provide final code           # Ready for printing
+```
+
+## 💡 Pro Tips
+
+- **Always start with `get_gears_examples()`** to understand available parameters
+- **Use 25° pressure angle** for 3D printed gears (stronger than 20°)
+- **Calculate module first** - it's the most critical parameter
+- **Verify gear ratio** by calculating center distance
+- **Add extra hub material** for mounting strength
+- **Test print small gears first** to verify printer capabilities
+- **Consider post-processing** for critical dimensions (bore reaming)
+
+This workflow ensures you ask the right questions, generate compatible gears, and deliver functional results for 3D printing applications.

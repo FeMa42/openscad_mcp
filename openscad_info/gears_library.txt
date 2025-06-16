@@ -1,0 +1,310 @@
+# OpenSCAD Parameterizable Gears Library Reference
+
+## Library Overview
+**Author:** Dr. Jörg Janssen  
+**Version:** 2.3 (October 29, 2018)  
+**License:** Creative Commons - Attribution, Non Commercial, Share Alike  
+**Usage:** `use <parameterizable_gears/gears.scad>`
+
+This library generates involute gears, worms, and racks according to DIN standards with full parametric control.
+
+## DIN Standard Modules (DIN 780)
+```
+Fine modules:    0.05, 0.06, 0.08, 0.10, 0.12, 0.16
+Small modules:   0.20, 0.25, 0.30, 0.40, 0.50, 0.60
+Medium modules:  0.70, 0.80, 0.90, 1.00, 1.25, 1.50
+Large modules:   2.00, 2.50, 3.00, 4.00, 5.00, 6.00
+Heavy modules:   8.00, 10.0, 12.0, 16.0, 20.0, 25.0
+Extra heavy:     32.0, 40.0, 50.0, 60.0
+```
+
+## Available Gear Types
+
+### 1. Spur Gear (stirnrad)
+**Type ID:** `"spur_gear"`  
+**Module:** `stirnrad(modul, zahnzahl, breite, bohrung, nabendicke, nabendurchmesser, eingriffswinkel, schraegungswinkel, optimiert)`
+
+**Description:** Standard external gear with straight teeth parallel to the axis. Most common gear type.
+
+**Key Parameters:**
+- `modul`: Module (tooth size) - determines gear size
+- `zahnzahl`: Number of teeth
+- `breite`: Face width (axial length)
+- `bohrung`: Bore diameter
+- `nabendicke`: Hub thickness (optional, default 0)
+- `nabendurchmesser`: Hub diameter (optional, default 0)
+- `eingriffswinkel`: Pressure angle (default 20°, recommend 25° for 3D printing)
+- `schraegungswinkel`: Helix angle (0° for spur, non-zero for helical)
+- `optimiert`: Weight optimization holes (true/false)
+
+**Example Parameters:**
+```json
+{
+  "Module": 0.5,
+  "teeth": 30,
+  "width": 1.5,
+  "bore": 1.9,
+  "hub_diameter": 5.85,
+  "hub_thickness": 3.12,
+  "pressure_angle": 20,
+  "optimized": false
+}
+```
+
+**Applications:** General power transmission, timing systems, simple gear trains
+
+---
+
+### 2. Herringbone Gear (pfeilrad)
+**Type ID:** `"herringbone_gear"`  
+**Module:** `pfeilrad(modul, zahnzahl, breite, bohrung, nabendicke, nabendurchmesser, eingriffswinkel, schraegungswinkel, optimiert)`
+
+**Description:** Gear with V-shaped teeth (double helical) that eliminates axial thrust forces.
+
+**Key Parameters:** Same as spur gear, but:
+- `schraegungswinkel`: Helix angle (typically 15-30°)
+- `breite`: Total width (divided into two halves)
+
+**Applications:** High-power transmission, eliminates axial forces, automotive differentials
+
+---
+
+### 3. Rack (zahnstange)
+**Type ID:** `"rack"`  
+**Module:** `zahnstange(modul, laenge, hoehe, breite, eingriffswinkel, schraegungswinkel)`
+
+**Description:** Linear gear with teeth on a straight bar for converting rotary to linear motion.
+
+**Key Parameters:**
+- `modul`: Module (must match mating pinion)
+- `laenge`: Length of rack
+- `hoehe`: Height from pitch line to base
+- `breite`: Width (depth) of teeth
+- `eingriffswinkel`: Pressure angle (default 20°)
+- `schraegungswinkel`: Helix angle for helical racks
+
+**Example Parameters:**
+```json
+{
+  "Module": 0.5,
+  "rack_length": 50,
+  "rack_height": 4,
+  "width": 5,
+  "pressure_angle": 20
+}
+```
+
+**Applications:** Linear actuators, CNC machines, steering systems
+
+---
+
+### 4. Rack and Pinion (zahnstange_und_rad)
+**Type ID:** `"rack_and_pinion"`  
+**Module:** `zahnstange_und_rad(modul, laenge_stange, zahnzahl_rad, hoehe_stange, bohrung_rad, breite, nabendicke, nabendurchmesser, eingriffswinkel, schraegungswinkel, zusammen_gebaut, optimiert)`
+
+**Description:** Complete rack and pinion system with properly meshed components.
+
+**Key Parameters:**
+- Combines rack and spur gear parameters
+- `zusammen_gebaut`: Assembly mode (true = meshed, false = separated for printing)
+
+**Applications:** Steering systems, linear motion conversion, positioning systems
+
+---
+
+### 5. Internal/Annular Spur Gear (hohlrad)
+**Type ID:** `"annular_spur_gear"`  
+**Module:** `hohlrad(modul, zahnzahl, breite, randbreite, eingriffswinkel, schraegungswinkel)`
+
+**Description:** Gear with teeth on the inside circumference, meshes with external gears.
+
+**Key Parameters:**
+- `randbreite`: Rim width from root circle outward
+- Higher tooth count than mating external gear
+
+**Applications:** Planetary systems, compact gear trains, speed reducers
+
+---
+
+### 6. Internal Herringbone Gear (pfeilhohlrad)
+**Type ID:** `"annular_herringbone_gear"`  
+**Module:** `pfeilhohlrad(modul, zahnzahl, breite, randbreite, eingriffswinkel, schraegungswinkel)`
+
+**Description:** Internal gear with herringbone teeth pattern.
+
+**Applications:** High-power planetary systems, heavy machinery
+
+---
+
+### 7. Planetary Gear System (planetengetriebe)
+**Type ID:** `"planetary_gear"`  
+**Module:** `planetengetriebe(modul, zahnzahl_sonne, zahnzahl_planet, anzahl_planeten, breite, randbreite, bohrung, eingriffswinkel, schraegungswinkel, zusammen_gebaut, optimiert)`
+
+**Description:** Complete planetary gear system with sun, planet, and ring gears.
+
+**Key Parameters:**
+- `zahnzahl_sonne`: Sun gear teeth
+- `zahnzahl_planet`: Planet gear teeth  
+- `anzahl_planeten`: Number of planet gears (0 = auto-calculate)
+- **Critical relationship:** Ring teeth = Sun teeth + 2 × Planet teeth
+
+**Example Parameters:**
+```json
+{
+  "Module": 0.5,
+  "solar_teeth": 20,
+  "planet_teeth": 10,
+  "number_of_planets": 3,
+  "width": 5,
+  "rim_width": 3,
+  "assembled": true
+}
+```
+
+**Gear Ratios:**
+- Fixed ring: `i = 1 + Ring_teeth/Sun_teeth`
+- Fixed sun: `i = (Ring_teeth + Sun_teeth)/Ring_teeth`
+
+**Applications:** High reduction ratios, compact transmissions, automotive
+
+---
+
+### 8. Bevel Gear (kegelrad)
+**Type ID:** `"bevel_gear"`  
+**Module:** `kegelrad(modul, zahnzahl, teilkegelwinkel, zahnbreite, bohrung, eingriffswinkel, schraegungswinkel)`
+
+**Description:** Conical gear for transmitting power between intersecting shafts.
+
+**Key Parameters:**
+- `teilkegelwinkel`: Pitch cone angle (typically 45° for 90° shaft angle)
+- `zahnbreite`: Tooth width from large end toward apex
+
+**Applications:** Right-angle drives, differentials, hand drills
+
+---
+
+### 9. Bevel Gear Pair (kegelradpaar)
+**Type ID:** `"bevel_gears"`  
+**Module:** `kegelradpaar(modul, zahnzahl_rad, zahnzahl_ritzel, achsenwinkel, zahnbreite, bohrung_rad, bohrung_ritzel, eingriffswinkel, schraegungswinkel, zusammen_gebaut)`
+
+**Description:** Matched pair of bevel gears with calculated cone angles.
+
+**Key Parameters:**
+- `achsenwinkel`: Shaft angle (default 90°)
+- `zahnzahl_rad`: Large gear teeth
+- `zahnzahl_ritzel`: Small gear (pinion) teeth
+
+**Applications:** Right-angle gear boxes, automotive differentials
+
+---
+
+### 10. Herringbone Bevel Gear (pfeilkegelrad)
+**Type ID:** `"herringbone_bevel_gear"`  
+**Module:** `pfeilkegelrad(modul, zahnzahl, teilkegelwinkel, zahnbreite, bohrung, eingriffswinkel, schraegungswinkel)`
+
+**Description:** Bevel gear with herringbone tooth pattern for smoother operation.
+
+**Applications:** High-speed bevel applications, marine drives
+
+---
+
+### 11. Worm (schnecke)
+**Type ID:** `"worm"`  
+**Module:** `schnecke(modul, gangzahl, laenge, bohrung, eingriffswinkel, steigungswinkel, zusammen_gebaut)`
+
+**Description:** Helical screw that meshes with worm wheel for high reduction ratios.
+
+**Key Parameters:**
+- `gangzahl`: Number of starts (threads) - typically 1-4
+- `steigungswinkel`: Lead angle (0.5° to 30°)
+- `laenge`: Worm length
+
+**Example Parameters:**
+```json
+{
+  "Module": 0.5,
+  "worm_starts": 1,
+  "lead_angle": 5,
+  "worm_length": 6,
+  "worm_bore": 1.9
+}
+```
+
+**Applications:** High reduction ratios (10:1 to 300:1), self-locking mechanisms
+
+---
+
+### 12. Worm Drive System (schneckenradsatz)
+**Type ID:** `"worm_drive"`  
+**Module:** `schneckenradsatz(modul, zahnzahl, gangzahl, breite, laenge, bohrung_schnecke, bohrung_rad, nabendurchmesser, nabendicke, eingriffswinkel, steigungswinkel, optimiert, zusammen_gebaut)`
+
+**Description:** Complete worm and worm wheel system.
+
+**Key Parameters:**
+- Combines worm and gear parameters
+- `zahnzahl`: Worm wheel teeth
+- `gangzahl`: Worm starts
+
+**Reduction Ratio:** `i = zahnzahl / gangzahl`
+
+**Applications:** High reduction gearboxes, lifting mechanisms, tuning machines
+
+---
+
+## Standard Parameter Ranges
+
+### Module Selection by Application
+- **Precision instruments:** 0.2 - 0.5mm
+- **Small mechanisms:** 0.5 - 1.0mm  
+- **General machinery:** 1.0 - 3.0mm
+- **Heavy machinery:** 3.0 - 8.0mm
+- **Large industrial:** 8.0+ mm
+
+### Pressure Angles (DIN 867)
+- **14.5°:** Legacy systems, smoother operation
+- **20°:** Standard industrial, balanced performance
+- **25°:** High strength, preferred for 3D printing
+
+### Minimum Teeth (Avoid Undercutting)
+- **20° pressure angle:** 13 teeth minimum
+- **25° pressure angle:** 9 teeth minimum
+- **14.5° pressure angle:** 17 teeth minimum
+
+### 3D Printing Recommendations
+- **Pressure angle:** 25° (stronger teeth)
+- **Module range:** 0.5 - 2.0mm typical
+- **Clearance:** Add 0.15mm for meshing gears
+- **Orientation:** Flat on bed (teeth in XY plane)
+- **Materials:** Nylon > PETG > PLA > ABS
+
+## Quick Reference: Function Mapping
+
+| Gear Type | OpenSCAD Module | Primary Use |
+|-----------|----------------|-------------|
+| Spur | `stirnrad()` | Parallel shafts |
+| Helical | `stirnrad()` + helix_angle | Smooth parallel shafts |
+| Herringbone | `pfeilrad()` | No axial thrust |
+| Rack | `zahnstange()` | Linear motion |
+| Rack & Pinion | `zahnstange_und_rad()` | Rotary to linear |
+| Internal | `hohlrad()` | Compact gear trains |
+| Planetary | `planetengetriebe()` | High reduction |
+| Bevel | `kegelrad()` | Intersecting shafts |
+| Worm | `schnecke()` | High reduction, locking |
+
+## Agent Processing Notes
+
+### Critical Validations
+1. **Planetary gears:** Verify Ring = Sun + 2×Planet relationship
+2. **Minimum teeth:** Check against pressure angle requirements  
+3. **Module compatibility:** All meshing gears must have same module
+4. **Center distance:** Calculate and verify for gear pairs
+
+### Parameter Priority Order
+1. **Module** (determines size)
+2. **Tooth count** (determines ratio)
+3. **Face width** (determines strength)
+4. **Bore diameter** (determines mounting)
+5. **Pressure angle** (determines strength/smoothness)
+
+### Common Parameter Sets (from gears.txt)
+Available as reference examples for typical configurations with proven parameters for 3D printing applications.

@@ -8,6 +8,7 @@
             "env": {
                 "PYTHONUNBUFFERED": "1",
                 "OPENSCAD_OUTPUT_DIR": "path/to/openscad_mcp/output",
+                "OPENSCAD_INFO_DIR": "path/to/openscad_mcp/openscad_info",
                 "FAISS_INDEX_PATH": "path/to/openscad_mcp/faiss_index",
                 "OPENSCAD_EXECUTABLE": "path/to/openscad",
                 "OPENSCAD_USER_LIBRARY_PATH": "path/to/openscad/libraries",
