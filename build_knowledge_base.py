@@ -1,212 +1,419 @@
 import os
-import glob
+import time
+import json
 from pathlib import Path
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_community.document_loaders import (
-    PyPDFLoader, 
-    TextLoader,
-    DirectoryLoader
-)
+from typing import List, Dict, Any, Optional
+
+# Use separate imports to avoid circular dependencies
+from langchain_community.document_loaders import DirectoryLoader, UnstructuredFileLoader
 from langchain_community.vectorstores import FAISS
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain.schema import Document
+from langchain_core.documents import Document
 
-# Define the paths
-DOCS_DIR = "openscad_documentation"
-DB_FAISS_PATH = "faiss_index_v2"
+# Import text splitters separately
+try:
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+    TEXT_SPLITTERS_AVAILABLE = True
+except ImportError:
+    # Fallback to older import if new package has issues
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    TEXT_SPLITTERS_AVAILABLE = True
+
+# Embeddings imports
+try:
+    from langchain_openai import OpenAIEmbeddings
+    OPENAI_AVAILABLE = True
+except ImportError:
+    OPENAI_AVAILABLE = False
+
+try:
+    from langchain_huggingface import HuggingFaceEmbeddings
+    LOCAL_EMBEDDINGS_AVAILABLE = True
+except ImportError:
+    LOCAL_EMBEDDINGS_AVAILABLE = False
+
+# Configuration
+DOCS_DIR = "openscad_test_documents"
+DB_FAISS_PATH = "faiss_index_modern"
 
 
-class CustomSCADLoader:
-    """Custom loader for OpenSCAD (.scad) files"""
-    
-    def __init__(self, file_path: str):
-        self.file_path = file_path
-    
-    def load(self):
+class ModernDocumentProcessor:
+    """
+    Modern LangChain-based document processor using best practices.
+    Uses UnstructuredLoader for automatic file type detection and processing.
+    """
+
+    def __init__(self,
+                 chunk_size: int = 1000,
+                 chunk_overlap: int = 150,
+                 use_unstructured: bool = True):
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+        self.use_unstructured = use_unstructured
+
+        # Initialize text splitter
+        self.text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+            length_function=len,
+            separators=["\n\n", "\n", " ", ""]
+        )
+
+    def load_documents_from_directory(self, directory_path: str) -> List[Document]:
+        """
+        Load documents using the modern DirectoryLoader approach.
+        This automatically handles multiple file types.
+        """
+        print(f"Loading documents from: {directory_path}")
+
+        if self.use_unstructured:
+            # Use UnstructuredFileLoader as the default loader
+            # This automatically detects and handles different file types
+            loader = DirectoryLoader(
+                directory_path,
+                glob="**/*",  # Load all files
+                # Exclude JSON files that cause NDJSON errors
+                exclude=["**/*.json", "**/*.jsonl", "**/*.ndjson"],
+                loader_cls=UnstructuredFileLoader,
+                loader_kwargs={
+                    "mode": "elements",  # Split into semantic elements
+                    "strategy": "fast"   # Use fast processing
+                },
+                recursive=True,
+                show_progress=True,
+                use_multithreading=True,
+                max_concurrency=4, 
+                silent_errors=True  # Continue processing even if some files fail
+            )
+        else:
+            # Fallback to basic approach
+            loader = DirectoryLoader(
+                directory_path,
+                glob="**/*",
+                recursive=True,
+                show_progress=True
+            )
+
         try:
-            with open(self.file_path, 'r', encoding='utf-8') as file:
-                content = file.read()
-            
-            # Create metadata for the document
-            metadata = {
-                'source': self.file_path,
-                'file_type': 'scad',
-                'filename': os.path.basename(self.file_path)
-            }
-            
-            return [Document(page_content=content, metadata=metadata)]
+            documents = loader.load()
+            print(f"Successfully loaded {len(documents)} documents")
+            return documents
         except Exception as e:
-            print(f"Error loading {self.file_path}: {e}")
+            print(f"Error loading documents: {e}")
             return []
 
+    def enhance_metadata(self, documents: List[Document]) -> List[Document]:
+        """
+        Enhance document metadata for better retrieval.
+        """
+        enhanced_docs = []
 
-def get_all_files_recursively(base_dir: str):
-    """
-    Recursively find all relevant files in the documentation directory
-    Returns lists of files by type
-    """
-    pdf_files = []
-    md_files = []
-    scad_files = []
-    
-    # Walk through all directories recursively
-    for root, dirs, files in os.walk(base_dir):
-        # Skip hidden directories and files
-        dirs[:] = [d for d in dirs if not d.startswith('.')]
-        
-        for file in files:
-            if file.startswith('.'):
-                continue
-                
-            file_path = os.path.join(root, file)
-            file_ext = os.path.splitext(file)[1].lower()
-            
-            if file_ext == '.pdf':
-                pdf_files.append(file_path)
-            elif file_ext == '.md':
-                md_files.append(file_path)
-            elif file_ext == '.scad':
-                scad_files.append(file_path)
-    
-    return pdf_files, md_files, scad_files
+        for doc in documents:
+            # Extract file information
+            source = doc.metadata.get('source', '')
+            file_path = Path(source)
+
+            # Add enhanced metadata
+            doc.metadata.update({
+                'filename': file_path.name,
+                'file_extension': file_path.suffix.lower(),
+                'file_size': len(doc.page_content),
+                'word_count': len(doc.page_content.split()),
+                'line_count': len(doc.page_content.split('\n'))
+            })
+
+            # Add content type classification
+            if file_path.suffix.lower() in {'.scad', '.py', '.js', '.cpp', '.c'}:
+                doc.metadata['content_type'] = 'code'
+            elif file_path.suffix.lower() in {'.md', '.markdown', '.txt'}:
+                doc.metadata['content_type'] = 'documentation'
+            elif file_path.suffix.lower() == '.pdf':
+                doc.metadata['content_type'] = 'pdf'
+            else:
+                doc.metadata['content_type'] = 'other'
+
+            enhanced_docs.append(doc)
+
+        return enhanced_docs
+
+    def apply_smart_chunking(self, documents: List[Document]) -> List[Document]:
+        """
+        Apply intelligent chunking based on content type.
+        """
+        all_chunks = []
+
+        # Group documents by content type for optimized processing
+        content_groups = {}
+        for doc in documents:
+            content_type = doc.metadata.get('content_type', 'other')
+            if content_type not in content_groups:
+                content_groups[content_type] = []
+            content_groups[content_type].append(doc)
+
+        # Process each group with optimized settings
+        for content_type, docs in content_groups.items():
+            print(f"Processing {len(docs)} {content_type} documents...")
+
+            if content_type == 'code':
+                # Larger chunks for code to preserve function integrity
+                splitter = RecursiveCharacterTextSplitter(
+                    chunk_size=1500,
+                    chunk_overlap=200,
+                    separators=["\n\nmodule ",
+                                "\n\nfunction ", "\n\n", "\n", " ", ""]
+                )
+            elif content_type == 'documentation':
+                # Standard chunking for documentation
+                splitter = RecursiveCharacterTextSplitter(
+                    chunk_size=800,
+                    chunk_overlap=100,
+                    separators=["\n\n", "\n", ". ", " ", ""]
+                )
+            else:
+                # Default chunking
+                splitter = self.text_splitter
+
+            chunks = splitter.split_documents(docs)
+
+            # Add chunk metadata
+            for i, chunk in enumerate(chunks):
+                chunk.metadata['chunk_id'] = f"{content_type}_{i}"
+                chunk.metadata['chunk_size'] = len(chunk.page_content)
+                chunk.metadata['processing_method'] = 'smart_chunking'
+
+            all_chunks.extend(chunks)
+
+        return all_chunks
+
+    def get_embedding_model(self, use_openai: bool = False, openai_api_key: str = None):
+        """
+        Get the best available embedding model.
+        """
+        if use_openai and OPENAI_AVAILABLE and openai_api_key:
+            print("Using OpenAI embeddings")
+            return OpenAIEmbeddings(
+                model="text-embedding-3-small",
+                api_key=openai_api_key
+            )
+        elif LOCAL_EMBEDDINGS_AVAILABLE:
+            print("Using local embeddings")
+            return HuggingFaceEmbeddings(
+                # "Salesforce/SFR-Embedding-Code-2B_R", # "Salesforce/SFR-Embedding-2_R",  # BAAI/bge-base-en-v1.5
+                model_name="BAAI/bge-base-en-v1.5",
+                model_kwargs={'device': 'cpu'},
+                encode_kwargs={'normalize_embeddings': True}
+            )
+        else:
+            raise RuntimeError("No embedding models available")
 
 
-def load_documents_by_type(pdf_files, md_files, scad_files):
+class BatchVectorStoreBuilder:
     """
-    Load documents from different file types
+    Build vector store in batches to handle large datasets efficiently.
     """
-    all_docs = []
-    
-    # Load PDF files
-    print(f"Loading {len(pdf_files)} PDF files...")
-    for pdf_file in pdf_files:
-        try:
-            loader = PyPDFLoader(pdf_file)
-            docs = loader.load()
-            # Add file type to metadata
-            for doc in docs:
-                doc.metadata['file_type'] = 'pdf'
-                doc.metadata['filename'] = os.path.basename(pdf_file)
-            all_docs.extend(docs)
-            print(f"  ✓ Loaded: {pdf_file}")
-        except Exception as e:
-            print(f"  ✗ Error loading {pdf_file}: {e}")
-    
-    # Load Markdown files
-    print(f"Loading {len(md_files)} Markdown files...")
-    for md_file in md_files:
-        try:
-            loader = TextLoader(md_file, encoding='utf-8')
-            docs = loader.load()
-            # Add file type to metadata
-            for doc in docs:
-                doc.metadata['file_type'] = 'markdown'
-                doc.metadata['filename'] = os.path.basename(md_file)
-            all_docs.extend(docs)
-            print(f"  ✓ Loaded: {md_file}")
-        except Exception as e:
-            print(f"  ✗ Error loading {md_file}: {e}")
-    
-    # Load SCAD files
-    print(f"Loading {len(scad_files)} SCAD files...")
-    for scad_file in scad_files:
-        try:
-            loader = CustomSCADLoader(scad_file)
-            docs = loader.load()
-            all_docs.extend(docs)
-            print(f"  ✓ Loaded: {scad_file}")
-        except Exception as e:
-            print(f"  ✗ Error loading {scad_file}: {e}")
-    
-    return all_docs
+
+    def __init__(self, batch_size: int = 100, delay: float = 0.5):
+        self.batch_size = batch_size
+        self.delay = delay
+
+    def build_vector_store(self,
+                           chunks: List[Document],
+                           embeddings_model,
+                           save_path: str) -> FAISS:
+        """
+        Build vector store with batch processing and error handling.
+        """
+        print(f"Building vector store with {len(chunks)} chunks...")
+
+        vector_store = None
+        processed_count = 0
+
+        # Process in batches
+        for i in range(0, len(chunks), self.batch_size):
+            batch = chunks[i:i + self.batch_size]
+            batch_num = i // self.batch_size + 1
+            total_batches = (len(chunks) + self.batch_size -
+                             1) // self.batch_size
+
+            print(
+                f"Processing batch {batch_num}/{total_batches} ({len(batch)} chunks)")
+
+            try:
+                if vector_store is None:
+                    vector_store = FAISS.from_documents(
+                        batch, embeddings_model)
+                else:
+                    batch_store = FAISS.from_documents(batch, embeddings_model)
+                    vector_store.merge_from(batch_store)
+
+                processed_count += len(batch)
+                print(f"  ✓ Processed {processed_count}/{len(chunks)} chunks")
+
+                # Small delay to prevent overwhelming the embedding service
+                if self.delay > 0:
+                    time.sleep(self.delay)
+
+            except Exception as e:
+                print(f"  ✗ Error processing batch {batch_num}: {e}")
+                # Try processing individual documents in this batch
+                for doc in batch:
+                    try:
+                        if vector_store is None:
+                            vector_store = FAISS.from_documents(
+                                [doc], embeddings_model)
+                        else:
+                            single_store = FAISS.from_documents(
+                                [doc], embeddings_model)
+                            vector_store.merge_from(single_store)
+                        processed_count += 1
+                    except Exception as doc_error:
+                        print(
+                            f"    ✗ Skipping problematic document: {doc_error}")
+
+        # Save the vector store
+        print(f"Saving vector store to: {save_path}")
+        vector_store.save_local(save_path)
+
+        return vector_store
 
 
-def create_vector_db():
+def create_modern_knowledge_base(docs_dir: str = DOCS_DIR,
+                                 output_path: str = DB_FAISS_PATH,
+                                 use_openai: bool = False,
+                                 openai_api_key: str = None):
     """
-    Creates a comprehensive vector database from all OpenSCAD documentation,
-    including PDFs, Markdown files, and SCAD code examples.
+    Create a modern knowledge base using current LangChain best practices.
     """
-    print("=" * 60)
-    print("Building Comprehensive OpenSCAD Knowledge Base v2")
-    print("=" * 60)
-    
-    # Check if documentation directory exists
-    if not os.path.exists(DOCS_DIR):
-        print(f"Error: Documentation directory '{DOCS_DIR}' not found!")
-        return
-    
-    print(f"Scanning directory: {DOCS_DIR}")
-    
-    # Get all files recursively
-    pdf_files, md_files, scad_files = get_all_files_recursively(DOCS_DIR)
-    
-    print(f"\nFound files:")
-    print(f"  - PDF files: {len(pdf_files)}")
-    print(f"  - Markdown files: {len(md_files)}")
-    print(f"  - SCAD files: {len(scad_files)}")
-    print(f"  - Total files: {len(pdf_files) + len(md_files) + len(scad_files)}")
-    
-    if not any([pdf_files, md_files, scad_files]):
-        print("No relevant files found!")
-        return
-    
-    print("\n" + "=" * 60)
-    print("LOADING DOCUMENTS")
-    print("=" * 60)
-    
-    # Load all documents
-    all_docs = load_documents_by_type(pdf_files, md_files, scad_files)
-    
-    if not all_docs:
-        print("No documents were successfully loaded!")
-        return
-    
-    print(f"\nSuccessfully loaded {len(all_docs)} document chunks")
-    
-    print("\n" + "=" * 60)
-    print("SPLITTING DOCUMENTS")
-    print("=" * 60)
-    
-    # Split documents into chunks
-    # Use different chunk sizes for different file types
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000, 
+    print("=" * 80)
+    print("MODERN LANGCHAIN KNOWLEDGE BASE BUILDER")
+    print("=" * 80)
+
+    if not os.path.exists(docs_dir):
+        print(f"Error: Documentation directory '{docs_dir}' not found!")
+        return None
+
+    # Initialize processor
+    processor = ModernDocumentProcessor(
+        chunk_size=1000,
         chunk_overlap=150,
-        separators=["\n\n", "\n", " ", ""]
+        use_unstructured=True
     )
-    
-    splits = text_splitter.split_documents(all_docs)
-    print(f"Created {len(splits)} text chunks")
-    
-    print("\n" + "=" * 60)
-    print("CREATING EMBEDDINGS AND BUILDING INDEX")
-    print("=" * 60)
-    
-    # Create embeddings using a high-quality model
-    print("Initializing embeddings model...")
-    embeddings = HuggingFaceEmbeddings(
-        model_name="Salesforce/SFR-Embedding-2_R",  # BAAI/bge-base-en-v1.5
-        model_kwargs={'device': 'mps'}
+
+    # Step 1: Load documents
+    print("\n📂 LOADING DOCUMENTS")
+    print("-" * 40)
+    documents = processor.load_documents_from_directory(docs_dir)
+
+    if not documents:
+        print("No documents loaded!")
+        return None
+
+    # Step 2: Enhance metadata
+    print("\n🏷️  ENHANCING METADATA")
+    print("-" * 40)
+    documents = processor.enhance_metadata(documents)
+
+    # Step 3: Apply smart chunking
+    print("\n✂️  APPLYING SMART CHUNKING")
+    print("-" * 40)
+    chunks = processor.apply_smart_chunking(documents)
+
+    print(f"Created {len(chunks)} chunks from {len(documents)} documents")
+
+    # Step 4: Analyze chunks
+    print("\n📊 CHUNK ANALYSIS")
+    print("-" * 40)
+    content_types = {}
+    total_size = 0
+
+    for chunk in chunks:
+        content_type = chunk.metadata.get('content_type', 'unknown')
+        content_types[content_type] = content_types.get(content_type, 0) + 1
+        total_size += len(chunk.page_content)
+
+    print(f"Content types: {content_types}")
+    print(f"Average chunk size: {total_size / len(chunks):.1f} characters")
+
+    # Step 5: Initialize embeddings
+    print("\n🧠 INITIALIZING EMBEDDINGS")
+    print("-" * 40)
+    try:
+        embeddings = processor.get_embedding_model(use_openai, openai_api_key)
+    except Exception as e:
+        print(f"Failed to initialize embeddings: {e}")
+        return None
+
+    # Step 6: Build vector store
+    print("\n🔗 BUILDING VECTOR STORE")
+    print("-" * 40)
+    builder = BatchVectorStoreBuilder(
+        batch_size=50 if use_openai else 100,
+        delay=0.5 if use_openai else 0.1
     )
-    
-    print("Building FAISS vector store...")
-    # Create the vector store from the document chunks
-    db = FAISS.from_documents(splits, embeddings)
-    
-    # Save the vector store locally
-    print(f"Saving to '{DB_FAISS_PATH}'...")
-    db.save_local(DB_FAISS_PATH)
-    
-    print("\n" + "=" * 60)
-    print("KNOWLEDGE BASE CREATION COMPLETE!")
-    print("=" * 60)
-    print(f"✓ Processed {len(pdf_files)} PDF files")
-    print(f"✓ Processed {len(md_files)} Markdown files") 
-    print(f"✓ Processed {len(scad_files)} SCAD files")
-    print(f"✓ Created {len(splits)} searchable chunks")
-    print(f"✓ Saved vector database to '{DB_FAISS_PATH}'")
-    print("\nYour OpenSCAD agent can now search through all this documentation!")
+
+    try:
+        vector_store = builder.build_vector_store(
+            chunks, embeddings, output_path)
+    except Exception as e:
+        print(f"Failed to build vector store: {e}")
+        return None
+
+    # Step 7: Save metadata
+    metadata = {
+        'total_documents': len(documents),
+        'total_chunks': len(chunks),
+        'content_types': content_types,
+        'chunk_size': processor.chunk_size,
+        'chunk_overlap': processor.chunk_overlap,
+        'embedding_model': 'openai' if use_openai else 'local',
+        'created_at': time.strftime('%Y-%m-%d %H:%M:%S')
+    }
+
+    metadata_file = f"{output_path}_metadata.json"
+    with open(metadata_file, 'w') as f:
+        json.dump(metadata, f, indent=2)
+
+    print("\n" + "=" * 80)
+    print("✅ SUCCESS!")
+    print("=" * 80)
+    print(f"📁 Vector database: {output_path}")
+    print(f"📋 Metadata: {metadata_file}")
+    print(f"📊 Documents: {len(documents)} → {len(chunks)} chunks")
+    print(f"🏷️  Content types: {list(content_types.keys())}")
+
+    return vector_store
 
 
 if __name__ == "__main__":
-    create_vector_db() 
+    # Configuration
+    USE_OPENAI = False  # Set to True to use OpenAI embeddings
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+    # Create the knowledge base
+    vector_store = create_modern_knowledge_base(
+        docs_dir=DOCS_DIR,
+        output_path=DB_FAISS_PATH,
+        use_openai=USE_OPENAI,
+        openai_api_key=OPENAI_API_KEY
+    )
+
+    if vector_store:
+        # Test the vector store with better debugging
+        print("\n🔍 TESTING VECTOR STORE")
+        print("-" * 40)
+        try:
+            results = vector_store.similarity_search(
+                "OpenSCAD cube example", k=3)
+            for i, doc in enumerate(results):
+                content = doc.page_content.strip()
+                lines = content.split('\n')
+                first_line = next((line.strip() for line in lines if line.strip()), 'No content found')
+                
+                print(f"Result {i+1}:")
+                print(f"  Source: {doc.metadata.get('filename', 'unknown')}")
+                print(f"  Content type: {doc.metadata.get('content_type', 'unknown')}")
+                print(f"  Content length: {len(content)} characters")
+                print(f"  Content preview: {content[:200]}...")
+                print(f"  First non-empty line: {first_line}")
+                print()
+        except Exception as e:
+            print(f"Test failed: {e}")

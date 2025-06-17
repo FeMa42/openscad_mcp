@@ -221,7 +221,7 @@ class EmbeddingManager:
 
         return HuggingFaceEmbeddings(
             model_name="Salesforce/SFR-Embedding-2_R",  # BAAI/bge-base-en-v1.5
-            model_kwargs={'device': 'cpu'},
+            model_kwargs={'device': 'mps'},
             encode_kwargs={'normalize_embeddings': True}
         )
 

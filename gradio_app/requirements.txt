@@ -1,0 +1,12 @@
+# Core dependencies for LangGraph MCP OpenSCAD Chat
+gradio>=4.0.0
+langgraph>=0.2.0
+langchain-mcp-adapters>=0.1.0
+langchain-openai>=0.2.0
+langchain-anthropic>=0.2.0  # Optional: for Claude models
+mcp>=1.0.0
+pillow>=10.0.0
+
+# Optional but recommended
+python-dotenv>=1.0.0  # For .env file support
+langsmith>=0.1.0  # For tracing and debugging
