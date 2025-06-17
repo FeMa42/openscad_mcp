@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Minimal OpenSCAD Chat using LangGraph + MCP with Persistent Session
-Shows proper session management to avoid server restarts
+Shows proper session management to avoid server restarts with improved conversation history management
 """
 
 import gradio as gr
@@ -21,7 +21,7 @@ import json
 import re
 
 class PersistentMCPOpenSCADChat:
-    """OpenSCAD chat assistant with persistent MCP session management"""
+    """OpenSCAD chat assistant with persistent MCP session management and proper conversation history"""
     
     def __init__(self, model="gpt-4o"):
         self.model = model
@@ -29,12 +29,13 @@ class PersistentMCPOpenSCADChat:
         self.current_image = None
         self.current_code = None
         self.conversation_history = []
+        self.system_prompt = None  # Store system prompt separately
         self.client = None
         self.session_context = None
         self.session = None
         
     async def initialize(self):
-        """Initialize with persistent MCP session"""
+        """Initialize with persistent MCP session and proper system prompt setup"""
         # Load MCP server configuration
         with open('config.json') as f:
             config = json.load(f)
@@ -55,20 +56,40 @@ class PersistentMCPOpenSCADChat:
         tools = await load_mcp_tools(self.session)
         print(f"🔧 Loaded {len(tools)} tools with persistent session: {[tool.name for tool in tools]}")
         
-        # Load instructions
+        # Load instructions and store as system prompt
         try:
-            instructions = Path("instructions.txt").read_text()
+            self.system_prompt = Path("instructions.txt").read_text()
         except FileNotFoundError:
-            instructions = "You are a helpful OpenSCAD design assistant. Help users create 3D objects using OpenSCAD code."
+            self.system_prompt = "You are a helpful OpenSCAD design assistant. Help users create 3D objects using OpenSCAD code."
         
         # Create LLM
         llm = ChatOpenAI(model=self.model, temperature=0.7)
         
-        # Create agent with persistent session tools
+        # Create agent with system prompt - use prompt parameter with function
+        def _add_system_prompt(state):
+            """Add system prompt to the conversation"""
+            messages = state.get("messages", [])
+            # If no system message exists as first message, add it
+            if not messages or not isinstance(messages[0], SystemMessage):
+                return [SystemMessage(content=self.system_prompt)] + messages
+            return messages
+        
         self.agent = create_react_agent(
-            llm, tools, prompt=SystemMessage(content=instructions))
+            llm, 
+            tools, 
+            prompt=_add_system_prompt  # This properly handles system prompt in conversation
+        )
 
-        return "✅ Ready with persistent MCP session! Server will not restart on tool calls."
+        # Initialize conversation history with system message
+        self._initialize_conversation_history()
+
+        return "✅ Ready with persistent MCP session and proper conversation history! Server will not restart on tool calls."
+    
+    def _initialize_conversation_history(self):
+        """Initialize conversation history with system message"""
+        self.conversation_history = [
+            SystemMessage(content=self.system_prompt)
+        ]
     
     async def cleanup(self):
         """Properly clean up the persistent session"""
@@ -80,8 +101,8 @@ class PersistentMCPOpenSCADChat:
                 print(f"❌ Error cleaning up session: {e}")
     
     def reset_conversation(self):
-        """Reset the conversation history"""
-        self.conversation_history = []
+        """Reset the conversation history but keep system prompt"""
+        self._initialize_conversation_history()
         self.current_image = None
         self.current_code = None
     
@@ -130,8 +151,16 @@ class PersistentMCPOpenSCADChat:
             print(f"Error creating fresh image copy: {e}")
             return None
     
+    def _get_conversation_messages(self):
+        """Get properly formatted conversation messages for the agent"""
+        # Always ensure system message is first
+        if not self.conversation_history or not isinstance(self.conversation_history[0], SystemMessage):
+            self._initialize_conversation_history()
+            
+        return self.conversation_history.copy()
+    
     async def chat(self, message: str, history: List):
-        """Process chat message with persistent session"""
+        """Process chat message with persistent session and proper history management"""
         if not self.agent:
             # If already in history, just update the response
             if history and history[-1][0] == message and history[-1][1] is None:
@@ -151,15 +180,18 @@ class PersistentMCPOpenSCADChat:
             history = history + [[message, "🤔 Thinking... (using persistent session)"]]
         
         try:
-            # Add to conversation history
+            # Add user message to conversation history
             self.conversation_history.append(HumanMessage(content=message))
             
-            # Invoke agent (tools will use persistent session)
+            # Get properly formatted messages for the agent
+            agent_messages = self._get_conversation_messages()
+            
+            # Invoke agent with proper message history
             response = await self.agent.ainvoke({
-                "messages": self.conversation_history
+                "messages": agent_messages
             })
             
-            # Extract AI response
+            # Extract AI response from the response messages
             latest_ai_message = None
             for msg in reversed(response["messages"]):
                 if isinstance(msg, AIMessage):
@@ -168,6 +200,7 @@ class PersistentMCPOpenSCADChat:
             
             if latest_ai_message:
                 ai_content = latest_ai_message.content
+                # Add AI response to conversation history
                 self.conversation_history.append(AIMessage(content=ai_content))
                 history[-1][1] = ai_content
             else:
@@ -215,14 +248,16 @@ class PersistentMCPOpenSCADChat:
             except Exception as e:
                 print(f"Failed to load MCP Image object: {e}")
         
-        # 2. Handle fastmcp Image objects specifically
-        if MCP_IMAGE_AVAILABLE and isinstance(content, MCPImage):
-            try:
+        # 2. Handle fastmcp Image objects specifically (if available)
+        try:
+            from fastmcp import Image as MCPImage
+            if isinstance(content, MCPImage):
                 self.current_image = self._create_fresh_image_copy(content.data)
                 if self.current_image:
                     print("✅ Loaded fastmcp Image object")
                     return True
-            except Exception as e:
+        except (ImportError, Exception) as e:
+            if not isinstance(e, ImportError):
                 print(f"Failed to load fastmcp Image object: {e}")
         
         # 3. Handle string content (base64 formats)
@@ -355,15 +390,18 @@ def create_app():
                 # Clear previous image to ensure fresh updates
                 chat_assistant._clear_current_image()
                 
-                # Add to conversation history
+                # Add user message to conversation history
                 chat_assistant.conversation_history.append(HumanMessage(content=message))
                 
-                # Invoke agent (tools will use persistent session)
+                # Get properly formatted messages for the agent
+                agent_messages = chat_assistant._get_conversation_messages()
+                
+                # Invoke agent with proper message history
                 response = await chat_assistant.agent.ainvoke({
-                    "messages": chat_assistant.conversation_history
+                    "messages": agent_messages
                 })
                 
-                # Extract AI response
+                # Extract AI response from the response messages
                 latest_ai_message = None
                 for msg in reversed(response["messages"]):
                     if isinstance(msg, AIMessage):
@@ -372,6 +410,7 @@ def create_app():
                 
                 if latest_ai_message:
                     ai_content = latest_ai_message.content
+                    # Add AI response to conversation history
                     chat_assistant.conversation_history.append(AIMessage(content=ai_content))
                     updated_history[-1][1] = ai_content
                 else:
