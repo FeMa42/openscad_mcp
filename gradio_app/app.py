@@ -56,6 +56,9 @@ class PersistentMCPOpenSCADChat:
         tools = await load_mcp_tools(self.session)
         print(f"🔧 Loaded {len(tools)} tools with persistent session: {[tool.name for tool in tools]}")
         
+        # Store reference to session for direct access if needed
+        self.mcp_session = self.session
+        
         # Load instructions and store as system prompt
         try:
             self.system_prompt = Path("instructions.txt").read_text()
@@ -237,9 +240,26 @@ class PersistentMCPOpenSCADChat:
         
         print(f"🔍 Processing potential image content: {type(content)}")
         
-        # 1. Handle MCP Image objects directly (most common success case)
+        # 1. Handle MCP CallToolResult with ImageContent list (new MCP format)
+        if isinstance(content, list) and len(content) > 0:
+            first_item = content[0]
+            print(f"🔍 List content, first item type: {type(first_item)}")
+            if hasattr(first_item, 'type') and first_item.type == 'image' and hasattr(first_item, 'data'):
+                try:
+                    print(f"🔍 ImageContent found: data type={type(first_item.data)}")
+                    # The data is base64 string, need to decode it
+                    img_data = base64.b64decode(first_item.data)
+                    self.current_image = self._create_fresh_image_copy(img_data)
+                    if self.current_image:
+                        print("✅ Loaded image from ImageContent")
+                        return True
+                except Exception as e:
+                    print(f"Failed to load ImageContent: {e}")
+        
+        # 2. Handle MCP Image objects directly (older format)
         if hasattr(content, 'data') and hasattr(content, 'format'):
             try:
+                print(f"🔍 MCP Image object found: data type={type(content.data)}, format={content.format}")
                 if isinstance(content.data, bytes):
                     self.current_image = self._create_fresh_image_copy(content.data)
                     if self.current_image:
@@ -248,10 +268,12 @@ class PersistentMCPOpenSCADChat:
             except Exception as e:
                 print(f"Failed to load MCP Image object: {e}")
         
-        # 2. Handle fastmcp Image objects specifically (if available)
+        # 3. Handle fastmcp Image objects specifically (if available)
         try:
             from fastmcp import Image as MCPImage
+            print(f"🔍 Checking if content is MCPImage: {isinstance(content, MCPImage)}")
             if isinstance(content, MCPImage):
+                print(f"🔍 FastMCP Image object found: data type={type(content.data)}")
                 self.current_image = self._create_fresh_image_copy(content.data)
                 if self.current_image:
                     print("✅ Loaded fastmcp Image object")
@@ -259,11 +281,63 @@ class PersistentMCPOpenSCADChat:
         except (ImportError, Exception) as e:
             if not isinstance(e, ImportError):
                 print(f"Failed to load fastmcp Image object: {e}")
+            else:
+                print("FastMCP not available")
         
-        # 3. Handle string content (base64 formats)
+        # 3. Handle string content (base64 formats or serialized objects)
         if isinstance(content, str):
+            print(f"🔍 String content length: {len(content)}")
+            print(f"🔍 String starts with: {content[:100]}...")
+            # Extended debugging to see the actual string format
+            if len(content) > 200:
+                print(f"🔍 String middle sample: ...{content[100:300]}...")
+            if len(content) > 500:
+                print(f"🔍 String end sample: ...{content[-200:]}...")
+            
+            # Check if it's a stringified ImageContent list (LangGraph serialization)
+            if "ImageContent(" in content:
+                print("🔍 Detected stringified ImageContent")
+                import re
+                # Try different patterns for base64 data extraction
+                patterns = [
+                    r"data='([^']+)'",           # data='base64...'
+                    r'data="([^"]+)"',           # data="base64..."
+                    r"data=([A-Za-z0-9+/=]+)",   # data=base64... (no quotes)
+                ]
+                
+                for pattern in patterns:
+                    base64_match = re.search(pattern, content)
+                    if base64_match:
+                        try:
+                            img_data = base64.b64decode(base64_match.group(1))
+                            self.current_image = self._create_fresh_image_copy(img_data)
+                            if self.current_image:
+                                print(f"✅ Loaded image from stringified ImageContent (pattern: {pattern})")
+                                return True
+                        except Exception as e:
+                            print(f"Failed to decode with pattern {pattern}: {e}")
+                            continue
+            
+            # Check if it's a serialized Image object representation
+            elif "Image(" in content and "data=" in content:
+                print("🔍 Detected serialized Image object in string")
+                # This is likely a string representation of an Image object
+                # Try to extract base64 data if it's embedded
+                import re
+                base64_match = re.search(r'data=b\'([^\']+)\'', content)
+                if base64_match:
+                    try:
+                        # This might be base64 encoded bytes
+                        img_data = base64.b64decode(base64_match.group(1))
+                        self.current_image = self._create_fresh_image_copy(img_data)
+                        if self.current_image:
+                            print("✅ Loaded image from serialized Image object")
+                            return True
+                    except Exception as e:
+                        print(f"Failed to decode serialized Image data: {e}")
+            
             # Data URL format
-            if content.startswith("data:image"):
+            elif content.startswith("data:image"):
                 try:
                     header, data = content.split(",", 1)
                     img_data = base64.b64decode(data)
@@ -284,6 +358,52 @@ class PersistentMCPOpenSCADChat:
                         return True
                 except Exception as e:
                     print(f"Failed to decode raw base64: {e}")
+            
+            # Fallback: Look for any large base64-like strings in the content
+            else:
+                print("🔍 Searching for base64 content in string...")
+                import re
+                
+                # Try multiple base64 patterns
+                patterns = [
+                    r'(iVBORw0KGgo[A-Za-z0-9+/=]{200,})',  # PNG signature
+                    r'([A-Za-z0-9+/=]{500,})',             # Any long base64
+                    r'data[\'"]:\s*[\'"]([A-Za-z0-9+/=]+)', # data: field
+                ]
+                
+                for i, pattern in enumerate(patterns):
+                    match = re.search(pattern, content)
+                    if match:
+                        try:
+                            base64_data = match.group(1)
+                            print(f"🔍 Found base64 match with pattern {i}, length: {len(base64_data)}")
+                            img_data = base64.b64decode(base64_data)
+                            self.current_image = self._create_fresh_image_copy(img_data)
+                            if self.current_image:
+                                print(f"✅ Loaded image from base64 pattern {i}")
+                                return True
+                        except Exception as e:
+                            print(f"Failed to decode base64 pattern {i}: {e}")
+                            continue
+                
+                print(f"🔍 No base64 patterns found in string of length {len(content)}")
+                
+                # Last resort: try to evaluate if it looks like a Python representation
+                if "ImageContent(" in content or "[ImageContent(" in content:
+                    print("🔍 Attempting to parse ImageContent representation...")
+                    try:
+                        # This is dangerous but as a last resort for debugging
+                        import ast
+                        # Look for base64 data in quotes
+                        base64_match = re.search(r"data='([A-Za-z0-9+/=]{100,})'", content)
+                        if base64_match:
+                            img_data = base64.b64decode(base64_match.group(1))
+                            self.current_image = self._create_fresh_image_copy(img_data)
+                            if self.current_image:
+                                print("✅ Loaded image from ImageContent representation")
+                                return True
+                    except Exception as e:
+                        print(f"Failed to parse ImageContent representation: {e}")
         
         # 4. Handle dict content (serialized MCP Image)
         elif isinstance(content, dict):
@@ -309,20 +429,38 @@ class PersistentMCPOpenSCADChat:
 
     def _extract_outputs(self, messages):
         """Extract images and code from tool responses"""
-        for msg in messages:
+        print(f"🔍 _extract_outputs: Processing {len(messages)} messages")
+        for i, msg in enumerate(messages):
+            print(f"🔍 Message {i}: type={type(msg).__name__}, hasattr tool_calls={hasattr(msg, 'tool_calls')}, hasattr name={hasattr(msg, 'name')}")
+            
             # Check for tool calls (to get code)
             if hasattr(msg, "tool_calls"):
                 for tool_call in msg.tool_calls:
                     if tool_call["name"] == "render_scad":
                         self.current_code = tool_call["args"].get("code", "")
+                        print(f"✅ Extracted code from tool call")
                         
             # Check tool responses for images
             if hasattr(msg, "name") and msg.name == "render_scad":
                 content = msg.content
+                print(f"🔍 Found render_scad response with content: {type(content)}")
                 
                 # Try to process image content, fallback if no image found
                 if not self._process_image_content(content) and self.current_image is None:
+                    print("⚠️ Image processing failed, loading fallback")
                     self._load_fallback_image()
+                else:
+                    print("✅ Image processing succeeded or image already loaded")
+            
+            # NEW: Check for any message with tool response content 
+            if hasattr(msg, "content") and isinstance(msg.content, str) and len(msg.content) > 1000:
+                # This might be a tool response that wasn't caught by the name check
+                print(f"🔍 Found large content message: {type(msg).__name__}, content length: {len(msg.content)}")
+                if "Image(" in msg.content or "ImageContent(" in msg.content or msg.content.startswith("iVBOR"):
+                    print("🔍 Large message contains potential image data")
+                    if not self.current_image:  # Only try if we don't already have an image
+                        if self._process_image_content(msg.content):
+                            print("✅ Successfully extracted image from large content message")
     
     def _load_fallback_image(self):
         """Load most recent image file as fallback"""
@@ -401,6 +539,10 @@ def create_app():
                     "messages": agent_messages
                 })
                 
+                # Debug: Check agent response structure
+                print(f"🔍 Agent response keys: {response.keys()}")
+                print(f"🔍 Response messages count: {len(response.get('messages', []))}")
+                
                 # Extract AI response from the response messages
                 latest_ai_message = None
                 for msg in reversed(response["messages"]):
@@ -418,6 +560,48 @@ def create_app():
                 
                 # Extract images and code from tool responses
                 chat_assistant._extract_outputs(response["messages"])
+                
+                # PRIMARY: For render_scad calls, always try direct MCP access first since LangGraph serializes responses
+                if chat_assistant.current_code:  # Try direct MCP call whenever we have code, regardless of current_image
+                    print("🔄 Attempting direct MCP tool call for image...")
+                    try:
+                        # Call render_scad directly through MCP
+                        direct_result = await chat_assistant.mcp_session.call_tool(
+                            "render_scad", 
+                            arguments={"code": chat_assistant.current_code}
+                        )
+                        print(f"🔍 Direct MCP result type: {type(direct_result)}")
+                        
+                        # Process the direct MCP result (this should be the raw FastMCP Image object)
+                        if hasattr(direct_result, 'content') and direct_result.content:
+                            content = direct_result.content
+                            print(f"🔍 Direct MCP content type: {type(content)}")
+                            
+                            # The direct result should be a list with ImageContent
+                            if isinstance(content, list) and len(content) > 0:
+                                first_item = content[0]
+                                if hasattr(first_item, 'data') and hasattr(first_item, 'type'):
+                                    print(f"✅ Found ImageContent with {len(first_item.data)} bytes")
+                                    try:
+                                        img_data = base64.b64decode(first_item.data)
+                                        chat_assistant.current_image = chat_assistant._create_fresh_image_copy(img_data)
+                                        if chat_assistant.current_image:
+                                            print("✅ Successfully processed image from direct MCP call")
+                                        else:
+                                            print("❌ Failed to create image from direct MCP call")
+                                    except Exception as decode_e:
+                                        print(f"❌ Failed to decode image from direct MCP call: {decode_e}")
+                                else:
+                                    print(f"❌ Direct MCP content first item missing data/type: {type(first_item)}")
+                            else:
+                                print(f"❌ Direct MCP content not a list or empty: {type(content)}")
+                        else:
+                            print(f"❌ Direct MCP result missing content: {hasattr(direct_result, 'content')}")
+                        
+                    except Exception as e:
+                        print(f"❌ Direct MCP call failed: {e}")
+                        import traceback
+                        traceback.print_exc()
                 
                 return "", updated_history, chat_assistant.current_image, chat_assistant.current_code
                 
@@ -455,7 +639,7 @@ def create_app():
                 "Make a gear with 20 teeth", 
                 "Create a parametric box with a separate lid",
                 "Build a box with hinged lid",
-                "Create a spiral vase"
+                "Create a spiral"
             ],
             inputs=msg
         )
