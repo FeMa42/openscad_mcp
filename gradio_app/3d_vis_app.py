@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Enhanced OpenSCAD Chat with 3D STL Visualization and Measurement Extraction
-Combines existing functionality with native Gradio Model3D component
+Enhanced OpenSCAD Chat with Smart Camera Positioning and Auto-Rotation
+Includes automatic camera adjustment and turntable rotation for optimal viewing
 """
 
 import gradio as gr
@@ -11,6 +11,7 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
 from langgraph.prebuilt import create_react_agent
 from langchain_openai import ChatOpenAI
+from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_core.tools import BaseTool
 import base64
@@ -21,6 +22,8 @@ import json
 import re
 import tempfile
 import os
+import math
+import argparse
 
 # 3D processing imports
 try:
@@ -36,6 +39,86 @@ try:
 except ImportError:
     OPEN3D_AVAILABLE = False
     print("⚠️ Open3D not available. Install with: pip install open3d")
+
+
+class SmartCameraCalculator:
+    """Calculate optimal camera positioning based on 3D object properties"""
+
+    @staticmethod
+    def calculate_optimal_camera_position(measurements: Dict[str, Any]) -> List[float]:
+        """Calculate optimal camera position based on object dimensions"""
+        if not measurements.get('available', False):
+            # Default camera position for unknown objects
+            return [200, 200, 200]
+
+        dims = measurements['dimensions']
+        bbox = measurements['bounding_box']
+
+        # Get the maximum dimension to determine camera distance
+        max_dim = max(dims['length'], dims['width'], dims['height'])
+
+        # Calculate optimal distance (typically 2-4x the max dimension)
+        optimal_distance = max_dim * 3.5
+
+        # Ensure minimum distance for very small objects
+        optimal_distance = max(optimal_distance, 50)
+
+        # Position camera at 45-degree angles for good visibility
+        # Slightly elevated to show top details
+        angle_h = 45  # horizontal angle (degrees)
+        angle_v = 30  # vertical angle (degrees)
+
+        # Convert to radians
+        angle_h_rad = math.radians(angle_h)
+        angle_v_rad = math.radians(angle_v)
+
+        # Calculate camera position
+        x = optimal_distance * math.cos(angle_v_rad) * math.cos(angle_h_rad)
+        y = optimal_distance * math.cos(angle_v_rad) * math.sin(angle_h_rad)
+        z = optimal_distance * math.sin(angle_v_rad)
+
+        # Adjust based on object center
+        center = bbox.get('center', [0, 0, 0])
+        camera_pos = [
+            x + center[0],
+            y + center[1],
+            z + center[2]
+        ]
+
+        print(f"📸 Calculated optimal camera position: {camera_pos}")
+        print(f"📐 Object dimensions: {dims}")
+        print(
+            f"📏 Max dimension: {max_dim:.2f}mm, Distance: {optimal_distance:.2f}mm")
+
+        return camera_pos
+
+    @staticmethod
+    def get_camera_presets(measurements: Dict[str, Any]) -> Dict[str, List[float]]:
+        """Get multiple camera preset positions for different views"""
+        if not measurements.get('available', False):
+            return {
+                "isometric": [200, 200, 200],
+                "front": [300, 0, 0],
+                "side": [0, 300, 0],
+                "top": [0, 0, 300]
+            }
+
+        dims = measurements['dimensions']
+        center = measurements['bounding_box'].get('center', [0, 0, 0])
+        max_dim = max(dims['length'], dims['width'], dims['height'])
+        distance = max(max_dim * 3.5, 100)
+
+        return {
+            "isometric": [
+                distance * 0.7 + center[0],
+                distance * 0.7 + center[1],
+                distance * 0.5 + center[2]
+            ],
+            "front": [distance + center[0], center[1], center[2]],
+            "side": [center[0], distance + center[1], center[2]],
+            "top": [center[0], center[1], distance + center[2]],
+            "bottom": [center[0], center[1], -distance + center[2]]
+        }
 
 
 class STLProcessor:
@@ -166,13 +249,18 @@ class STLProcessor:
 - Faces: {props['face_count']:,}
 - Vertices: {props['vertex_count']:,}
 - Watertight: {'✅' if props['is_watertight'] else '❌'}
+
+**Camera Info:**
+- Optimal viewing distance: {max(dims['length'], dims['width'], dims['height']) * 3.5:.1f} mm
+- Object center: ({props.get('center_of_mass', [0,0,0])[0]:.1f}, {props.get('center_of_mass', [0,0,0])[1]:.1f}, {props.get('center_of_mass', [0,0,0])[2]:.1f})
 """
 
         return summary
 
 
+
 class Enhanced3DOpenSCADChat:
-    """Enhanced OpenSCAD chat with 3D visualization and measurements"""
+    """Enhanced OpenSCAD chat with smart camera and auto-rotation"""
 
     def __init__(self, model="gpt-4o"):
         self.model = model
@@ -181,12 +269,68 @@ class Enhanced3DOpenSCADChat:
         self.current_code = None
         self.current_3d_model = None
         self.current_measurements = {}
+        self.current_camera_position = [200, 200, 200]
         self.conversation_history = []
         self.system_prompt = None
         self.client = None
         self.session_context = None
         self.session = None
         self.stl_processor = STLProcessor()
+        self.camera_calculator = SmartCameraCalculator()
+        
+        # Supported models configuration
+        self.supported_models = {
+            # OpenAI models
+            "gpt-4o": {"provider": "openai", "model": "gpt-4o", "display": "GPT-4o"},
+            "gpt-4o-mini": {"provider": "openai", "model": "gpt-4o-mini", "display": "GPT-4o Mini"},
+            "gpt-4-turbo": {"provider": "openai", "model": "gpt-4-turbo", "display": "GPT-4 Turbo"},
+            
+            # Anthropic Claude 4 models (latest)
+            "claude-4-sonnet": {"provider": "anthropic", "model": "claude-sonnet-4-20250514", "display": "Claude 4 Sonnet"},
+            "claude-4-opus": {"provider": "anthropic", "model": "claude-opus-4-20250514", "display": "Claude 4 Opus"},
+        }
+
+    def _create_llm(self):
+        """Create the appropriate LLM based on the selected model"""
+        # Get model configuration
+        if self.model in self.supported_models:
+            model_config = self.supported_models[self.model]
+            provider = model_config["provider"]
+            model_name = model_config["model"]
+        else:
+            # Default to OpenAI if model not recognized
+            print(f"⚠️ Model '{self.model}' not recognized, defaulting to gpt-4o")
+            provider = "openai"
+            model_name = "gpt-4o"
+
+        # Create LLM based on provider
+        if provider == "anthropic":
+            print(f"🤖 Initializing Claude model: {model_name}")
+            return ChatAnthropic(
+                model=model_name,
+                # temperature=0.7,
+                max_tokens=4096
+            )
+        else:  # OpenAI
+            print(f"🤖 Initializing OpenAI model: {model_name}")
+            return ChatOpenAI(
+                model=model_name,
+                #temperature=0.7
+            )
+    
+    def get_available_models(self):
+        """Get list of available models for UI selection"""
+        return [(config["display"], key) for key, config in self.supported_models.items()]
+    
+    def change_model(self, new_model):
+        """Change the model and reinitialize the agent"""
+        if new_model != self.model and new_model in self.supported_models:
+            print(f"🔄 Switching from {self.model} to {new_model}")
+            self.model = new_model
+            # Will need to reinitialize agent on next use
+            self.agent = None
+            return f"✅ Switched to {self.supported_models[new_model]['display']}"
+        return f"⚠️ Model {new_model} not available or already selected"
 
     async def initialize(self):
         """Initialize with persistent MCP session and proper system prompt setup"""
@@ -220,8 +364,8 @@ class Enhanced3DOpenSCADChat:
         except FileNotFoundError:
             self.system_prompt = "You are a helpful OpenSCAD design assistant. Help users create 3D objects using OpenSCAD code."
 
-        # Create LLM
-        llm = ChatOpenAI(model=self.model, temperature=0.7)
+        # Create LLM based on model selection
+        llm = self._create_llm()
 
         # Create agent with system prompt
         def _add_system_prompt(state):
@@ -240,7 +384,7 @@ class Enhanced3DOpenSCADChat:
         # Initialize conversation history with system message
         self._initialize_conversation_history()
 
-        return "✅ Ready with 3D visualization and measurement extraction!"
+        return "✅ Ready with smart camera positioning and auto-rotation!"
 
     def _initialize_conversation_history(self):
         """Initialize conversation history with system message"""
@@ -264,6 +408,7 @@ class Enhanced3DOpenSCADChat:
         self.current_code = None
         self.current_3d_model = None
         self.current_measurements = {}
+        self.current_camera_position = [200, 200, 200]
 
     def _clear_current_outputs(self):
         """Clear current outputs to ensure fresh updates"""
@@ -306,7 +451,7 @@ class Enhanced3DOpenSCADChat:
             return None
 
     def _process_3d_output(self):
-        """Process 3D output files (STL) and generate optimized models"""
+        """Process 3D output files (STL) and generate optimized models with smart camera"""
         # Common output directories to check
         output_dirs = [
             "../output",  # Your current output directory
@@ -321,18 +466,24 @@ class Enhanced3DOpenSCADChat:
         if latest_stl:
             print(f"🎯 Processing 3D model: {latest_stl}")
 
+            # Extract measurements first
+            measurements = self.stl_processor.extract_measurements(latest_stl)
+
+            # Calculate optimal camera position
+            optimal_camera = self.camera_calculator.calculate_optimal_camera_position(
+                measurements)
+            self.current_camera_position = optimal_camera
+
             # Convert STL to GLB for better web performance
             optimized_model = self.stl_processor.convert_stl_to_glb(
                 latest_stl, optimize=True)
-
-            # Extract measurements
-            measurements = self.stl_processor.extract_measurements(latest_stl)
 
             self.current_3d_model = str(
                 optimized_model) if optimized_model else None
             self.current_measurements = measurements
 
             print(f"✅ 3D model processed: {self.current_3d_model}")
+            print(f"📸 Camera positioned at: {self.current_camera_position}")
             return True
 
         print("⚠️ No STL files found")
@@ -340,8 +491,6 @@ class Enhanced3DOpenSCADChat:
 
     def _process_image_content(self, content) -> bool:
         """Process various image content formats and set self.current_image"""
-        # [Keep your existing image processing logic here - it's working well]
-
         # Early exit for obviously non-image content
         if not content:
             return False
@@ -368,8 +517,6 @@ class Enhanced3DOpenSCADChat:
                         return True
                 except Exception as e:
                     print(f"Failed to load ImageContent: {e}")
-
-        # [Include your other image processing methods here...]
 
         return False
 
@@ -404,18 +551,23 @@ class Enhanced3DOpenSCADChat:
             self._initialize_conversation_history()
         return self.conversation_history.copy()
 
-    async def chat(self, message: str, history: List) -> Tuple[List, Optional[str], str, Dict]:
-        """Process chat message and return updated outputs"""
+    async def chat(self, message: str, history: List) -> Tuple[List, Optional[str], str, Dict, str]:
+        """Process chat message and return updated outputs including camera info"""
         if not self.agent:
-            return history + [[message, "❌ Not initialized!"]], None, "", {}
+            new_message = {"role": "assistant",
+                           "content": "❌ Not initialized!"}
+            return history + [{"role": "user", "content": message}, new_message], None, "", {}, ""
 
         # Clear previous outputs
         self._clear_current_outputs()
 
         # Add user message to history if not already there
-        if not (history and history[-1][0] == message and "🤔 Thinking..." in str(history[-1][1])):
-            history = history + \
-                [[message, "🤔 Thinking... (generating 3D model)"]]
+        user_msg = {"role": "user", "content": message}
+        thinking_msg = {"role": "assistant",
+                        "content": "🤔 Thinking... (generating 3D model with smart camera)"}
+
+        if not (history and len(history) > 0 and history[-1].get("content") == message and "🤔 Thinking..." in str(history[-1].get("content", ""))):
+            history = history + [user_msg, thinking_msg]
 
         try:
             # Add user message to conversation history
@@ -439,9 +591,11 @@ class Enhanced3DOpenSCADChat:
             if latest_ai_message:
                 ai_content = latest_ai_message.content
                 self.conversation_history.append(AIMessage(content=ai_content))
-                history[-1][1] = ai_content
+                # Update the last message with the actual response
+                history[-1] = {"role": "assistant", "content": ai_content}
             else:
-                history[-1][1] = "❌ No response generated"
+                history[-1] = {"role": "assistant",
+                               "content": "❌ No response generated"}
 
             # Extract outputs from tool responses
             self._extract_outputs(response["messages"])
@@ -466,34 +620,36 @@ class Enhanced3DOpenSCADChat:
                     print(f"❌ Direct MCP call failed: {e}")
 
         except Exception as e:
-            history[-1][1] = f"❌ Error: {str(e)}"
+            history[-1] = {"role": "assistant",
+                           "content": f"❌ Error: {str(e)}"}
 
         return (
             history,
             self.current_3d_model,
             self.current_code or "",
-            self.current_measurements
+            self.current_measurements,
         )
 
 
-def create_enhanced_app():
-    """Create enhanced Gradio app with 3D visualization"""
-    chat_assistant = Enhanced3DOpenSCADChat()
+def create_enhanced_app(default_model="gpt-4o"):
+    """Create enhanced Gradio app with smart camera and auto-rotation"""
+    chat_assistant = Enhanced3DOpenSCADChat(model=default_model)
 
-    with gr.Blocks(title="Enhanced OpenSCAD Assistant", theme=gr.themes.Soft()) as app:
-        gr.Markdown("# 🎨 Enhanced OpenSCAD Design Assistant")
+    with gr.Blocks(title="OpenSCAD Assistant", theme=gr.themes.Soft()) as app:
+        gr.Markdown("# 🤖 OpenSCAD Design Assistant")
         gr.Markdown(
-            "Chat naturally about 3D design - Now with **3D visualization** and **measurement extraction**!")
+            "Chat naturally about 3D design with AI models from OpenAI and Anthropic")
 
         # Status indicator
-        status = gr.Markdown("⏳ Initializing enhanced MCP server...")
+        status = gr.Markdown("⏳ Initializing MCP server...")
 
         with gr.Row():
             # Chat interface
             with gr.Column(scale=2):
-                chatbot = gr.Chatbot(height=800, show_label=False)
+                chatbot = gr.Chatbot(
+                    height=600, show_label=False, type='messages')
                 msg = gr.Textbox(
-                    placeholder="Try: 'Create a phone stand with measurements'",
+                    placeholder="Try: 'Create a phone stand'",
                     show_label=False
                 )
                 with gr.Row():
@@ -503,21 +659,23 @@ def create_enhanced_app():
             # Enhanced preview panel
             with gr.Column(scale=2):
                 with gr.Tabs():
-                    # 3D Model Tab
-                    with gr.TabItem("🎯 3D Model"):
+                    # Enhanced 3D Model Tab with smart camera
+                    with gr.TabItem("🎯 Smart 3D Viewer"):
+                        # Gradio native Model3D with dynamic camera positioning
                         model_3d = gr.Model3D(
-                            label="3D Model",
-                            height=400,
+                            label="3D Model (Auto-adjusting camera)",
+                            height=600,
                             display_mode="solid",
-                            camera_position=[300, 450, 450]
+                            # Will be updated dynamically
+                            camera_position=[200, 200, 200]
                         )
 
                     # 2D Preview Tab (fallback)
                     with gr.TabItem("🖼️ 2D Preview"):
                         preview_2d = gr.Image(label="2D Preview", height=400)
 
-                # Measurements panel
-                with gr.Accordion("📏 Measurements", open=False):
+                # Enhanced measurements panel with camera info
+                with gr.Accordion("📏 Measurements & Camera Info", open=False):
                     measurements_display = gr.Markdown(
                         "No measurements available")
 
@@ -532,32 +690,40 @@ def create_enhanced_app():
             return result
 
         async def handle_message(message, history):
-            """Handle user messages with 3D processing"""
+            """Handle user messages with smart 3D processing"""
             if not message:
-                return "", history, None, None, "No measurements available", ""
+                return "", history, None, "", None, "No measurements available", ""
 
             # Process the message
             updated_history, model_3d_path, code, measurements = await chat_assistant.chat(message, history)
 
-            # Create measurements display
+            # Create enhanced measurements display
             measurements_text = "No measurements available"
             if measurements.get('available', False):
                 measurements_text = chat_assistant.stl_processor.create_measurement_summary(
                     measurements)
 
+            # Update Model3D with smart camera position
+            updated_model_3d = gr.Model3D(
+                value=model_3d_path,
+                camera_position=chat_assistant.current_camera_position,
+                display_mode="solid",
+                height=400
+            ) if model_3d_path else None
+
             return (
                 "",  # Clear input
                 updated_history,  # Updated chat history
-                model_3d_path,  # 3D model file path
+                updated_model_3d,  # 3D model with smart camera
                 chat_assistant.current_image,  # 2D preview image
-                measurements_text,  # Measurements markdown
+                measurements_text,  # Enhanced measurements with camera info
                 code  # Generated code
             )
 
         def clear_chat():
             """Clear conversation and outputs"""
             chat_assistant.reset_conversation()
-            return [], None, None, "No measurements available", ""
+            return [], None, None, None, "No measurements available", ""
 
         async def cleanup():
             """Clean up resources"""
@@ -566,35 +732,39 @@ def create_enhanced_app():
         # Wire up events
         app.load(startup, outputs=status)
 
-        # Message handling
+        # Message handling with enhanced outputs
         msg.submit(
             handle_message,
             [msg, chatbot],
-            [msg, chatbot, model_3d, preview_2d, measurements_display, code_view]
+            [msg, chatbot, model_3d,
+                preview_2d, measurements_display, code_view]
         )
         send_btn.click(
             handle_message,
             [msg, chatbot],
-            [msg, chatbot, model_3d, preview_2d, measurements_display, code_view]
+            [msg, chatbot, model_3d,
+                preview_2d, measurements_display, code_view]
         )
 
         clear_btn.click(
             clear_chat,
-            outputs=[chatbot, model_3d, preview_2d,
-                     measurements_display, code_view]
+            outputs=[chatbot, model_3d,
+                     preview_2d, measurements_display, code_view]
         )
 
         # Cleanup on app close
         app.unload(cleanup)
 
-        # Enhanced example prompts
+        # Enhanced example prompts showcasing smart camera features
         gr.Examples(
             examples=[
-                "Create a phone stand with angled back support",
-                "Make a parametric gear with 20 teeth and show me its dimensions",
-                "Design a pencil holder that's 80mm tall",
-                "Build a simple bearing holder with precise measurements",
-                "Create a spiral vase and tell me its volume"
+                "Create a small phone stand - camera should zoom in close",
+                "Make a large gear with 50 teeth - camera should pull back", 
+                "Design a tall pencil holder that's 120mm high",
+                "Build a tiny bearing that's only 10mm diameter",
+                "Create a wide platform that's 200mm x 100mm x 5mm",
+                "Design a spiral staircase with parametric steps",
+                "Make a customizable box with rounded corners"
             ],
             inputs=msg
         )
@@ -606,15 +776,23 @@ def create_enhanced_app():
 if __name__ == "__main__":
     import os
 
-    # Check for API key
-    if not os.getenv("OPENAI_API_KEY"):
-        print("❌ Please set OPENAI_API_KEY environment variable")
+    parser = argparse.ArgumentParser(description="OpenSCAD 3D Assistant")
+    parser.add_argument('--model', type=str, default="claude-4-sonnet",
+                        help="Model to use (default: claude-4-sonnet)")
+    args = parser.parse_args()
+    selected_model = args.model
+
+    # Check for at least one API key
+    openai_key = os.getenv("OPENAI_API_KEY")
+    anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+    if not openai_key and not anthropic_key:
+        print("❌ Please set at least one of OPENAI_API_KEY or ANTHROPIC_API_KEY environment variables.")
         exit(1)
 
     # Check for required dependencies
     if not TRIMESH_AVAILABLE:
         print("⚠️ For full 3D functionality, install: pip install trimesh")
 
-    print("🚀 Starting Enhanced OpenSCAD Chat with 3D Visualization...")
-    app = create_enhanced_app()
+    print(f"🚀 Starting Smart 3D OpenSCAD Chat with Model: {selected_model}")
+    app = create_enhanced_app(default_model=selected_model)
     app.launch(server_port=7861)
