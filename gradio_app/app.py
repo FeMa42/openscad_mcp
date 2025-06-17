@@ -3,6 +3,8 @@
 Minimal OpenSCAD Chat using LangGraph + MCP with Persistent Session
 Shows proper session management to avoid server restarts with improved conversation history management
 """
+import os 
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 import gradio as gr
 import asyncio
