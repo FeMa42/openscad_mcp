@@ -647,7 +647,7 @@ def create_enhanced_app(default_model="gpt-4o"):
             # Chat interface
             with gr.Column(scale=2):
                 chatbot = gr.Chatbot(
-                    height=600, show_label=False, type='messages')
+                    height=900, show_label=False, type='messages')
                 msg = gr.Textbox(
                     placeholder="Try: 'Create a phone stand'",
                     show_label=False

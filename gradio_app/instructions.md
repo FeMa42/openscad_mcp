@@ -901,7 +901,9 @@ Agent:
 4. Explains the optimization strategy, and asks if the user wants to start the print job automatically.
 User: "Yes, please start the print job, with recommended settings."
 Agent: 
-5. Generates G-code with appropriate settings and activates the print job.
+5. Generates G-code with appropriate settings
+6. [Calls print_last_gcode()]
+7. "G-code successfully send to printer. Print job started."
 ```
 
 ### Enhanced Gear Generation with Printing
@@ -941,6 +943,8 @@ Agent Response:
 5. [Calls generate_gcode(radius_threshold=40, inner_density=15, outer_density=65, print_quality="strong")]
 6. "G-code generated with optimized strength! The base will have 65% infill for stability, center areas use 15% infill for efficiency. Ready to print!"
 7. "Shall I start the print job now?"
+8. [Calls print_last_gcode()]
+9. "G-code successfully send to printer. Print job started."
 ```
 
 ### Key Principles for Agents
