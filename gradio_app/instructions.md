@@ -753,7 +753,7 @@ include <UB/ub.scad>
 - User asks about "strong parts", "reinforcement", "durability"
 - User mentions material optimization, infill, or print settings
 - User describes functional parts (gears, brackets, mechanical components)
-- User asks about the German phrase: "Verstärke alles außerhalb von X mm Radius"
+- User asks about the phrase: "Verstärke alles außerhalb von X mm Radius" (reinforcement)
 
 ### G-code Generation Workflow
 
@@ -762,7 +762,7 @@ include <UB/ub.scad>
 2. Assess strength requirements
 3. Configure variable density if needed
 4. Generate G-code with appropriate settings
-5. Upload to OctoPrint (if configured)
+5. Upload to OctoPrint (if printing is requested)
 6. Start print job (if requested)
 ```
 
@@ -780,22 +780,7 @@ generate_gcode(
 )
 ```
 
-If you set `auto_start_print=True`, the print job will be started automatically. If you set `auto_start_print=False`, the print job will not be started automatically and only the G-code will be generated. 
-
-#### `setup_octoprint_connection()` - OctoPrint Setup
-If the user does not specifically state the octoprint connection, the default values will should be used. Set up the octoprint connection as follows:
-```python
-setup_octoprint_connection()
-```
-
-If the user provides a host, api_key, or port, the default values can be overridden as follows:
-```python
-setup_octoprint_connection(
-    host="192.168.1.100",      # OctoPrint IP
-    api_key="your_api_key",    # From OctoPrint Settings → API
-    port=80                     # Default port
-)
-```
+If you set `auto_start_print=True`, the print job will be started automatically. If you set `auto_start_print=False`, the print job will not be started automatically and only the G-code will be generated.
 
 #### `get_printing_presets()` - Available Options
 Shows all available quality presets, materials, and variable density examples.
@@ -888,7 +873,9 @@ Agent:
 1. Creates OpenSCAD phone stand design
 2. Renders and shows design
 3. Automatically suggests: "I'll generate G-code for printing. Since this is a functional part, I recommend reinforcing the base and contact points. Should I use variable density with stronger edges?"
-4. Generates G-code with appropriate settings
+User: "Yes, please start the print job, with recommended settings."
+Agent: 
+5. Generates G-code with appropriate settings and activates the print job.
 ```
 
 **Pattern 2: Strength Optimization Request**
@@ -898,7 +885,10 @@ Agent:
 1. Creates gear using parameterizable_gears library
 2. Renders and validates
 3. Explains: "I'll apply variable density printing - 60% infill for the teeth (strong) and 15% infill in the center (material savings)"
-4. Uses generate_gcode() with radius-based optimization
+5. Explains: "I'll generate G-code for printing. Since this is a functional part, I recommend reinforcing the base and contact points. Should I use variable density with stronger edges?"
+User: "Yes, please start the print job, with recommended settings."
+Agent: 
+5. Generates G-code with appropriate settings and activates the print job.
 ```
 
 **Pattern 3: Gear Reinforcement Request**
@@ -908,7 +898,10 @@ Agent:
 1. Completes current design
 2. Explains: "I'll strengthen everything outside 40mm radius using variable density printing"
 3. Calls generate_gcode(radius_threshold=40, inner_density=15, outer_density=65)
-4. Explains the optimization strategy
+4. Explains the optimization strategy, and asks if the user wants to start the print job automatically.
+User: "Yes, please start the print job, with recommended settings."
+Agent: 
+5. Generates G-code with appropriate settings and activates the print job.
 ```
 
 ### Enhanced Gear Generation with Printing
@@ -947,7 +940,7 @@ Agent Response:
 4. "Here's your phone stand design. For printing, I recommend variable density - reinforcing the base and contact points while saving material in the middle sections."
 5. [Calls generate_gcode(radius_threshold=40, inner_density=15, outer_density=65, print_quality="strong")]
 6. "G-code generated with optimized strength! The base will have 65% infill for stability, center areas use 15% infill for efficiency. Ready to print!"
-7. [If OctoPrint configured] "Shall I start the print job now?"
+7. "Shall I start the print job now?"
 ```
 
 ### Key Principles for Agents
