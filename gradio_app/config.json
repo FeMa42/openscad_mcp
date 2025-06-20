@@ -14,7 +14,8 @@
                 "OPENSCAD_USER_LIBRARY_PATH": "/Users/damian/Documents/OpenSCAD/libraries",
                 "OPENSCAD_EXECUTABLE": "/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD",
                 "EMBEDDING_PROVIDER": "local",
-                "OPENAI_EMBEDDING_MODEL": "text-embedding-3-small"
+                "OPENAI_EMBEDDING_MODEL": "text-embedding-3-small",
+                "PRUSASLICER_PATH": "/Applications/PrusaSlicer.app/Contents/MacOS/PrusaSlicer"
             }
         }
     }
