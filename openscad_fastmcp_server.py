@@ -5,8 +5,10 @@ Enhanced OpenSCAD MCP Server with API-Based Embeddings Support
 
 import os
 import sys
+import time
 import uuid
 import base64
+import asyncio
 import subprocess
 import logging
 from pathlib import Path
@@ -15,6 +17,20 @@ from PIL import Image as PILImage
 from io import BytesIO
 
 from fastmcp import FastMCP, Image
+
+
+# Import the printing pipeline
+try:
+    from printing_pipeline import (
+        generate_and_print_gcode,
+        print_gcode_file
+    )
+    PRINTING_AVAILABLE = True
+except ImportError as e:
+    PRINTING_AVAILABLE = False
+    print(f"Warning: Printing pipeline not available: {e}")
+    print("Save the G-code generation implementation as printing_pipeline.py to enable printing features")
+
 
 # API-based embeddings imports
 try:
@@ -321,13 +337,10 @@ def detect_available_libraries() -> Dict[str, Dict]:
 
     return available
 
-
 # Initialize available libraries
 INSTALLED_LIBRARIES = detect_available_libraries()
 
 # Tool: Search documentation
-
-
 @mcp.tool()
 def openscad_doc_search(query: str) -> str:
     """
@@ -658,9 +671,180 @@ def get_gear_generation_instructions() -> str:
         return "Instructions for gears not found. Add it in: " + OPENSCAD_INFO_DIR + "/gears_instructions.txt"
 
 
+@mcp.tool()
+async def generate_gcode(
+    radius_threshold: float = 50.0,
+    inner_density: int = 15,
+    outer_density: int = 60,
+    print_quality: str = "quality",
+    auto_start_print: bool = False,
+    printer_settings: str = "PLA_default"
+) -> str:
+    """
+    Generate G-code with variable density optimization for 3D printing.
+    
+    Also implements the reinforcement requirement: "Verstärke alles außerhalb von 50 mm Radius 
+    mit einem stabileren Material" by using variable infill density.
+    
+    Args:
+        radius_threshold: Radius in mm where reinforcement starts (default: 50mm)
+        inner_density: Infill percentage inside radius (5-30%, default: 15%)
+        outer_density: Infill percentage outside radius (30-80%, default: 60%)
+        print_quality: Quality preset ("fast", "quality", "strong")
+        auto_start_print: Whether to automatically start printing via OctoPrint
+        printer_settings: Material preset ("PLA_default", "PETG_strong", "ABS_temp")
+    
+    Returns:
+        Status message with G-code generation results and file paths
+    """
+
+    if not PRINTING_AVAILABLE:
+        return "❌ Printing pipeline not available. Please install the printing_pipeline module.\n\n" \
+               "1. Install PrusaSlicer: brew install --cask prusaslicer\n" \
+               "2. Restart the MCP server"
+
+    # Find the most recent STL file from rendering
+    output_dir = Path(OUTPUT_DIR) / generation_id
+    stl_files = list(output_dir.rglob("*.stl"))
+
+    if not stl_files:
+        return "❌ No STL file found. Please render an OpenSCAD model first using render_scad()."
+
+    # Use the most recent STL
+    latest_stl = max(stl_files, key=lambda p: p.stat().st_mtime)
+
+    # Create G-code output directory
+    gcode_output_dir = output_dir / "gcode"
+    gcode_output_dir.mkdir(exist_ok=True)
+
+    # Material-specific settings
+    material_settings = {
+        "PLA_default": {
+            "temperature": 215,
+            "bed_temperature": 60,
+            "retraction_length": 0.8
+        },
+        "PETG_strong": {
+            "temperature": 240,
+            "bed_temperature": 80,
+            "retraction_length": 1.0,
+            "print_speed": 35  # Slower for better adhesion
+        },
+        "ABS_temp": {
+            "temperature": 250,
+            "bed_temperature": 100,
+            "retraction_length": 1.2,
+            "enclosure_temp": 40  # Prusa Core One has enclosure
+        }
+    }
+
+    custom_settings = material_settings.get(
+        printer_settings, material_settings["PLA_default"])
+
+    try:
+        # Generate G-code with variable density
+        result = await generate_and_print_gcode(
+            stl_path=str(latest_stl),
+            output_dir=str(gcode_output_dir),
+            strengthen_radius=radius_threshold,
+            inner_density=inner_density,
+            outer_density=outer_density,
+            profile=print_quality,
+            auto_print=auto_start_print
+        )
+
+        # Add material info to result
+        result += f"\n🧪 Material settings: {printer_settings}\n"
+        result += f"   - Extruder: {custom_settings.get('temperature', 215)}°C\n"
+        result += f"   - Bed: {custom_settings.get('bed_temperature', 60)}°C\n"
+
+        if auto_start_print:
+            result += f"\n🎯 Variable density strategy applied:\n"
+            result += f"   - Weak areas (center, r<{radius_threshold*0.9}mm): {inner_density}% infill\n"
+            result += f"   - Strong areas (edges, r>{radius_threshold*1.1}mm): {outer_density}% infill\n"
+            result += f"   - Material saved: ~{((outer_density-inner_density)/outer_density)*100:.1f}% less plastic in center\n"
+
+        return result
+
+    except Exception as e:
+        logger.error(f"G-code generation failed: {e}")
+        return f"❌ G-code generation failed: {str(e)}"
+
+
+@mcp.tool()
+async def print_last_gcode() -> str:
+    """
+    Call to print the last generated G-code. 
+    """
+    if not PRINTING_AVAILABLE:
+        return "❌ Printing pipeline not available. Please install the printing_pipeline module.\n\n" \
+               "1. Install PrusaSlicer: brew install --cask prusaslicer\n" \
+               "2. Restart the MCP server"
+    # find the most recent G-code file
+    gcode_output_dir = Path(OUTPUT_DIR) / generation_id / "gcode"
+    gcode_files = list(gcode_output_dir.rglob("*.gcode"))
+    if not gcode_files:
+        return "❌ No G-code file found. Please generate a G-code file first using generate_gcode()."
+    latest_gcode = max(gcode_files, key=lambda p: p.stat().st_mtime)
+    # print the G-code file
+    if print_gcode_file(latest_gcode):
+        return "G-Code successfully send to printer. Print job started."
+    else:
+        return "❌ Failed to print G-code file. Please try again."
+
+@mcp.tool()
+def get_printing_presets() -> str:
+    """
+    Get available printing presets and variable density examples.
+    
+    Returns:
+        Information about available presets and usage examples
+    """
+    return """
+🎯 **Available Print Quality Presets:**
+
+**fast** - Quick prototypes (0.3mm layers)
+- Speed: 60mm/s, Infill: 15%, Supports: No
+- Use for: Concept models, fit tests
+
+**quality** - Balanced printing (0.2mm layers) 
+- Speed: 45mm/s, Infill: 20%, Supports: Yes
+- Use for: General purpose, functional parts
+
+**strong** - Maximum strength (0.25mm layers)
+- Speed: 40mm/s, Infill: 40%, Supports: Yes  
+- Use for: Mechanical parts, gears, stress parts
+
+🧪 **Material Presets:**
+- **PLA_default**: 215°C/60°C, general purpose
+- **PETG_strong**: 240°C/80°C, chemical resistance
+- **ABS_temp**: 250°C/100°C, high temperature parts
+
+🎯 **Variable Density Examples:**
+
+```python
+# Light center, strong edges (gear teeth)
+generate_gcode(radius_threshold=50, inner_density=10, outer_density=70)
+
+# Minimal material usage with edge reinforcement  
+generate_gcode(radius_threshold=30, inner_density=5, outer_density=50)
+
+# Heavy duty with gradient reinforcement
+generate_gcode(radius_threshold=40, inner_density=25, outer_density=80)
+```
+
+**Reinforcement Use Case Implementation:**
+"Verstärke alles außerhalb von 50 mm Radius mit einem stabileren Material"
+→ `generate_gcode(radius_threshold=50, inner_density=15, outer_density=60)`
+
+This creates:
+- Weak center (0-45mm): 15% infill → saves material, fast printing
+- Transition zone (45-55mm): gradient 15%→60% → smooth stress distribution  
+- Strong edges (55mm+): 60% infill → reinforced against tooth breakage
+"""
 
 def main():
-    """Run the enhanced FastMCP server"""
+    """Run FastMCP server"""
     logger.info(
         "Starting Enhanced OpenSCAD FastMCP Server with API Embeddings...")
     logger.info(f"Output directory: {OUTPUT_DIR}")
@@ -673,10 +857,11 @@ def main():
     init_knowledge_base()
 
     logger.info("Available tools:")
-    logger.info(
-        "  - render_scad: Render OpenSCAD code with auto library detection")
+    logger.info("  - render_scad: Render OpenSCAD code with auto library detection")
     logger.info("  - list_openscad_libraries: List installed libraries")
     logger.info("  - openscad_doc_search: Search documentation (API-powered)")
+    logger.info("  - generate_gcode: Generate G-code with variable density optimization, and start print job automatically")
+    logger.info("  - print_last_gcode: Print the last generated G-code")
 
     mcp.run()
 
