@@ -1,81 +1,620 @@
-# BOSL
-The Belfry OpenScad Library (BOSL) is a library of tools, shapes, and helpers to make OpenScad easier to use. 
-You can use it to create more complex shapes and objects.This library is a set of useful tools, shapes and manipulators.
+# BOSL2 Library Reference for OpenSCAD Agents
 
-You can search for library docs in the bosl wiki. Taken from https://github.com/revarbat/BOSL/wiki. 
+## Overview
 
-## Usage Examples
+The **Belfry OpenSCAD Library v2 (BOSL2)** is the most comprehensive enhancement library for OpenSCAD, designed to make 3D modeling easier, more intuitive, and more powerful. This guide helps OpenSCAD agents understand when and how to use BOSL2 effectively.
 
-```
-// Example 1: Rounded cube with BOSL
-include <BOSL/constants.scad>
-use <BOSL/shapes.scad>
+**⚠️ Important Version Notes:**
+- **BOSL2** is the current, actively developed version (recommended)
+- **BOSL v1** is legacy (avoid for new projects)
+- **Code written for BOSL v1 won't work with BOSL2**
+- Requires **OpenSCAD 2021.01 or later**
 
+## 🎯 When to Use BOSL2 vs Vanilla OpenSCAD
+
+### Use BOSL2 When:
+✅ **Positioning objects relative to each other** (attachment system)  
+✅ **Rounding/chamfering edges** on cubes, cylinders, complex shapes  
+✅ **Creating arrays/patterns** of objects (grids, circles, distributions)  
+✅ **Working with complex transformations** (skewing, matrix operations)  
+✅ **Building functional parts** (gears, threads, mechanical joints)  
+✅ **Creating organic shapes** (path sweeps, bezier curves, metaballs)  
+✅ **Need readable, maintainable code** (intent-based naming)  
+✅ **3D printing optimization** (teardrops, support structures)  
+
+### Stay with Vanilla OpenSCAD When:
+❌ **Simple geometric primitives** with basic positioning  
+❌ **File size/load time is critical** (BOSL2 adds overhead)  
+❌ **Educational purposes** where learning core OpenSCAD is the goal  
+❌ **Compatibility with older OpenSCAD versions** required  
+
+## 🏗️ Installation and Setup
+
+### Standard Installation
+```openscad
+// Always include at the top of your file
+include <BOSL2/std.scad>
+
+// Quality settings still recommended
 $fa = 1;
 $fs = 0.4;
+```
 
-// Create a rounded cube using BOSL
-cuboid([30, 40, 20], fillet=5, edges=EDGES_Z_ALL);
+### Library Detection for Agents
+```openscad
+// Check if BOSL2 is available
+list_openscad_libraries() // Use MCP tool to verify installation
+```
 
-// Example 2: Transformed cylinders
-use <BOSL/transforms.scad>
+## 🎨 Core Concepts
 
-// Easy cylinder transformations
-color("blue") xcyl(l=30, d=10);  // X-oriented cylinder
-color("red") up(15) ycyl(l=30, d=10);  // Y-oriented, moved up
+### 1. Attachments - The Revolutionary Feature
 
-// Example 3: Complex shape with masks
-use <BOSL/masks.scad>
+**Attachments** eliminate coordinate tracking by letting you position objects relative to each other using anchor points and directions.
 
-difference() {
-    cube([20, 20, 20], center=true);
-    // Apply chamfer masks
-    zflip_copy() chamfer_mask_z(l=20, chamfer=3);
-}```
+#### Basic Attachment Concepts:
+- **Anchor**: Where on an object to attach (CENTER, TOP, BOTTOM, LEFT, RIGHT, etc.)
+- **Position**: Place child at parent's anchor point
+- **Attach**: Position AND orient child relative to parent
+- **Orient**: Point object in specific direction
+- **Spin**: Rotate around attachment axis
 
-## Terminology
-For purposes of the BOSL library, the following terms apply:
-- **Left**: Towards X-
-- **Right**: Towards X+
-- **Front**/**Forward**: Towards Y-
-- **Back**/**Behind**: Towards Y+
-- **Bottom**/**Down**/**Below**: Towards Z-
-- **Top**/**Up**/**Above**: Towards Z+
+```openscad
+include <BOSL2/std.scad>
 
-- **Axis-Positive**: Towards the positive end of the axis the object is oriented on.  IE: X+, Y+, or Z+.
-- **Axis-Negative**: Towards the negative end of the axis the object is oriented on.  IE: X-, Y-, or Z-.
+// Instead of manual coordinate calculation:
+// translate([25, 0, 15]) cube([10, 10, 10]);
 
-## Common Arguments:
+// Use attachment system:
+cuboid([50, 20, 30])
+    attach(TOP) cuboid([10, 10, 10]);
+```
 
-Args    | What it is
-------- | ----------------------------------------
-fillet  | Radius of rounding for interior or exterior edges.
-chamfer | Size of chamfers/bevels for interior or exterior edges.
-orient  | Axis a part should be oriented along.  Given as an XYZ triplet of rotation angles.  It is recommended that you use the `ORIENT_` constants from `constants.scad`.  Default is usually `ORIENT_Z` for vertical orientation.
-align   | Side of the origin that the part should be on.  Given as a vector away from the origin.  It is recommended that you use the `V_` constants from `constants.scad`.  Default is usually `V_ZERO` for centered.
+### 2. Anchoring System
 
+Every BOSL2 shape can be anchored at any point using directional vectors:
 
-## Examples
-A lot of the features of this library are to allow shorter, easier-to-read, intent-based coding.  For example:
+```openscad
+// Directional constants
+CENTER      // [0, 0, 0] - center
+TOP         // [0, 0, 1] - top face
+BOTTOM      // [0, 0, -1] - bottom face  
+LEFT        // [-1, 0, 0] - left side
+RIGHT       // [1, 0, 0] - right side
+FRONT/FWD   // [0, -1, 0] - front face
+BACK        // [0, 1, 0] - back face
 
-[`BOSL/transforms.scad`](https://github.com/revarbat/BOSL/wiki/transforms.scad) Examples | Raw OpenSCAD Equivalent
-------------------------------- | -------------------------------
-`up(5)`                         | `translate([0,0,5])`
-`xrot(30,cp=[0,10,20])`         | `translate([0,10,20]) rotate([30,0,0]) translate([0,-10,-20])`
-`xspread(20,n=3)`               | `for (dx=[-20,0,20]) translate([dx,0,0])`
-`zring(n=6,r=20)`               | `for (zr=[0:5]) rotate([0,0,zr*60]) translate([20,0,0])`
-`skew_xy(xa=30,ya=45)`          | `multmatrix([[1,0,tan(30),0],[0,1,tan(45),0],[0,0,1,0],[0,0,0,1]])`
+// Combinations
+TOP+LEFT    // [−1, 0, 1] - top-left edge
+FRONT+TOP+RIGHT  // [1, -1, 1] - front-top-right corner
+```
 
-[`BOSL/shapes.scad`](https://github.com/revarbat/BOSL/wiki/shapes.scad) Examples | Raw OpenSCAD Equivalent
----------------------------------- | -------------------------------
-`upcube([10,20,30]);`              | `translate([0,0,15]) cube([10,20,30], center=true);`
-`cuboid([20,20,30], fillet=5, edges=EDGES_Z_ALL);` | `minkowski() {cube([10,10,20], center=true); sphere(r=5, $fn=32);}`
-`prismoid([30,40],[20,30],h=10);`  | `hull() {translate([0,0,0.005]) cube([30,40,0.01], center=true); translate([0,0,9.995]) cube([20,30,0.01],center=true);}`
-`xcyl(l=20,d=4);`                  | `rotate([0,90,0]) cylinder(h=20, d=4, center=true);`
-`cyl(l=100, d=40, fillet=5);`      | `translate([0,0,50]) minkowski() {cylinder(h=90, d=30, center=true); sphere(r=5);}`
+### 3. Enhanced Transforms
 
-[`BOSL/masks.scad`](https://github.com/revarbat/BOSL/wiki/masks.scad) Examples | Raw Openscad Equivalent
------------------------------------ | -------------------------------
-`chamfer_mask_z(l=20,chamfer=5);`   | `rotate(45) cube([5*sqrt(2), 5*sqrt(2), 20], center=true);`
-`fillet_mask_z(l=20,fillet=5);`     | `difference() {cube([10,10,20], center=true); for(dx=[-5,5],dy=[-5,5]) translate([dx,dy,0]) cylinder(h=20.1, r=5, center=true);}`
-`fillet_hole_mask(r=30,fillet=5);`  | `difference() {cube([70,70,10], center=true); translate([0,0,-5]) rotate_extrude(convexity=4) translate([30,0,0]) circle(r=5);}`
+BOSL2 provides readable alternatives to OpenSCAD's verbose transforms:
+
+```openscad
+// BOSL2 (clear and readable)
+up(10)           // instead of translate([0,0,10])
+right(5)         // instead of translate([5,0,0])
+xrot(30)         // instead of rotate([30,0,0])
+zrot(45)         // instead of rotate([0,0,45])
+
+// With centerpoints
+xrot(30, cp=[0,10,0])  // rotate around point [0,10,0]
+```
+
+## 🎯 Decision Tree: When to Suggest BOSL2
+
+```
+User's Request Analysis:
+├── Simple primitive shapes only?
+│   └── Use vanilla OpenSCAD
+├── Need to position multiple objects?
+│   └── Suggest BOSL2 attachments
+├── Want rounded/chamfered edges?
+│   └── Use BOSL2 cuboid/cyl with rounding
+├── Creating patterns/arrays?
+│   └── Use BOSL2 distributors (grid_copies, etc.)
+├── Complex transformations needed?
+│   └── Use BOSL2 enhanced transforms
+├── Functional mechanical parts?
+│   └── Use BOSL2 (gears, threads, joints)
+└── Organic/curved shapes?
+    └── Use BOSL2 (path_sweep, beziers)
+```
+
+## 📐 Essential BOSL2 Modules by Category
+
+### Enhanced Basic Shapes
+
+#### `cuboid()` - Enhanced Cube
+```openscad
+include <BOSL2/std.scad>
+
+// Basic usage (centers by default)
+cuboid([30, 20, 15]);
+
+// With rounding
+cuboid([30, 20, 15], rounding=3);
+
+// Selective edge rounding
+cuboid([30, 20, 15], rounding=5, edges=TOP);      // only top edges
+cuboid([30, 20, 15], rounding=5, edges="Z");      // all Z-aligned edges
+cuboid([30, 20, 15], rounding=5, edges=LEFT+TOP); // specific edge
+
+// With chamfering
+cuboid([30, 20, 15], chamfer=2);
+
+// With anchoring
+cuboid([30, 20, 15], anchor=BOTTOM);  // sits on Z=0 plane
+```
+
+#### `cyl()` - Enhanced Cylinder
+```openscad
+// Basic enhanced cylinder (centers by default)
+cyl(d=20, h=30);
+
+// With rounding/chamfering
+cyl(d=20, h=30, rounding=2);          // rounded edges
+cyl(d=20, h=30, chamfer=1);           // chamfered edges
+
+// Complex shapes
+cyl(d1=20, d2=30, h=25, rounding=3);  // rounded truncated cone
+
+// With anchoring
+cyl(d=20, h=30, anchor=BOTTOM);       // sits on Z=0
+```
+
+### Transform Shortcuts
+
+#### Directional Movement
+```openscad
+// Much more readable than translate()
+up(z)           // translate([0, 0, z])
+down(z)         // translate([0, 0, -z])
+left(x)         // translate([-x, 0, 0])
+right(x)        // translate([x, 0, 0])
+fwd(y)          // translate([0, -y, 0])
+back(y)         // translate([0, y, 0])
+move([x,y,z])   // translate([x, y, z])
+```
+
+#### Rotation Shortcuts
+```openscad
+// Clear axis-specific rotations
+xrot(a)         // rotate([a, 0, 0])
+yrot(a)         // rotate([0, a, 0])
+zrot(a)         // rotate([0, 0, a])
+rot([x,y,z])    // rotate([x, y, z])
+
+// With centerpoints
+xrot(30, cp=[0,10,0])  // rotate around specific point
+```
+
+#### Mirroring/Flipping
+```openscad
+// Intuitive mirroring
+xflip()         // mirror([1, 0, 0])
+yflip()         // mirror([0, 1, 0])
+zflip()         // mirror([0, 0, 1])
+
+// With offset
+xflip(x=10)     // mirror across plane at x=10
+```
+
+### Distribution/Array Functions
+
+#### `grid_copies()` - 2D/3D Grids
+```openscad
+// Create grid of objects
+grid_copies(spacing=20, n=[3, 4]) sphere(d=5);        // 3x4 grid
+grid_copies(spacing=[20, 15], n=3) cylinder(d=5, h=10); // square grid
+```
+
+#### `xrot_copies()`, `yrot_copies()`, `zrot_copies()` - Circular Arrays
+```openscad
+// Circular pattern around Z-axis
+zrot_copies(n=6) translate([20, 0, 0]) cube(5);
+
+// Specific angles
+zrot_copies([0, 45, 90, 180]) translate([15, 0, 0]) cylinder(d=3, h=10);
+```
+
+#### `line_copies()` - Linear Arrays
+```openscad
+// Objects along a line
+line_copies(spacing=15, n=5) sphere(d=5);
+line_copies(p1=[0,0,0], p2=[50,0,20], n=6) cube(3);
+```
+
+### Attachment System
+
+#### `attach()` - Position and Orient
+```openscad
+include <BOSL2/std.scad>
+
+// Basic attachment
+cuboid([50, 30, 20])
+    attach(TOP) cylinder(d=10, h=15);
+
+// Multiple attachments
+cuboid([40, 40, 20]) {
+    attach(TOP) cylinder(d=8, h=10);
+    attach(BOTTOM) sphere(d=12);
+    attach([LEFT, RIGHT]) cube([5, 5, 25]);
+}
+```
+
+#### `position()` - Position Only (No Orientation)
+```openscad
+// Just position, don't orient
+cuboid([30, 30, 20])
+    position(TOP+RIGHT) sphere(d=8);
+```
+
+### Advanced Shapes
+
+#### `prismoid()` - Truncated Pyramid
+```openscad
+// Basic prismoid
+prismoid([40, 30], [20, 15], h=25);
+
+// With rounding
+prismoid([40, 30], [20, 15], h=25, rounding=5);
+
+// With shift
+prismoid([40, 30], [20, 15], h=25, shift=[5, 0]);
+```
+
+#### `path_sweep()` - Sweep Along Path
+```openscad
+// Sweep 2D shape along 3D path
+path = [[0,0,0], [20,0,0], [20,20,10], [0,20,10]];
+shape = circle(d=8);
+path_sweep(shape, path);
+```
+
+#### `skin()` - Blend Between Shapes
+```openscad
+// Morph between different 2D shapes
+profiles = [
+    scale([1, 1], circle(d=20)),
+    scale([1.5, 0.8], square([20, 20], center=true)),
+    circle(d=15)
+];
+skin(profiles, z=[0, 10, 20]);
+```
+
+### Masking and Edge Profiles
+
+#### `diff()` - Enhanced Boolean Operations
+```openscad
+// More intuitive than difference()
+diff()
+cuboid([30, 30, 20]) {
+    // Children with "remove" tag are subtracted
+    tag("remove") cylinder(d=10, h=25, anchor=CENTER);
+    tag("remove") attach(TOP) sphere(d=8);
+}
+```
+
+#### `edge_profile()` - Apply 2D Profiles to Edges
+```openscad
+diff()
+cuboid([50, 50, 20])
+    edge_profile(TOP) mask2d_roundover(r=5);
+```
+
+### Rounding and Chamfering
+
+#### Selective Edge Control
+```openscad
+// Round specific edges
+cuboid([40, 30, 20], rounding=5, edges=TOP);
+cuboid([40, 30, 20], rounding=5, edges="Z");  // all Z-aligned edges
+cuboid([40, 30, 20], rounding=5, edges=[TOP, BOTTOM]);
+
+// Exclude specific edges
+cuboid([40, 30, 20], rounding=5, except_edges=BOTTOM);
+```
+
+## 🔧 Common BOSL2 Patterns
+
+### Pattern 1: Creating Complex Assemblies
+```openscad
+include <BOSL2/std.scad>
+
+module phone_stand() {
+    // Base
+    cuboid([80, 60, 8], rounding=5, anchor=BOTTOM) {
+        // Vertical support
+        attach(BACK+TOP) 
+            cuboid([6, 60, 50], rounding=2, anchor=BOTTOM);
+        
+        // Phone rest
+        attach(BACK+TOP, FWD+BOTTOM) 
+            translate([0, 0, 30]) 
+            xrot(15) 
+            cuboid([70, 6, 40], rounding=2, anchor=BOTTOM);
+        
+        // Cable slot
+        attach(FRONT+TOP)
+            tag("remove")
+            cuboid([20, 8, 12], rounding=2);
+    }
+}
+
+phone_stand();
+```
+
+### Pattern 2: Parametric Designs with Attachments
+```openscad
+include <BOSL2/std.scad>
+
+module bracket(width=40, height=30, thickness=5, hole_d=6) {
+    diff()
+    cuboid([width, thickness, height], rounding=2, anchor=BOTTOM) {
+        // Mounting holes
+        attach(FRONT) {
+            tag("remove") 
+            grid_copies(spacing=[width-10, 0, height-10], n=[2, 1, 2])
+                cylinder(d=hole_d, h=thickness+2);
+        }
+        
+        // Strengthening ribs
+        for(i = [-1, 1]) {
+            attach(BOTTOM+RIGHT*i, TOP)
+                right(i * (width/2 - thickness/2))
+                prismoid([thickness, thickness], [thickness, 0], h=height-5);
+        }
+    }
+}
+
+bracket(width=60, height=40, thickness=8, hole_d=8);
+```
+
+### Pattern 3: Functional Mechanical Parts
+```openscad
+include <BOSL2/std.scad>
+
+module gear_assembly() {
+    // Main gear
+    cyl(d=50, h=10, rounding=1, anchor=BOTTOM) {
+        // Shaft hole
+        attach(CENTER) 
+            tag("remove") 
+            cyl(d=8, h=15);
+        
+        // Mounting flange
+        attach(BOTTOM, TOP)
+            down(2)
+            cyl(d=35, h=3, rounding=0.5);
+        
+        // Set screws
+        attach(CENTER)
+            zrot_copies(n=4)
+            right(20)
+            tag("remove")
+            cyl(d=3, h=8, orient=RIGHT);
+    }
+}
+
+gear_assembly();
+```
+
+## 🎯 Agent Code Generation Guidelines
+
+### 1. Always Start with BOSL2 for Multi-Object Designs
+```openscad
+// DON'T manually calculate positions:
+translate([25, 15, 0]) cube([10, 10, 10]);
+translate([0, 0, 15]) cylinder(d=30, h=5);
+
+// DO use attachments:
+include <BOSL2/std.scad>
+cylinder(d=30, h=5, anchor=BOTTOM)
+    attach(TOP) cuboid([10, 10, 10]);
+```
+
+### 2. Use Rounding/Chamfering for 3D Printing
+```openscad
+// Good for 3D printing (rounded edges)
+cuboid([50, 30, 20], rounding=2, anchor=BOTTOM);
+
+// Add functional features
+diff()
+cuboid([50, 30, 20], rounding=2, anchor=BOTTOM) {
+    tag("remove") 
+    attach(TOP) 
+    cylinder(d=6, h=8);  // mounting hole
+}
+```
+
+### 3. Leverage Distributors for Patterns
+```openscad
+// Instead of manual loops
+grid_copies(spacing=20, n=[4, 3]) cylinder(d=5, h=10);
+
+// For circular patterns
+zrot_copies(n=8) translate([25, 0, 0]) sphere(d=8);
+```
+
+### 4. Use Intent-Based Naming
+```openscad
+// Clear, intent-based transformations
+up(10) right(5) xrot(30) cuboid([20, 15, 8]);
+
+// Instead of
+translate([5, 0, 10]) rotate([30, 0, 0]) cube([20, 15, 8]);
+```
+
+## 🔍 Troubleshooting Common Issues
+
+### Issue 1: "BOSL2 not found"
+```
+Solution: Check installation with list_openscad_libraries()
+Ensure correct include: include <BOSL2/std.scad>
+```
+
+### Issue 2: "Attachment not working"
+```openscad
+// Make sure parent is attachable (BOSL2 shape)
+// Wrong:
+cube(20) attach(TOP) sphere(5);  // cube() is vanilla OpenSCAD
+
+// Right:
+cuboid(20) attach(TOP) sphere(5);  // cuboid() is BOSL2
+```
+
+### Issue 3: "Shape appears in wrong location"
+```openscad
+// Check anchor settings
+cuboid([20, 30, 10], anchor=BOTTOM);  // sits on Z=0
+// vs
+cuboid([20, 30, 10]);  // centered (BOSL2 default)
+```
+
+### Issue 4: "Boolean operations not working"
+```openscad
+// Use diff() instead of difference() for complex operations
+diff()
+cuboid(30) {
+    tag("remove") cylinder(d=10, h=35);
+    tag("remove") attach(TOP) sphere(d=8);
+}
+```
+
+## 📊 BOSL2 vs Vanilla OpenSCAD Comparison
+
+| Task | Vanilla OpenSCAD | BOSL2 |
+|------|------------------|-------|
+| **Position cube on top of cylinder** | `translate([0,0,15]) cube([10,10,10], center=true);` | `cyl(d=30,h=5) attach(TOP) cuboid([10,10,10]);` |
+| **Round cube edges** | `minkowski() {cube([10,10,10]); sphere(r=2, $fn=32);}` | `cuboid([10,10,10], rounding=2);` |
+| **Create grid pattern** | `for(i=[0:2]) for(j=[0:2]) translate([i*20,j*20,0]) sphere(5);` | `grid_copies(spacing=20, n=3) sphere(d=10);` |
+| **Rotate around point** | `translate([10,10,0]) rotate([30,0,0]) translate([-10,-10,0]) cube(5);` | `xrot(30, cp=[10,10,0]) cube(5);` |
+
+## 🎨 Advanced BOSL2 Features
+
+### Texturing
+```openscad
+// Apply textures to surfaces
+cuboid([50, 50, 10], texture="diamonds", tex_size=5);
+```
+
+### Path Operations
+```openscad
+// Create smooth paths
+path = arc(angle=180, r=20);
+stroke(path, width=2);
+```
+
+### VNF (Vertices 'N' Faces) Operations
+```openscad
+// Advanced polyhedron operations
+vnf = cuboid([20, 20, 20]);
+vnf_polyhedron(vnf);
+```
+
+### Bezier Curves and Surfaces
+```openscad
+// Smooth curved surfaces
+bezier_patch([
+    [[0,0,0], [10,0,5], [20,0,0]],
+    [[0,10,2], [10,10,8], [20,10,2]],
+    [[0,20,0], [10,20,5], [20,20,0]]
+]);
+```
+
+## ⚡ Performance Considerations
+
+### When BOSL2 Might Be Slower:
+- **Simple geometric operations** (BOSL2 adds overhead)
+- **Very large numbers of objects** (attachment calculations)
+- **Complex bezier/path operations** (computational intensive)
+
+### Optimization Tips:
+```openscad
+// Use simpler shapes when possible
+sphere(d=10);  // instead of complex VNF operations
+
+// Minimize attachment depth
+cuboid(20)
+    attach(TOP) cylinder(d=5, h=10)  // single level
+    // avoid deep nesting
+```
+
+## 🎓 Learning Path for Agents
+
+### Level 1: Basic BOSL2 (Essential)
+1. **Installation and setup** (`include <BOSL2/std.scad>`)
+2. **Transform shortcuts** (`up()`, `xrot()`, etc.)
+3. **Enhanced shapes** (`cuboid()`, `cyl()` with rounding)
+4. **Basic attachments** (`attach()`, `position()`)
+
+### Level 2: Intermediate (Common Use)
+1. **Distribution functions** (`grid_copies()`, `zrot_copies()`)
+2. **Edge selection and rounding** (selective edge control)
+3. **Boolean operations** (`diff()` with tags)
+4. **Anchoring system** (directional vectors)
+
+### Level 3: Advanced (Specialized)
+1. **Path operations** (`path_sweep()`, `skin()`)
+2. **Complex attachments** (custom anchors)
+3. **VNF operations** (polyhedron manipulation)
+4. **Texturing and organic shapes**
+
+## 🛠️ Code Generation Checklist for Agents
+
+### Before Suggesting BOSL2:
+- ✅ Multiple objects need positioning?
+- ✅ Rounded/chamfered edges needed?
+- ✅ Pattern/array creation required?
+- ✅ Complex transformations involved?
+- ✅ User wants readable, maintainable code?
+
+### BOSL2 Code Structure:
+```openscad
+// 1. Include library
+include <BOSL2/std.scad>
+
+// 2. Quality settings
+$fa = 1; $fs = 0.4;
+
+// 3. Main shape with attachments
+main_shape() {
+    attach(position1) sub_shape1();
+    attach(position2) sub_shape2();
+    // Use diff() for boolean operations
+}
+```
+
+### Key Decision Points:
+1. **Shape Selection**: Use BOSL2 enhanced shapes (`cuboid()`, `cyl()`) over vanilla
+2. **Positioning**: Use attachments instead of manual `translate()`
+3. **Rounding**: Apply at shape level (`rounding=`) rather than `minkowski()`
+4. **Patterns**: Use distributors (`grid_copies()`) instead of loops
+5. **Boolean Ops**: Use `diff()` with tags instead of `difference()`
+
+---
+
+## 🎯 Summary: When to Recommend BOSL2
+
+**ALWAYS suggest BOSL2 when:**
+- Creating assemblies with multiple parts
+- Need rounded/chamfered edges
+- Creating patterns or arrays
+- Want readable, maintainable code
+- Building functional/mechanical parts
+
+**Explain the benefits:**
+- Eliminates coordinate tracking
+- Makes code more readable and intent-based  
+- Provides powerful 3D printing optimizations
+- Enables complex shapes with simple commands
+- Creates more maintainable, parametric designs
+
+**Start simple:**
+Begin with basic transforms and attachments, then introduce advanced features as needed. The goal is to make OpenSCAD modeling more intuitive and productive while maintaining the power and flexibility that makes OpenSCAD special.
+
+Remember: BOSL2 doesn't replace OpenSCAD—it enhances it by providing higher-level abstractions that make complex 3D modeling tasks easier and more intuitive.
