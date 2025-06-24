@@ -33,13 +33,6 @@ except ImportError:
     TRIMESH_AVAILABLE = False
     print("⚠️ Trimesh not available. Install with: pip install trimesh")
 
-try:
-    import open3d as o3d
-    OPEN3D_AVAILABLE = True
-except ImportError:
-    OPEN3D_AVAILABLE = False
-    print("⚠️ Open3D not available. Install with: pip install open3d")
-
 
 class SmartCameraCalculator:
     """Calculate optimal camera positioning based on 3D object properties"""
@@ -85,10 +78,10 @@ class SmartCameraCalculator:
             z + center[2]
         ]
 
-        print(f"📸 Calculated optimal camera position: {camera_pos}")
-        print(f"📐 Object dimensions: {dims}")
+        print(f"Calculated optimal camera position: {camera_pos}")
+        print(f"Object dimensions: {dims}")
         print(
-            f"📏 Max dimension: {max_dim:.2f}mm, Distance: {optimal_distance:.2f}mm")
+            f"Max dimension: {max_dim:.2f}mm, Distance: {optimal_distance:.2f}mm")
 
         return camera_pos
 
@@ -249,10 +242,6 @@ class STLProcessor:
 - Faces: {props['face_count']:,}
 - Vertices: {props['vertex_count']:,}
 - Watertight: {'✅' if props['is_watertight'] else '❌'}
-
-**Camera Info:**
-- Optimal viewing distance: {max(dims['length'], dims['width'], dims['height']) * 3.5:.1f} mm
-- Object center: ({props.get('center_of_mass', [0,0,0])[0]:.1f}, {props.get('center_of_mass', [0,0,0])[1]:.1f}, {props.get('center_of_mass', [0,0,0])[2]:.1f})
 """
 
         return summary
@@ -317,20 +306,6 @@ class Enhanced3DOpenSCADChat:
                 model=model_name,
                 #temperature=0.7
             )
-    
-    def get_available_models(self):
-        """Get list of available models for UI selection"""
-        return [(config["display"], key) for key, config in self.supported_models.items()]
-    
-    def change_model(self, new_model):
-        """Change the model and reinitialize the agent"""
-        if new_model != self.model and new_model in self.supported_models:
-            print(f"🔄 Switching from {self.model} to {new_model}")
-            self.model = new_model
-            # Will need to reinitialize agent on next use
-            self.agent = None
-            return f"✅ Switched to {self.supported_models[new_model]['display']}"
-        return f"⚠️ Model {new_model} not available or already selected"
 
     async def initialize(self):
         """Initialize with persistent MCP session and proper system prompt setup"""
@@ -758,8 +733,8 @@ def create_enhanced_app(default_model="gpt-4o"):
         # Enhanced example prompts showcasing smart camera features
         gr.Examples(
             examples=[
-                "Create a small phone stand - camera should zoom in close",
-                "Make a large gear with 50 teeth - camera should pull back", 
+                "Create a small phone stand",
+                "Make a large gear with 50 teeth", 
                 "Design a tall pencil holder that's 120mm high",
                 "Build a tiny bearing that's only 10mm diameter",
                 "Create a wide platform that's 200mm x 100mm x 5mm",
