@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """
-Enhanced OpenSCAD Chat with Smart Camera Positioning and Auto-Rotation
-Includes automatic camera adjustment and turntable rotation for optimal viewing
+Enhanced OpenSCAD Chat with Smart Camera Positioning, Auto-Rotation, and Web Search
+Includes automatic camera adjustment, turntable rotation, and web search capabilities for optimal assistance
 """
+
+# Fix HuggingFace tokenizer warning in multiprocessing environments
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 import gradio as gr
 import asyncio
+import logging
 from typing import List, Dict, Any, Optional, Tuple
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
@@ -21,10 +26,38 @@ from pathlib import Path
 import json
 import re
 import tempfile
-import os
 import math
 import argparse
 import time
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),  # Console output
+        logging.FileHandler('openscad_chat.log', encoding='utf-8')  # File output
+    ]
+)
+logger = logging.getLogger(__name__)
+
+# Web search imports
+try:
+    from langchain_tavily import TavilySearch
+    from langchain_core.tools import Tool
+    TAVILY_AVAILABLE = True
+except ImportError:
+    TAVILY_AVAILABLE = False
+    logger.warning("⚠️ TavilySearch not available. Install with: pip install langchain-tavily")
+
+# Optional: LangSmith for comprehensive tracing
+try:
+    import langsmith
+    from langsmith import traceable
+    LANGSMITH_AVAILABLE = True
+except ImportError:
+    LANGSMITH_AVAILABLE = False
+    logger.info("💡 For advanced tracing, install LangSmith: pip install langsmith")
 
 # 3D processing imports
 try:
@@ -32,7 +65,7 @@ try:
     TRIMESH_AVAILABLE = True
 except ImportError:
     TRIMESH_AVAILABLE = False
-    print("⚠️ Trimesh not available. Install with: pip install trimesh")
+    logger.warning("⚠️ Trimesh not available. Install with: pip install trimesh")
 
 
 class SmartCameraCalculator:
@@ -79,9 +112,9 @@ class SmartCameraCalculator:
             z + center[2]
         ]
 
-        print(f"Calculated optimal camera position: {camera_pos}")
-        print(f"Object dimensions: {dims}")
-        print(
+        logger.info(f"Calculated optimal camera position: {camera_pos}")
+        logger.info(f"Object dimensions: {dims}")
+        logger.info(
             f"Max dimension: {max_dim:.2f}mm, Distance: {optimal_distance:.2f}mm")
 
         return camera_pos
@@ -138,10 +171,10 @@ class STLProcessor:
                     if file_age <= max_age_seconds:
                         stl_files.append(stl_file)
                     else:
-                        print(f"⚠️ Skipping old STL file: {stl_file} (age: {file_age:.1f}s)")
+                        logger.info(f"Skipping old STL file: {stl_file} (age: {file_age:.1f}s)")
 
         if not stl_files:
-            print("⚠️ No recent STL files found (within last 5 minutes)")
+            logger.warning("⚠️ No recent STL files found (within last 5 minutes)")
             return None
 
         # Prefer files from generation-specific directories
@@ -155,13 +188,13 @@ class STLProcessor:
         # Return the most recently modified STL file
         latest_stl = max(files_to_consider, key=lambda p: p.stat().st_mtime)
         file_age = current_time - latest_stl.stat().st_mtime
-        print(f"🔍 Found latest STL: {latest_stl} (age: {file_age:.1f}s)")
+        logger.info(f"🔍 Found latest STL: {latest_stl} (age: {file_age:.1f}s)")
         return latest_stl
 
     def convert_stl_to_glb(self, stl_path: Path, optimize: bool = True) -> Optional[Path]:
         """Convert STL to GLB format for better web performance"""
         if not TRIMESH_AVAILABLE:
-            print("❌ Trimesh not available for STL conversion")
+            logger.warning("❌ Trimesh not available for STL conversion")
             return stl_path  # Return original STL
 
         try:
@@ -170,7 +203,7 @@ class STLProcessor:
 
             if optimize:
                 # Optimization pipeline
-                print(f"🔧 Original mesh: {len(mesh.faces)} faces")
+                logger.info(f"🔧 Original mesh: {len(mesh.faces)} faces")
 
                 # Remove duplicate faces and vertices
                 mesh.remove_duplicate_faces()
@@ -181,17 +214,17 @@ class STLProcessor:
                 if len(mesh.faces) > 50000:
                     target_faces = 50000
                     mesh = mesh.simplify_quadratic_decimation(target_faces)
-                    print(f"🔧 Simplified to: {len(mesh.faces)} faces")
+                    logger.info(f"🔧 Simplified to: {len(mesh.faces)} faces")
 
             # Export as GLB (binary glTF format - better for web)
             glb_path = self.temp_dir / f"{stl_path.stem}.glb"
             mesh.export(str(glb_path))
 
-            print(f"✅ Converted STL to GLB: {glb_path}")
+            logger.info(f"✅ Converted STL to GLB: {glb_path}")
             return glb_path
 
         except Exception as e:
-            print(f"❌ Failed to convert STL to GLB: {e}")
+            logger.error(f"❌ Failed to convert STL to GLB: {e}")
             return stl_path  # Fallback to original STL
 
     def extract_measurements(self, stl_path: Path) -> Dict[str, Any]:
@@ -235,10 +268,10 @@ class STLProcessor:
                 }
             })
 
-            print(f"📏 Extracted measurements: {measurements['dimensions']}")
+            logger.info(f"📏 Extracted measurements: {measurements['dimensions']}")
 
         except Exception as e:
-            print(f"❌ Failed to extract measurements: {e}")
+            logger.error(f"❌ Failed to extract measurements: {e}")
 
         return measurements
 
@@ -310,20 +343,20 @@ class Enhanced3DOpenSCADChat:
             model_name = model_config["model"]
         else:
             # Default to OpenAI if model not recognized
-            print(f"⚠️ Model '{self.model}' not recognized, defaulting to gpt-4o")
+            logger.warning(f"⚠️ Model '{self.model}' not recognized, defaulting to gpt-4o")
             provider = "openai"
             model_name = "gpt-4o"
 
         # Create LLM based on provider
         if provider == "anthropic":
-            print(f"🤖 Initializing Claude model: {model_name}")
+            logger.info(f"🤖 Initializing Claude model: {model_name}")
             return ChatAnthropic(
                 model=model_name,
                 # temperature=0.7,
                 max_tokens=4096
             )
         else:  # OpenAI
-            print(f"🤖 Initializing OpenAI model: {model_name}")
+            logger.info(f"🤖 Initializing OpenAI model: {model_name}")
             return ChatOpenAI(
                 model=model_name,
                 #temperature=0.7
@@ -336,14 +369,14 @@ class Enhanced3DOpenSCADChat:
         
         # If forced to use instructions.txt or XML file doesn't exist, try instructions.txt first
         if force_instructions:
-            print("🔄 Force using instructions.txt as requested")
+            logger.info("🔄 Force using instructions.txt as requested")
             return self._load_fallback_instructions()
         
         system_prompt_path = Path("system_prompt.xml")
         
         if not system_prompt_path.exists():
-            print(f"❌ System prompt XML file not found: {system_prompt_path}")
-            print("🔄 Falling back to instructions.txt...")
+            logger.warning(f"❌ System prompt XML file not found: {system_prompt_path}")
+            logger.info("🔄 Falling back to instructions.txt...")
             return self._load_fallback_instructions()
         
         try:
@@ -357,19 +390,19 @@ class Enhanced3DOpenSCADChat:
             if root.tag == 'SYSTEM_PROMPT':
                 # Get the inner text content, preserving formatting
                 system_prompt_text = ET.tostring(root, encoding='unicode', method='text')
-                print(f"✅ Loaded advanced system prompt from XML ({len(system_prompt_text)} characters)")
+                logger.info(f"✅ Loaded advanced system prompt from XML ({len(system_prompt_text)} characters)")
                 return system_prompt_text.strip()
             else:
-                print(f"❌ Expected <SYSTEM_PROMPT> root tag, found: {root.tag}")
+                logger.error(f"❌ Expected <SYSTEM_PROMPT> root tag, found: {root.tag}")
                 raise ValueError(f"Expected SYSTEM_PROMPT root tag, found: {root.tag}")
                 
         except ET.ParseError as e:
-            print(f"❌ XML parsing failed: {e}")
-            print("🔄 Trying text-based extraction from XML file...")
+            logger.error(f"❌ XML parsing failed: {e}")
+            logger.info("🔄 Trying text-based extraction from XML file...")
             return self._load_xml_as_text(system_prompt_path)
         except Exception as e:
-            print(f"❌ Error loading XML system prompt: {e}")
-            print("🔄 Trying text-based extraction from XML file...")
+            logger.error(f"❌ Error loading XML system prompt: {e}")
+            logger.info("🔄 Trying text-based extraction from XML file...")
             return self._load_xml_as_text(system_prompt_path)
 
     def _load_xml_as_text(self, xml_path: Path) -> str:
@@ -384,16 +417,16 @@ class Enhanced3DOpenSCADChat:
             
             if match:
                 extracted_content = match.group(1).strip()
-                print(f"✅ Extracted system prompt using text processing ({len(extracted_content)} characters)")
+                logger.info(f"✅ Extracted system prompt using text processing ({len(extracted_content)} characters)")
                 return extracted_content
             else:
-                print("❌ Could not find <SYSTEM_PROMPT> tags in XML file")
-                print("🔄 Falling back to instructions.txt...")
+                logger.warning("❌ Could not find <SYSTEM_PROMPT> tags in XML file")
+                logger.info("🔄 Falling back to instructions.txt...")
                 return self._load_fallback_instructions()
                 
         except Exception as e:
-            print(f"❌ Text-based XML extraction failed: {e}")
-            print("🔄 Falling back to instructions.txt...")
+            logger.error(f"❌ Text-based XML extraction failed: {e}")
+            logger.info("🔄 Falling back to instructions.txt...")
             return self._load_fallback_instructions()
 
     def _load_fallback_instructions(self) -> str:
@@ -401,10 +434,10 @@ class Enhanced3DOpenSCADChat:
         try:
             instructions_path = Path("instructions.txt")
             prompt = instructions_path.read_text()
-            print(f"✅ Loaded fallback system prompt from {instructions_path}")
+            logger.info(f"✅ Loaded fallback system prompt from {instructions_path}")
             return prompt
         except FileNotFoundError:
-            print("❌ Instructions.txt also not found, using basic fallback")
+            logger.error("❌ Instructions.txt also not found, using basic fallback")
             return self._get_fallback_prompt()
 
     def _get_fallback_prompt(self) -> str:
@@ -412,35 +445,57 @@ class Enhanced3DOpenSCADChat:
         return "You are a helpful OpenSCAD design assistant. Help users create 3D objects using OpenSCAD code."
 
     async def initialize(self):
-        """Initialize with persistent MCP session and proper system prompt setup"""
+        """Initialize with persistent MCP session, web search, and proper system prompt setup"""
+        logger.info("🚀 Starting OpenSCAD Chat initialization...")
+        
+        # Setup tracing based on available services
+        tracing_mode = setup_tracing()
+        
         # Load MCP server configuration
         with open('config.json') as f:
             config = json.load(f)
-        print("📋 Configuration loaded:", config)
+        logger.info(f"📋 Configuration loaded: {list(config.keys())}")
 
         # Extract servers config
         mcp_config = config.get("mcpServers", config)
 
         # Create MCP client
         self.client = MultiServerMCPClient(mcp_config)
+        logger.info("🔌 Created MultiServerMCP client")
 
         # Create and maintain persistent session
-        print("🔌 Creating persistent MCP session...")
+        logger.info("🔌 Creating persistent MCP session...")
         self.session_context = self.client.session("openscad")
         self.session = await self.session_context.__aenter__()
 
         # Load tools from persistent session
         tools = await load_mcp_tools(self.session)
-        print(
-            f"🔧 Loaded {len(tools)} tools with persistent session: {[tool.name for tool in tools]}")
+        logger.info(f"🔧 Loaded {len(tools)} MCP tools: {[tool.name for tool in tools]}")
+
+        # Add web search tool if available
+        web_search_tools = []
+        web_search_tool = create_web_search_tool()
+        if web_search_tool:
+            web_search_tools.append(web_search_tool)
+            logger.info("🌐 Web search enabled with TavilySearch")
+        elif not os.getenv("TAVILY_API_KEY"):
+            logger.warning("⚠️ TAVILY_API_KEY not set - web search disabled")
+        
+        # Combine all tools
+        all_tools = tools + web_search_tools
+        logger.info(f"🔧 Total tools available: {len(all_tools)} (MCP: {len(tools)}, Web: {len(web_search_tools)})")
+        logger.info(f"🔍 Tracing mode: {tracing_mode}")
 
         # Store reference to session for direct access if needed
         self.mcp_session = self.session
 
         # Load system prompt from XML file (or instructions.txt if specified)
+        logger.info("📄 Loading system prompt...")
         self.system_prompt = self._load_system_prompt(force_instructions=self.force_instructions)
+        logger.info(f"📄 System prompt loaded: {len(self.system_prompt)} characters")
 
         # Create LLM based on model selection
+        logger.info(f"🤖 Initializing LLM: {self.model}")
         llm = self._create_llm()
 
         # Create agent with system prompt
@@ -451,16 +506,22 @@ class Enhanced3DOpenSCADChat:
                 return [SystemMessage(content=self.system_prompt)] + messages
             return messages
 
+        logger.info("🧠 Creating React agent...")
         self.agent = create_react_agent(
             llm,
-            tools,
+            all_tools,  # Use combined tools including web search
             prompt=_add_system_prompt
         )
 
         # Initialize conversation history with system message
         self._initialize_conversation_history()
+        logger.info("💾 Initialized conversation history")
 
-        return "✅ Ready with smart camera positioning and auto-rotation!"
+        web_status = "with web search" if web_search_tools else "without web search"
+        success_msg = f"✅ Ready with smart camera positioning, auto-rotation, and {len(all_tools)} tools ({web_status})!"
+        logger.info(success_msg)
+        
+        return success_msg
 
     def _initialize_conversation_history(self):
         """Initialize conversation history with system message"""
@@ -473,9 +534,9 @@ class Enhanced3DOpenSCADChat:
         if self.session_context:
             try:
                 await self.session_context.__aexit__(None, None, None)
-                print("🧹 MCP session cleaned up properly")
+                logger.info("🧹 MCP session cleaned up properly")
             except Exception as e:
-                print(f"❌ Error cleaning up session: {e}")
+                logger.error(f"❌ Error cleaning up session: {e}")
 
     def reset_conversation(self):
         """Reset the conversation history but keep system prompt"""
@@ -523,7 +584,7 @@ class Enhanced3DOpenSCADChat:
             return fresh_img
 
         except Exception as e:
-            print(f"Error creating fresh image copy: {e}")
+            logger.error(f"Error creating fresh image copy: {e}")
             return None
 
     def _process_3d_output(self):
@@ -540,7 +601,7 @@ class Enhanced3DOpenSCADChat:
         latest_stl = self.stl_processor.find_latest_stl(output_dirs)
 
         if latest_stl:
-            print(f"🎯 Processing 3D model: {latest_stl}")
+            logger.info(f"🎯 Processing 3D model: {latest_stl}")
 
             # Extract measurements first
             measurements = self.stl_processor.extract_measurements(latest_stl)
@@ -558,11 +619,11 @@ class Enhanced3DOpenSCADChat:
                 optimized_model) if optimized_model else None
             self.current_measurements = measurements
 
-            print(f"✅ 3D model processed: {self.current_3d_model}")
-            print(f"📸 Camera positioned at: {self.current_camera_position}")
+            logger.info(f"✅ 3D model processed: {self.current_3d_model}")
+            logger.info(f"📸 Camera positioned at: {self.current_camera_position}")
             return True
 
-        print("⚠️ No STL files found")
+        logger.warning("⚠️ No STL files found")
         return False
 
     def _process_image_content(self, content) -> bool:
@@ -578,7 +639,7 @@ class Enhanced3DOpenSCADChat:
                     len(content) < 50):
                 return False
 
-        print(f"🔍 Processing potential image content: {type(content)}")
+        logger.info(f"🔍 Processing potential image content: {type(content)}")
 
         # 1. Handle MCP CallToolResult with ImageContent list (new MCP format)
         if isinstance(content, list) and len(content) > 0:
@@ -589,16 +650,16 @@ class Enhanced3DOpenSCADChat:
                     self.current_image = self._create_fresh_image_copy(
                         img_data)
                     if self.current_image:
-                        print("✅ Loaded image from ImageContent")
+                        logger.info("✅ Loaded image from ImageContent")
                         return True
                 except Exception as e:
-                    print(f"Failed to load ImageContent: {e}")
+                    logger.error(f"Failed to load ImageContent: {e}")
 
         return False
 
     def _extract_outputs(self, messages):
         """Extract images, code, and 3D models from tool responses"""
-        print(f"🔍 _extract_outputs: Processing {len(messages)} messages")
+        logger.info(f"🔍 _extract_outputs: Processing {len(messages)} messages")
 
         for i, msg in enumerate(messages):
             # Check for tool calls (to get code)
@@ -606,16 +667,16 @@ class Enhanced3DOpenSCADChat:
                 for tool_call in msg.tool_calls:
                     if tool_call["name"] == "render_scad":
                         self.current_code = tool_call["args"].get("code", "")
-                        print(f"✅ Extracted code from tool call")
+                        logger.info(f"✅ Extracted code from tool call")
 
             # Check tool responses for images and errors
             if hasattr(msg, "name") and msg.name == "render_scad":
                 content = msg.content
-                print(f"🔍 Found render_scad response with content: {type(content)}")
+                logger.info(f"🔍 Found render_scad response with content: {type(content)}")
 
                 # Check if the response contains an error
                 if isinstance(content, str) and any(error_word in content.lower() for error_word in ["error", "failed", "exception"]):
-                    print(f"❌ Detected error in render_scad response: {content}")
+                    logger.error(f"❌ Detected error in render_scad response: {content}")
                     # Don't try to process this as a successful render
                     return
                 
@@ -639,6 +700,9 @@ class Enhanced3DOpenSCADChat:
                            "content": "❌ Not initialized!"}
             return history + [{"role": "user", "content": message}, new_message], None, "", {}, ""
 
+        # Log the incoming user message
+        logger.info(f"💬 User message: {message}")
+
         # Clear previous outputs
         self._clear_current_outputs()
 
@@ -657,10 +721,16 @@ class Enhanced3DOpenSCADChat:
             # Get properly formatted messages for the agent
             agent_messages = self._get_conversation_messages()
 
+            # Log agent invocation
+            logger.info(f"🤖 Invoking agent with {len(agent_messages)} messages")
+
             # Invoke agent with proper message history
             response = await self.agent.ainvoke({
                 "messages": agent_messages
             })
+
+            # Log tool usage
+            self._log_tool_usage(response.get("messages", []))
 
             # Extract AI response
             latest_ai_message = None
@@ -674,15 +744,18 @@ class Enhanced3DOpenSCADChat:
                 self.conversation_history.append(AIMessage(content=ai_content))
                 # Update the last message with the actual response
                 history[-1] = {"role": "assistant", "content": ai_content}
+                logger.info(f"🤖 Agent response: {ai_content[:200]}...")
             else:
                 history[-1] = {"role": "assistant",
                                "content": "❌ No response generated"}
+                logger.warning("⚠️ No AI response generated")
 
             # Extract outputs from tool responses
             self._extract_outputs(response["messages"])
 
             # Try direct MCP call for immediate results
             if self.current_code:
+                logger.info("🔧 Attempting direct MCP call for immediate OpenSCAD rendering")
                 try:
                     direct_result = await self.mcp_session.call_tool(
                         "render_scad",
@@ -699,18 +772,24 @@ class Enhanced3DOpenSCADChat:
 
                 except Exception as e:
                     error_msg = str(e)
-                    print(f"❌ Direct MCP call failed: {error_msg}")
+                    logger.error(f"❌ Direct MCP call failed: {error_msg}")
                     
                     # Update the chat history to show the error to the user
                     if "OpenSCAD" in error_msg and ("failed" in error_msg or "error" in error_msg.lower()):
                         # This is an OpenSCAD-specific error, show it to the user
                         error_response = f"❌ OpenSCAD Error: {error_msg}\n\nPlease check your code and try again."
                         history[-1] = {"role": "assistant", "content": error_response}
-                        print(f"🔄 Updated chat history with OpenSCAD error")
+                        logger.error(f"🔄 Updated chat history with OpenSCAD error")
 
         except Exception as e:
-            history[-1] = {"role": "assistant",
-                           "content": f"❌ Error: {str(e)}"}
+            error_msg = f"❌ Error: {str(e)}"
+            history[-1] = {"role": "assistant", "content": error_msg}
+            logger.error(f"💥 Chat processing error: {str(e)}")
+
+        # Log final outputs
+        logger.info(f"📊 Chat complete - 3D model: {'✅' if self.current_3d_model else '❌'}, "
+                   f"Code: {'✅' if self.current_code else '❌'}, "
+                   f"Measurements: {'✅' if self.current_measurements.get('available') else '❌'}")
 
         return (
             history,
@@ -718,6 +797,111 @@ class Enhanced3DOpenSCADChat:
             self.current_code or "",
             self.current_measurements,
         )
+
+    def _log_tool_usage(self, messages: List) -> None:
+        """Log tool usage from agent messages"""
+        tool_calls = []
+        tool_responses = []
+        
+        for msg in messages:
+            # Log tool calls
+            if hasattr(msg, "tool_calls") and msg.tool_calls:
+                for tool_call in msg.tool_calls:
+                    tool_name = tool_call.get("name", "unknown")
+                    tool_args = tool_call.get("args", {})
+                    tool_calls.append(f"{tool_name}({list(tool_args.keys())})")
+                    logger.info(f"🔧 Tool call: {tool_name} with args: {list(tool_args.keys())}")
+            
+            # Log tool responses
+            if hasattr(msg, "name") and msg.name:
+                tool_name = msg.name
+                content_type = type(msg.content).__name__
+                tool_responses.append(f"{tool_name}({content_type})")
+                logger.info(f"📤 Tool response: {tool_name} returned {content_type}")
+        
+        if tool_calls:
+            logger.info(f"🛠️  Total tool calls in this conversation: {', '.join(tool_calls)}")
+        if tool_responses:
+            logger.info(f"📨 Total tool responses: {', '.join(tool_responses)}")
+
+
+def setup_tracing():
+    """Setup tracing based on available services"""
+    # Option 1: LangSmith (most comprehensive)
+    if os.getenv("LANGCHAIN_API_KEY") and LANGSMITH_AVAILABLE:
+        os.environ["LANGCHAIN_TRACING_V2"] = "true"
+        os.environ["LANGCHAIN_PROJECT"] = "OpenSCAD-Agent"
+        logger.info("🔍 LangSmith tracing enabled - full tool and search logging available")
+        return "langsmith"
+    
+    # Option 2: Basic Python logging (what we already have)
+    logger.info("🔍 Using basic Python logging for tool tracking")
+    return "basic"
+
+
+def create_web_search_tool():
+    """Create web search tool with logging based on available tracing"""
+    if not TAVILY_AVAILABLE or not os.getenv("TAVILY_API_KEY"):
+        return None
+        
+    # Create standard TavilySearch tool
+    tavily_tool = TavilySearch(
+        max_results=3,
+        search_depth="advanced",
+        include_answer=True,
+        include_raw_content=False
+    )
+    
+    # If LangSmith is available, it will automatically trace everything
+    if os.getenv("LANGCHAIN_TRACING_V2") == "true":
+        logger.info("🌐 Web search with LangSmith tracing enabled")
+        return tavily_tool
+    
+    # Otherwise, create a wrapper tool that adds logging
+    search_count = 0
+    
+    def logged_tavily_search(query: str):
+        """Wrapper function that adds logging to TavilySearch"""
+        nonlocal search_count
+        search_count += 1
+        
+        logger.info(f"🔍 WEB SEARCH #{search_count}: {query}")
+        start_time = time.time()
+        
+        try:
+            result = tavily_tool.invoke(query)
+            elapsed = time.time() - start_time
+            
+            # Log basic search info
+            if isinstance(result, dict) and 'results' in result:
+                results_count = len(result['results'])
+                logger.info(f"✅ Found {results_count} results in {elapsed:.2f}s")
+                
+                # Log top result
+                if result['results']:
+                    top_result = result['results'][0]
+                    logger.info(f"🔗 Top result: {top_result.get('title', 'No title')}")
+                    logger.info(f"🌐 URL: {top_result.get('url', 'No URL')}")
+            else:
+                logger.info(f"✅ Search completed in {elapsed:.2f}s")
+                
+            return result
+            
+        except Exception as e:
+            logger.error(f"❌ Search failed: {str(e)}")
+            raise
+    
+    # Create a new tool with the same interface but with logging
+    from langchain_core.tools import Tool
+    
+    logging_tool = Tool(
+        name="tavily_search_results_json",
+        description=tavily_tool.description,
+        func=logged_tavily_search
+    )
+    
+    logger.info("🌐 Web search with basic logging enabled")
+    return logging_tool
 
 
 def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
@@ -775,12 +959,15 @@ def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
         # Event handlers
         async def startup():
             """Initialize the assistant"""
+            logger.info("🎬 Starting Gradio app startup sequence...")
             result = await chat_assistant.initialize()
+            logger.info(f"🎉 Startup complete: {result}")
             return result
 
         async def handle_message(message, history):
             """Handle user messages with smart 3D processing"""
             if not message:
+                logger.warning("⚠️ Empty message received")
                 return "", history, None, "", None, "No measurements available", ""
 
             # Process the message
@@ -791,6 +978,7 @@ def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
             if measurements.get('available', False):
                 measurements_text = chat_assistant.stl_processor.create_measurement_summary(
                     measurements)
+                logger.info(f"📏 Generated measurements summary: {len(measurements_text)} chars")
 
             # Update Model3D with smart camera position
             updated_model_3d = gr.Model3D(
@@ -799,6 +987,9 @@ def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
                 display_mode="solid",
                 height=400
             ) if model_3d_path else None
+
+            if model_3d_path:
+                logger.info(f"🎯 Updated 3D model with camera position: {chat_assistant.current_camera_position}")
 
             return (
                 "",  # Clear input
@@ -809,36 +1000,104 @@ def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
                 code  # Generated code
             )
 
+        async def handle_message_chat_only(message, history):
+            """Handle message and update only chat history (no loading on 3D/code)"""
+            if not message:
+                return "", history
+
+            # Process the message
+            updated_history, model_3d_path, code, measurements = await chat_assistant.chat(message, history)
+
+            return "", updated_history
+
+        async def update_3d_model():
+            """Update 3D model separately (shows loading only when needed)"""
+            if chat_assistant.current_3d_model:
+                updated_model_3d = gr.Model3D(
+                    value=chat_assistant.current_3d_model,
+                    camera_position=chat_assistant.current_camera_position,
+                    display_mode="solid",
+                    height=400
+                )
+                return updated_model_3d
+            return None
+
+        async def update_code_viewer():
+            """Update code viewer separately (shows loading only when needed)"""
+            return chat_assistant.current_code or ""
+
+        async def update_measurements():
+            """Update measurements separately (shows loading only when needed)"""
+            if chat_assistant.current_measurements.get('available', False):
+                return chat_assistant.stl_processor.create_measurement_summary(
+                    chat_assistant.current_measurements)
+            return "No measurements available"
+
+        async def update_2d_preview():
+            """Update 2D preview separately (shows loading only when needed)"""
+            return chat_assistant.current_image
+
         def clear_chat():
             """Clear conversation and outputs"""
+            logger.info("🧹 Clearing chat conversation and outputs")
             chat_assistant.reset_conversation()
             return [], None, None, None, "No measurements available", ""
 
         async def cleanup():
             """Clean up resources"""
+            logger.info("🧹 Starting cleanup process...")
             await chat_assistant.cleanup()
+            logger.info("✅ Cleanup complete")
 
         # Wire up events
         app.load(startup, outputs=status)
 
-        # Message handling with enhanced outputs
+        # Optimized message handling with controlled loading states
+        # Main chat handler - updates chat history immediately (no loading)
         msg.submit(
-            handle_message,
+            handle_message_chat_only,
             [msg, chatbot],
-            [msg, chatbot, model_3d,
-                preview_2d, measurements_display, code_view]
+            [msg, chatbot],
+            queue=False  # No loading state for chat updates
+        ).then(
+            update_3d_model,
+            outputs=model_3d
+        ).then(
+            update_code_viewer,
+            outputs=code_view
+        ).then(
+            update_measurements,
+            outputs=measurements_display
+        ).then(
+            update_2d_preview,
+            outputs=preview_2d
         )
+
+        # Send button - same optimized flow
         send_btn.click(
-            handle_message,
+            handle_message_chat_only,
             [msg, chatbot],
-            [msg, chatbot, model_3d,
-                preview_2d, measurements_display, code_view]
+            [msg, chatbot],
+            queue=False  # No loading state for chat updates
+        ).then(
+            update_3d_model,
+            outputs=model_3d
+        ).then(
+            update_code_viewer,
+            outputs=code_view
+        ).then(
+            update_measurements,
+            outputs=measurements_display
+        ).then(
+            update_2d_preview,
+            outputs=preview_2d
         )
 
         clear_btn.click(
             clear_chat,
             outputs=[chatbot, model_3d,
-                     preview_2d, measurements_display, code_view]
+                     preview_2d, measurements_display, code_view],
+            queue=False  # No loading for clear operation
         )
 
         # Cleanup on app close
@@ -870,22 +1129,73 @@ if __name__ == "__main__":
                         help="Model to use (default: claude-4-sonnet)")
     parser.add_argument('--prompt-source', type=str, choices=['xml', 'instructions'], default='xml',
                         help="Source for system prompt: 'xml' for system_prompt.xml, 'instructions' for instructions.txt (default: xml)")
+    parser.add_argument('--log-level', type=str, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default='INFO',
+                        help="Logging level (default: INFO)")
     args = parser.parse_args()
+    
     selected_model = args.model
     force_instructions = (args.prompt_source == 'instructions')
+
+    # Set logging level based on argument
+    logging.getLogger().setLevel(getattr(logging, args.log_level))
+    
+    logger.info("🚀 OpenSCAD 3D Assistant Starting Up")
+    logger.info(f"🤖 Selected model: {selected_model}")
+    logger.info(f"📝 Prompt source: {args.prompt_source}")
+    logger.info(f"📊 Log level: {args.log_level}")
 
     # Check for at least one API key
     openai_key = os.getenv("OPENAI_API_KEY")
     anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+    tavily_key = os.getenv("TAVILY_API_KEY")
+    langsmith_key = os.getenv("LANGCHAIN_API_KEY")
+    
     if not openai_key and not anthropic_key:
-        print("❌ Please set at least one of OPENAI_API_KEY or ANTHROPIC_API_KEY environment variables.")
+        logger.error("❌ Please set at least one of OPENAI_API_KEY or ANTHROPIC_API_KEY environment variables.")
         exit(1)
+    
+    # Log available services
+    services = []
+    if openai_key:
+        services.append("OpenAI")
+    if anthropic_key:
+        services.append("Anthropic")
+    if tavily_key:
+        services.append("Tavily Search")
+    if langsmith_key:
+        services.append("LangSmith Tracing")
+    
+    logger.info(f"🔑 Available services: {', '.join(services)}")
 
+    # Log tracing recommendations
+    if not langsmith_key:
+        logger.info("💡 For advanced tool tracing, set LANGCHAIN_API_KEY for LangSmith")
+        logger.info("   Sign up at: https://smith.langchain.com/")
+    
     # Check for required dependencies
     if not TRIMESH_AVAILABLE:
-        print("⚠️ For full 3D functionality, install: pip install trimesh")
+        logger.warning("⚠️ For full 3D functionality, install: pip install trimesh")
+    else:
+        logger.info("✅ Trimesh available for 3D processing")
+        
+    if not TAVILY_AVAILABLE:
+        logger.warning("⚠️ For web search functionality, install: pip install langchain-tavily")
+    else:
+        logger.info("✅ TavilySearch available for web search")
+        
+    if not LANGSMITH_AVAILABLE:
+        logger.info("💡 For advanced tracing, install: pip install langsmith")
+    else:
+        logger.info("✅ LangSmith available for advanced tracing")
 
-    print(f"🚀 Starting Smart 3D OpenSCAD Chat with Model: {selected_model}")
-    print(f"📝 Using prompt source: {args.prompt_source}")
-    app = create_enhanced_app(default_model=selected_model, force_instructions=force_instructions)
-    app.launch(server_port=7861)
+    logger.info(f"🌐 Starting Smart 3D OpenSCAD Chat with Model: {selected_model}")
+    logger.info(f"📝 Using prompt source: {args.prompt_source}")
+    
+    try:
+        app = create_enhanced_app(default_model=selected_model, force_instructions=force_instructions)
+        logger.info("🎯 Gradio app created successfully")
+        logger.info("🌐 Launching on http://localhost:7861")
+        app.launch(server_port=7861)
+    except Exception as e:
+        logger.error(f"💥 Failed to start application: {str(e)}")
+        raise
