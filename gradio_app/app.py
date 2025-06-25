@@ -251,8 +251,9 @@ class STLProcessor:
 class Enhanced3DOpenSCADChat:
     """Enhanced OpenSCAD chat with smart camera and auto-rotation"""
 
-    def __init__(self, model="gpt-4o"):
+    def __init__(self, model="gpt-4o", force_instructions=False):
         self.model = model
+        self.force_instructions = force_instructions
         self.agent = None
         self.current_image = None
         self.current_code = None
@@ -307,6 +308,88 @@ class Enhanced3DOpenSCADChat:
                 #temperature=0.7
             )
 
+    def _load_system_prompt(self, force_instructions: bool = False) -> str:
+        """Load system prompt from XML or instructions.txt file"""
+        import xml.etree.ElementTree as ET
+        import re
+        
+        # If forced to use instructions.txt or XML file doesn't exist, try instructions.txt first
+        if force_instructions:
+            print("🔄 Force using instructions.txt as requested")
+            return self._load_fallback_instructions()
+        
+        system_prompt_path = Path("system_prompt.xml")
+        
+        if not system_prompt_path.exists():
+            print(f"❌ System prompt XML file not found: {system_prompt_path}")
+            print("🔄 Falling back to instructions.txt...")
+            return self._load_fallback_instructions()
+        
+        try:
+            # First, try XML parsing
+            xml_content = system_prompt_path.read_text(encoding='utf-8')
+            
+            # Parse XML and extract content from <SYSTEM_PROMPT> tags
+            root = ET.fromstring(xml_content)
+            
+            # The root element IS the SYSTEM_PROMPT tag
+            if root.tag == 'SYSTEM_PROMPT':
+                # Get the inner text content, preserving formatting
+                system_prompt_text = ET.tostring(root, encoding='unicode', method='text')
+                print(f"✅ Loaded advanced system prompt from XML ({len(system_prompt_text)} characters)")
+                return system_prompt_text.strip()
+            else:
+                print(f"❌ Expected <SYSTEM_PROMPT> root tag, found: {root.tag}")
+                raise ValueError(f"Expected SYSTEM_PROMPT root tag, found: {root.tag}")
+                
+        except ET.ParseError as e:
+            print(f"❌ XML parsing failed: {e}")
+            print("🔄 Trying text-based extraction from XML file...")
+            return self._load_xml_as_text(system_prompt_path)
+        except Exception as e:
+            print(f"❌ Error loading XML system prompt: {e}")
+            print("🔄 Trying text-based extraction from XML file...")
+            return self._load_xml_as_text(system_prompt_path)
+
+    def _load_xml_as_text(self, xml_path: Path) -> str:
+        """Fallback: Extract content between <SYSTEM_PROMPT> tags using text processing"""
+        try:
+            content = xml_path.read_text(encoding='utf-8')
+            
+            # Use regex to extract content between <SYSTEM_PROMPT> and </SYSTEM_PROMPT> tags
+            import re
+            pattern = r'<SYSTEM_PROMPT>\s*(.*?)\s*</SYSTEM_PROMPT>'
+            match = re.search(pattern, content, re.DOTALL)
+            
+            if match:
+                extracted_content = match.group(1).strip()
+                print(f"✅ Extracted system prompt using text processing ({len(extracted_content)} characters)")
+                return extracted_content
+            else:
+                print("❌ Could not find <SYSTEM_PROMPT> tags in XML file")
+                print("🔄 Falling back to instructions.txt...")
+                return self._load_fallback_instructions()
+                
+        except Exception as e:
+            print(f"❌ Text-based XML extraction failed: {e}")
+            print("🔄 Falling back to instructions.txt...")
+            return self._load_fallback_instructions()
+
+    def _load_fallback_instructions(self) -> str:
+        """Fallback to instructions.txt if XML loading fails"""
+        try:
+            instructions_path = Path("instructions.txt")
+            prompt = instructions_path.read_text()
+            print(f"✅ Loaded fallback system prompt from {instructions_path}")
+            return prompt
+        except FileNotFoundError:
+            print("❌ Instructions.txt also not found, using basic fallback")
+            return self._get_fallback_prompt()
+
+    def _get_fallback_prompt(self) -> str:
+        """Basic fallback system prompt"""
+        return "You are a helpful OpenSCAD design assistant. Help users create 3D objects using OpenSCAD code."
+
     async def initialize(self):
         """Initialize with persistent MCP session and proper system prompt setup"""
         # Load MCP server configuration
@@ -333,11 +416,8 @@ class Enhanced3DOpenSCADChat:
         # Store reference to session for direct access if needed
         self.mcp_session = self.session
 
-        # Load instructions and store as system prompt
-        try:
-            self.system_prompt = Path("instructions.txt").read_text()
-        except FileNotFoundError:
-            self.system_prompt = "You are a helpful OpenSCAD design assistant. Help users create 3D objects using OpenSCAD code."
+        # Load system prompt from XML file (or instructions.txt if specified)
+        self.system_prompt = self._load_system_prompt(force_instructions=self.force_instructions)
 
         # Create LLM based on model selection
         llm = self._create_llm()
@@ -606,9 +686,9 @@ class Enhanced3DOpenSCADChat:
         )
 
 
-def create_enhanced_app(default_model="gpt-4o"):
+def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
     """Create enhanced Gradio app with smart camera and auto-rotation"""
-    chat_assistant = Enhanced3DOpenSCADChat(model=default_model)
+    chat_assistant = Enhanced3DOpenSCADChat(model=default_model, force_instructions=force_instructions)
 
     with gr.Blocks(title="OpenSCAD Assistant", theme=gr.themes.Soft()) as app:
         gr.Markdown("# 🤖 OpenSCAD Design Assistant")
@@ -754,8 +834,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="OpenSCAD 3D Assistant")
     parser.add_argument('--model', type=str, default="claude-4-sonnet",
                         help="Model to use (default: claude-4-sonnet)")
+    parser.add_argument('--prompt-source', type=str, choices=['xml', 'instructions'], default='xml',
+                        help="Source for system prompt: 'xml' for system_prompt.xml, 'instructions' for instructions.txt (default: xml)")
     args = parser.parse_args()
     selected_model = args.model
+    force_instructions = (args.prompt_source == 'instructions')
 
     # Check for at least one API key
     openai_key = os.getenv("OPENAI_API_KEY")
@@ -769,5 +852,6 @@ if __name__ == "__main__":
         print("⚠️ For full 3D functionality, install: pip install trimesh")
 
     print(f"🚀 Starting Smart 3D OpenSCAD Chat with Model: {selected_model}")
-    app = create_enhanced_app(default_model=selected_model)
+    print(f"📝 Using prompt source: {args.prompt_source}")
+    app = create_enhanced_app(default_model=selected_model, force_instructions=force_instructions)
     app.launch(server_port=7861)
