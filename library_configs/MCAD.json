@@ -1,0 +1,15 @@
+{
+  "name": "MCAD",
+  "description": "OpenSCAD Parametric CAD Library - collection of common mechanical parts and shapes",
+  "main_files": ["boxes.scad", "gears.scad", "motors.scad", "nuts_and_bolts.scad", "regular_shapes.scad"],
+  "usage": "// MCAD usage:\nuse <MCAD/boxes.scad>\nuse <MCAD/gears.scad>\nuse <MCAD/nuts_and_bolts.scad>\n\n// Rounded box:\nroundedBox([20,30,10], 2, true);\n\n// Gear:\ngear(number_of_teeth=20, circular_pitch=5);",
+  "common_modules": [
+    "boxes: roundedBox(), box()",
+    "gears: gear(), rack()",
+    "motors: stepper_motor_mount(), nema17()",
+    "fasteners: cap_bolt(), hex_nut()",
+    "shapes: regular_polygon(), cylinder_outer()"
+  ],
+  "documentation_url": "https://github.com/openscad/MCAD",
+  "license": "LGPL-2.1+"
+} 

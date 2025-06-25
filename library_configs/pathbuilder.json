@@ -1,0 +1,13 @@
+{
+  "name": "pathbuilder",
+  "description": "Pathbuilder Library - create complex 2D shapes with fillets and chamfers using SVG syntax",
+  "main_files": ["pathbuilder.scad"],
+  "usage": "// Pathbuilder usage:\ninclude <pathbuilder/pathbuilder.scad>\n\n// Complex 2D shape with fillets:\nsvgShape(\"m 0 0 chamfer8 h20 fillet2 v20 fillet10 h20 v-10 fillet2 l35 20 fillet2 l-35 20 fillet2 v-10 h-40 fillet30\", $fn=32);\n\n// Simple rounded rectangle:\nsvgShape(\"m 0 0 h 50 fillet5 v 30 fillet5 h -50 fillet5 v -30 fillet5\");",
+  "common_modules": [
+    "shapes: svgShape(), svgPath()",
+    "commands: move (m), line (l), horizontal (h), vertical (v)",
+    "modifiers: fillet, chamfer, arc"
+  ],
+  "documentation_url": "https://github.com/dinther/pathbuilder",
+  "license": "MIT"
+} 

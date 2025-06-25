@@ -1,0 +1,482 @@
+# UB.scad OpenSCAD Library Reference Guide
+
+## Library Overview
+**Author:** UBaer21  
+**License:** CC0-1.0  
+**Description:** A full 3D printing workflow solution for OpenSCAD v.21 and above  
+**Usage:** `include <UB/ub.scad>`
+
+UB.scad is a comprehensive 3D printing workflow library that brings tools for modifying and generating 3D objects, view helpers, and a selection of mechanical parts. The library is designed to be used without ever looking at the library's code itself, with extensive help systems and console feedback.
+
+## When to Use UB.scad
+
+### Perfect For:
+- **Complete 3D printing workflows** - From design to print-ready models
+- **Rapid prototyping** - Quick creation of functional parts with built-in tolerances
+- **Mechanical parts** - Gears, bearings, screws, and assemblies
+- **Educational projects** - Learning 3D modeling with guided examples
+- **Production parts** - Professional-grade mechanical components
+
+### Key Advantages:
+- **Self-contained workflow** - Design, validate, and prepare for printing in one library
+- **Built-in help system** - Extensive documentation accessible within OpenSCAD
+- **3D printing optimized** - Automatic consideration of nozzle sizes, clearances, and tolerances
+- **Console feedback** - Real-time information about what the library is doing
+- **No dependencies** - Single file solution
+
+## Installation and Setup
+
+### Basic Installation
+```openscad
+// Single file approach - just include
+include <ub.scad>
+
+// All examples and help available with this line
+helpsw = true; // Shows help for all modules (1-5 for specific levels)
+```
+
+### Configuration Variables
+```openscad
+// 3D Printing Settings (automatically configured)
+nozzle = 0.4;        // Nozzle diameter
+clearance = 0.15;    // General clearance for moving parts
+fragments = 50;      // Fragment count (auto-adjusts for render)
+
+// Workflow Settings
+vp = false;          // View position mode
+bed = false;         // Show print bed
+pPos = [0,0];       // Print position
+info = true;         // Show information output
+```
+
+## Core 3D Printing Workflow Features
+
+### 1. Automatic 3D Printing Optimization
+```openscad
+include <ub.scad>
+/*[Hidden]*/
+useVersion = 22.046;
+designVersion = 1.0;
+
+/*[Basics]*/
+vp = false;          // View position
+bed = false;         // Show print bed  
+pPos = [0,0];       // Print position
+info = true;        // Show console info
+nozzle = 0.2;       // Nozzle diameter
+
+// Parts automatically adjust for nozzle size and clearances
+```
+
+### 2. Positioning and Print Bed Integration
+```openscad
+// Automatic print positioning
+T(printPos) {
+    // Your objects here - automatically positioned for printing
+    my_part();
+}
+
+// Print bed visualization
+if (bed) {
+    color("lightgray") cube([200, 200, 1], center=true);
+}
+```
+
+### 3. Information and Help System
+```openscad
+// Get help for any module
+Example(help=true);
+
+// Console output levels
+helpsw = 1;    // Basic help
+helpsw = 2;    // Intermediate help  
+helpsw = 3;    // Advanced help
+helpsw = 4;    // Expert help
+helpsw = 5;    // All help
+helpsw = true; // Complete help system
+```
+
+## Essential UB.scad Modules
+
+### Mechanical Components
+
+#### Gears (Complete Gear System)
+```openscad
+include <ub.scad>
+/*[Gears]*/
+z = 10;           // Number of teeth
+f = 3;            // Teeth width divisor
+modul = 2;        // Teeth size
+h = 5;            // Height
+w = 30;           // Helical teeth skew
+achse = 3;        // Arbor diameter
+
+// Create gear with UB.scad
+CyclGetriebe(h=h, z=z, f=f, modul=modul, linear=false, w=w, achse=achse, help=true);
+
+// Gear ratio calculation
+function pitchcircle(z=z) = z*modul/f;
+
+// Multiple gear arrangements
+T(pitchcircle(z)*2) { 
+    CyclGetriebe(h=h, z=z, f=f, modul=modul, linear=false, center=false, w=w, achse=achse);
+    mirror([1,0]) CyclGetriebe(h=h, z=z, f=f, modul=modul, linear=false, center=false, rotZahn=-1, w=w, achse=achse);
+}
+
+// Internal/ring gears
+T(pitchcircle(z)*4) rotate(180) { 
+    CyclGetriebe(h=h, z=z*3, f=f, modul=modul, linear=false, center=false, d=pitchcircle(z*3)+modul, w=w, achse=achse);
+    CyclGetriebe(h=h, z=z, f=f, modul=modul, linear=false, center=false, w=w, achse=achse);
+}
+
+// Rack and pinion
+T(0, -pitchcircle(z)*2) {
+    CyclGetriebe(h=h, z=z, f=f, modul=modul, linear=modul*2, center=false, w=w, achse=achse);
+    CyclGetriebe(h=h, z=z, f=f, modul=modul, center=2, rotZahn=0, w=w, achse=achse);
+}
+```
+
+#### Advanced Gear Features
+```openscad
+// Gear with locking mechanism and lightening
+T(pitchcircle(z)*2, pitchcircle(z)+pitchcircle(z*3)/2) 
+    CyclGetriebe(h=h, z=z*3, f=f, lock=5, light=5, modul=modul, w=w, achse=achse);
+```
+
+### 2D Shape Library (Extensive Polygon Collection)
+```openscad
+include <ub.scad>
+help2D = true; 
+$helpM = true;
+
+// Basic polygons
+Trapez();           // Trapezoid
+Tri();              // Triangle
+Tri90();            // Right triangle
+Quad();             // Quadrilateral
+VorterantQ();       // Special quadrilateral
+
+// Curved shapes
+Linse();            // Lens shape
+Bogendreieck();     // Arc triangle
+Reuleaux();         // Reuleaux triangle
+WKreis();          // Wavy circle
+Rosette();         // Rosette pattern
+
+// Complex curves
+Superellipse();     // Mathematical superellipse
+Cycloid();          // Cycloid curve
+Vollwelle();        // Full wave
+CycloidZahn();      // Cycloid tooth profile
+Bezier();           // Bezier curves
+
+// Functional shapes
+Stern();            // Star
+ZigZag();           // Zigzag pattern
+WStern();           // Wavy star
+Flower();           // Flower pattern
+Seg7();             // 7-segment display digit
+```
+
+### Transformation and Positioning (UB.scad Style)
+```openscad
+// UB.scad transformation shortcuts
+T([x, y, z])        // Translate (short for translate)
+R([x, y, z])        // Rotate (short for rotate)
+Tz(z)               // Translate Z only
+Tx(x)               // Translate X only
+Ty(y)               // Translate Y only
+
+// Example usage
+T(printPos) {
+    Tz(h/2) color("chartreuse") Kreis(d=pitchcircle(z), rand=.1);
+}
+```
+
+### Utility Functions
+```openscad
+// 3D printing utilities
+Kreis(d=diameter, rand=thickness);    // Circle with rim
+printPos = vp ? [0,0] : pPos;        // Automatic print positioning
+
+// Information display
+if (info) {
+    echo("Design Version:", designVersion);
+    echo("Nozzle size:", nozzle);
+    echo("Current fragments:", $fn);
+}
+```
+
+## Advanced UB.scad Workflow
+
+### Complete Project Template
+```openscad
+include <UB/ub.scad>
+
+/*[Hidden]*/
+useVersion = 22.046;
+designVersion = 1.0;
+
+/*[Basics]*/
+vp = false;          // View position mode
+bed = false;         // Show print bed
+pPos = [0,0];       // Print position on bed
+info = true;        // Console information
+nozzle = 0.4;       // Printer nozzle diameter
+
+/*[Project Specific]*/
+part_size = 20;     // Main part dimension
+tolerance = 0.15;   // Mechanical tolerance
+
+/*[Advanced]*/
+$helpM = true;      // Module help
+render_quality = 50; // Render quality
+
+// Main design
+T(printPos) {
+    my_mechanism();
+    
+    if (info) {
+        echo("Part size:", part_size);
+        echo("Total height:", get_part_height());
+        echo("Print time estimate:", get_print_time());
+    }
+}
+
+// Print bed visualization
+if (bed) {
+    %cube([200, 200, 1], center=true);
+}
+
+module my_mechanism() {
+    // Your design here using UB.scad modules
+    CyclGetriebe(h=5, z=20, f=3, modul=1, achse=3);
+}
+```
+
+### Multi-Part Assembly Example
+```openscad
+include <ub.scad>
+
+// Assembly with automatic spacing for printing
+parts_to_print = ["gear1", "gear2", "housing"];
+
+for (i = [0:len(parts_to_print)-1]) {
+    T([i * 50, 0, 0]) {  // Space parts for printing
+        if (parts_to_print[i] == "gear1") {
+            CyclGetriebe(h=5, z=15, f=3, modul=1.5, achse=4);
+        } else if (parts_to_print[i] == "gear2") {
+            CyclGetriebe(h=5, z=30, f=3, modul=1.5, achse=6);
+        } else if (parts_to_print[i] == "housing") {
+            housing_part();
+        }
+        
+        // Part labels
+        if (info) {
+            echo(str("Part ", i+1, ": ", parts_to_print[i]));
+        }
+    }
+}
+```
+
+## Best Practices for UB.scad
+
+### 1. **Start with Help System**
+```openscad
+// Always begin with help to understand available modules
+helpsw = true;  // See all available modules
+$helpM = true;  // Get module-specific help
+```
+
+### 2. **Use Console Feedback**
+```openscad
+// Let UB.scad guide you through the process
+info = true;    // Enable all console output
+// Watch the console for valuable information about:
+// - Calculated dimensions
+// - 3D printing recommendations  
+// - Tolerance adjustments
+// - Performance tips
+```
+
+### 3. **Leverage 3D Printing Integration**
+```openscad
+// Configure for your specific printer
+nozzle = 0.4;        // Your actual nozzle size
+clearance = 0.15;    // Adjust for your printer's precision
+pPos = [100, 100];   // Position on your print bed
+```
+
+### 4. **Take Advantage of Automatic Features**
+```openscad
+// Let UB.scad handle complexity
+// - Fragment count adjusts automatically for preview/render
+// - Tolerances scale with nozzle size
+// - Print positioning handles multiple parts
+// - Gear calculations include proper clearances
+```
+
+### 5. **Use the Example System**
+```openscad
+// Every module has built-in examples
+module_name(help=true);  // See usage examples
+// Study the console output for guidance
+```
+
+## Common UB.scad Patterns
+
+### Pattern 1: Functional Mechanical Assembly
+```openscad
+include <ub.scad>
+
+// Multi-gear transmission
+T(printPos) {
+    // Main drive gear
+    CyclGetriebe(h=8, z=20, f=3, modul=2, achse=5);
+    
+    // Intermediate gear
+    T([gear_spacing, 0, 0]) 
+        CyclGetriebe(h=8, z=15, f=3, modul=2, achse=4);
+    
+    // Output gear  
+    T([gear_spacing*2, 0, 0]) 
+        CyclGetriebe(h=8, z=30, f=3, modul=2, achse=6);
+}
+```
+
+### Pattern 2: Complex 2D Profile Extrusion
+```openscad
+include <ub.scad>
+
+// Custom 2D shape extruded to 3D
+linear_extrude(height=10) {
+    Reuleaux();  // or any UB.scad 2D shape
+}
+
+// Multiple shapes for complex profiles
+difference() {
+    linear_extrude(height=10) Superellipse();
+    T([0, 0, 5]) linear_extrude(height=5) Flower();
+}
+```
+
+### Pattern 3: Educational/Learning Project
+```openscad
+include <ub.scad>
+helpsw = true;   // Learn while building
+$helpM = true;   // Module help
+
+// Step-by-step gear exploration
+pieces = ["basic", "helical", "internal", "rack"];
+
+for (i = [0:len(pieces)-1]) {
+    T([i * 80, 0, 0]) {
+        echo(str("Learning: ", pieces[i], " gear"));
+        
+        if (pieces[i] == "basic") {
+            CyclGetriebe(h=5, z=12, f=3, modul=2, w=0, achse=3, help=true);
+        } else if (pieces[i] == "helical") {
+            CyclGetriebe(h=5, z=12, f=3, modul=2, w=20, achse=3, help=true);
+        }
+        // ... continue pattern
+    }
+}
+```
+
+## Integration with Other Libraries
+
+### UB.scad + Parameterizable Gears
+```openscad
+include <ub.scad>
+use <parameterizable_gears/gears.scad>
+
+// Compare UB.scad gears with parameterizable gears
+T(printPos) {
+    // UB.scad gear
+    CyclGetriebe(h=5, z=20, f=3, modul=1.5, achse=4);
+    
+    // Parameterizable gear for comparison
+    T([60, 0, 0]) 
+        stirnrad(modul=1.5, zahnzahl=20, breite=5, bohrung=4);
+}
+```
+
+### UB.scad + BOSL
+```openscad
+include <ub.scad>
+use <BOSL/shapes.scad>
+
+// Combine UB.scad mechanical parts with BOSL shapes
+T(printPos) {
+    // UB.scad gear
+    CyclGetriebe(h=5, z=15, f=3, modul=2, achse=5);
+    
+    // BOSL housing
+    T([50, 0, 0]) 
+        cuboid([40, 40, 20], fillet=3);
+}
+```
+
+## Troubleshooting Guide
+
+### Common Issues and Solutions:
+
+**"Too many console messages"**
+- Set `helpsw = false` to reduce output
+- Set `info = false` to disable general information
+- Use specific help levels (1-5) instead of `true`
+
+**"Parts don't fit together"**
+- Check `nozzle` setting matches your printer
+- Adjust `clearance` for your printer's precision
+- Use UB.scad's automatic tolerance calculations
+
+**"Gears don't mesh properly"**
+- Ensure both gears use same `modul` value
+- Check `f` (teeth width divisor) is consistent
+- Use UB.scad's gear spacing calculations
+
+**"Slow rendering"**
+- Disable `help` modes during final render
+- Use lower fragment counts for preview
+- Let UB.scad auto-adjust fragment count
+
+**"Can't find specific feature"**
+- Use `helpsw = true` to see all available modules
+- Check console output for module suggestions
+- Try module_name(help=true) for specific help
+
+## Quick Reference: Key UB.scad Modules
+
+| Module | Purpose | Example |
+|--------|---------|---------|
+| `CyclGetriebe()` | Parametric gears | `CyclGetriebe(h=5, z=20, modul=1.5)` |
+| `Reuleaux()` | Reuleaux triangle | `linear_extrude(5) Reuleaux();` |
+| `Kreis()` | Circle with rim | `Kreis(d=20, rand=2);` |
+| `T()` | Transform shortcut | `T([10,0,0]) cube(5);` |
+| `Superellipse()` | Mathematical curves | `linear_extrude(10) Superellipse();` |
+
+## Agent Processing Notes
+
+### Critical Features for AI Agents:
+1. **Self-documenting**: Extensive help system provides guidance
+2. **Console feedback**: Real-time information about operations
+3. **3D printing aware**: Automatic tolerance and clearance handling
+4. **Educational**: Built-in examples and learning progression
+5. **Complete workflow**: Single library handles entire design-to-print process
+
+### When to Recommend UB.scad:
+- User mentions 3D printing workflow
+- Need for mechanical parts with proper tolerances
+- Educational/learning projects
+- Complex gear systems
+- Integration of design and manufacturing considerations
+
+### Optimal Usage Pattern:
+1. Start with `helpsw = true` to explore capabilities
+2. Configure printer settings (nozzle, clearances)
+3. Use console feedback to guide design decisions
+4. Leverage automatic 3D printing optimizations
+5. Test with built-in examples before custom designs
+
+UB.scad represents a complete paradigm shift from pure geometric modeling to manufacturing-aware design, making it invaluable for functional 3D printing projects.

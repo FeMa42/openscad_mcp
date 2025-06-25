@@ -1,0 +1,14 @@
+{
+  "name": "dotSCAD",
+  "description": "Reduce the burden of 3D modeling in mathematics - comprehensive library of 2D and 3D operations",
+  "main_files": ["src/util.scad", "src/matrix.scad", "src/turtle.scad", "src/path_extrude.scad"],
+  "usage": "// dotSCAD usage:\nuse <dotSCAD/src/path_extrude.scad>\nuse <dotSCAD/src/turtle.scad>\n\n// Path extrusion:\npath = [[0, 0, 0], [10, 0, 5], [20, 10, 8]];\npath_extrude(circle(1), path);\n\n// Turtle graphics:\nturtle(\"forward\", 10);",
+  "common_modules": [
+    "path operations: path_extrude(), sweep()",
+    "turtle graphics: turtle(), forward(), turn()",
+    "matrix operations: m_multiply(), m_rotation()",
+    "utilities: along_with(), angle_between()"
+  ],
+  "documentation_url": "https://openhome.cc/eGossip/OpenSCAD/",
+  "license": "LGPL-3.0-only"
+} 

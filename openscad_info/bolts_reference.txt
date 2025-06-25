@@ -1,0 +1,556 @@
+# BOLTS OpenSCAD Library Reference Guide
+
+## Library Overview
+**Full Name:** BOLTS is an Open Library of Technical Specifications  
+**License:** Multiple open-source licenses  
+**Description:** A free and open-source standard parts library for CAD applications  
+**Usage:** `include <BOLTS.scad>`
+
+BOLTS provides a comprehensive database of standard mechanical parts (nuts, bolts, washers, bearings, etc.) with precise dimensions according to international standards (ISO, DIN, ANSI, EN, etc.). It's designed to eliminate the tedious task of modeling standard parts, allowing designers to focus on custom components.
+
+## When to Use BOLTS
+
+### Perfect For:
+- **Mechanical assemblies** - Precise standard fasteners and hardware
+- **Engineering designs** - Parts that must meet specific standards
+- **Bill of materials** - Automatic part identification and specifications
+- **Professional designs** - Industry-standard components
+- **Assembly visualization** - Realistic representation of hardware
+- **Design validation** - Proper clearances and fits
+
+### Key Advantages:
+- **Standards compliance** - Parts follow ISO, DIN, ANSI, EN specifications
+- **Precise dimensions** - Exact measurements from technical specifications
+- **Unique identification** - Standard part numbers for purchasing
+- **Positioning system** - Built-in connector system for easy placement
+- **Multi-CAD support** - Works with OpenSCAD, FreeCAD, and IGES
+- **Comprehensive database** - Thousands of standard parts
+
+## Installation and Setup
+
+### Basic Installation
+```openscad
+// Include the main BOLTS library
+include <BOLTS.scad>
+
+// Test with a simple bolt
+ISO4014(key="M3", l=20);  // M3x20 hex bolt
+```
+
+### Finding Part Numbers
+BOLTS uses standard part numbers, not descriptive names. Use the online directory at boltsparts.github.io to find the correct module names and parameters.
+
+## Understanding BOLTS Naming Convention
+
+### Standard-Based Naming
+```openscad
+// Parts named after standards, not descriptions
+ISO4014();     // NOT: hex_bolt()
+DIN912();      // NOT: socket_head_cap_screw()
+ISO4032();     // NOT: hex_nut()
+DIN125A();     // NOT: washer()
+```
+
+### Why Standard Numbers?
+- **Unique specification** - Each number precisely defines the part
+- **Professional communication** - Standard language for engineering
+- **Purchasing accuracy** - Exact part numbers for ordering
+- **International compatibility** - Works across different regions
+
+## Core BOLTS Fasteners
+
+### Hex Bolts and Screws
+```openscad
+include <BOLTS.scad>
+
+// ISO 4014 - Hex head bolts (partial thread)
+ISO4014(key="M6", l=30);        // M6x30 hex bolt
+ISO4014(key="M8", l=50);        // M8x50 hex bolt
+ISO4014(key="M10", l=80);       // M10x80 hex bolt
+
+// ISO 4017 - Hex head screws (full thread)  
+ISO4017(key="M5", l=25);        // M5x25 hex screw
+
+// DIN 912 - Socket head cap screws
+DIN912(key="M4", l=20);         // M4x20 socket head cap screw
+DIN912(key="M6", l=35);         // M6x35 socket head cap screw
+
+// ISO 7380 - Button head screws
+ISO7380_1(key="M3", l=12);      // M3x12 button head screw
+```
+
+### Nuts and Washers
+```openscad
+// ISO 4032 - Hex nuts
+ISO4032(key="M6");              // M6 hex nut
+ISO4032(key="M8");              // M8 hex nut
+
+// DIN 934 - Hex nuts (alternative standard)
+DIN934(key="M5");               // M5 hex nut
+
+// ISO 7040 - Lock nuts  
+ISO7040(key="M4");              // M4 lock nut
+
+// DIN 125 - Washers
+DIN125A(key="M6");              // M6 washer (form A)
+DIN125B(key="M8");              // M8 washer (form B)
+
+// ISO 7089 - Washers
+ISO7089(key="M5");              // M5 washer
+```
+
+### Specialty Fasteners
+```openscad
+// Set screws and grub screws
+ISO4026(key="M3", l=6);         // M3x6 set screw (hex socket)
+DIN916(key="M4", l=8);          // M4x8 set screw (hex socket, cup point)
+
+// Thumb screws
+DIN464(key="M5", l=20);         // M5x20 thumb screw
+
+// Wing nuts
+DIN315(key="M6");               // M6 wing nut
+
+// Clevis pins
+ISO2341A(d=6, l=40);            // 6x40 clevis pin
+
+// Spring pins
+ISO8752(d=3, l=20);             // 3x20 spring pin
+```
+
+## BOLTS Positioning System (local.scad)
+
+### Understanding Connectors
+BOLTS includes an advanced positioning system using "connectors" - coordinate systems that define both position and orientation:
+
+```openscad
+include <BOLTS.scad>
+
+// Create a connector
+my_connector = new_cs(
+    origin = [10, 20, 5],           // Position  
+    axes = [[1,0,0], [0,1,0]]      // X and Y directions (Z calculated)
+);
+
+// Show connector for visualization
+show_cs(my_connector);
+```
+
+### Part Connectors
+Many BOLTS parts have predefined connectors for easy positioning:
+
+```openscad
+// Get connector from a bolt
+bolt_connector = ISO4014_conn("head", key="M6", l=30);
+
+// Position another part relative to the bolt
+align(my_target_connector, bolt_connector) {
+    ISO4014(key="M6", l=30);
+}
+```
+
+### Common Connector Names
+```openscad
+// Typical connector names for fasteners:
+// "head" - top of bolt head
+// "root" - bottom of bolt head  
+// "tip" - end of threaded portion
+// "top" - top surface of nut
+// "bottom" - bottom surface of nut
+```
+
+## Practical BOLTS Assembly Examples
+
+### Example 1: Flange Assembly
+```openscad
+include <BOLTS.scad>
+
+module flange_assembly() {
+    // Main flange (custom part)
+    difference() {
+        cylinder(d=80, h=10);
+        cylinder(d=20, h=12);  // Center hole
+        
+        // Bolt holes
+        for(i = [0:3]) {
+            rotate(i * 90) translate([30, 0, -1]) {
+                cylinder(d=7, h=12);  // M6 clearance hole
+            }
+        }
+    }
+    
+    // Bolts with washers and nuts
+    for(i = [0:3]) {
+        rotate(i * 90) translate([30, 0, 0]) {
+            // Washer under head
+            translate([0, 0, -1]) DIN125A(key="M6");
+            
+            // Bolt
+            ISO4014(key="M6", l=40);
+            
+            // Washer and nut on bottom
+            translate([0, 0, 11]) {
+                DIN125A(key="M6");
+                translate([0, 0, 2]) ISO4032(key="M6");
+            }
+        }
+    }
+}
+
+flange_assembly();
+```
+
+### Example 2: Motor Mount with Precise Positioning
+```openscad
+include <BOLTS.scad>
+
+module motor_mount() {
+    // NEMA 17 mounting pattern
+    motor_holes = [[-15.5, -15.5], [15.5, -15.5], [15.5, 15.5], [-15.5, 15.5]];
+    
+    // Base plate
+    difference() {
+        cube([60, 60, 8], center=true);
+        
+        // Motor mounting holes
+        for(hole = motor_holes) {
+            translate([hole[0], hole[1], -1]) {
+                cylinder(d=3.2, h=10);  // M3 clearance
+            }
+        }
+        
+        // Base mounting holes
+        for(x = [-25, 25]) {
+            for(y = [-25, 25]) {
+                translate([x, y, -1]) {
+                    cylinder(d=5.5, h=10);  // M5 clearance
+                }
+            }
+        }
+    }
+    
+    // Motor mounting screws
+    for(hole = motor_holes) {
+        translate([hole[0], hole[1], 4]) {
+            DIN912(key="M3", l=12);
+        }
+    }
+    
+    // Base mounting hardware
+    for(x = [-25, 25]) {
+        for(y = [-25, 25]) {
+            translate([x, y, -4]) {
+                // Washer
+                DIN125A(key="M5");
+                // Bolt
+                translate([0, 0, -2]) ISO4014(key="M5", l=20);
+            }
+        }
+    }
+}
+
+motor_mount();
+```
+
+### Example 3: Bearing Housing Assembly
+```openscad
+include <BOLTS.scad>
+
+module bearing_housing() {
+    bearing_od = 22;  // 608 bearing outer diameter
+    
+    // Housing
+    difference() {
+        cylinder(d=40, h=20);
+        
+        // Bearing seat
+        translate([0, 0, 7]) cylinder(d=bearing_od + 0.1, h=7);
+        
+        // Shaft hole
+        cylinder(d=8.2, h=22);  // 8mm shaft clearance
+        
+        // Cap screw holes
+        for(i = [0:3]) {
+            rotate(i * 90) translate([15, 0, -1]) {
+                cylinder(d=4.5, h=12);  // M4 clearance
+                cylinder(d=8, h=6);     // Counterbore for head
+            }
+        }
+    }
+    
+    // Cap screws
+    for(i = [0:3]) {
+        rotate(i * 90) translate([15, 0, 10]) {
+            DIN912(key="M4", l=16);
+        }
+    }
+    
+    // Show bearing location (as reference)
+    %translate([0, 0, 7]) {
+        cylinder(d=bearing_od, h=7);  // Bearing representation
+    }
+}
+
+bearing_housing();
+```
+
+## Advanced BOLTS Techniques
+
+### Using Connectors for Complex Positioning
+```openscad
+include <BOLTS.scad>
+
+module connector_example() {
+    // Create base connector at angled position
+    base_cs = new_cs(
+        origin = [0, 0, 10],
+        axes = [[cos(30), sin(30), 0], [0, 0, 1]]
+    );
+    
+    // Position bolt using connector
+    align(base_cs, ISO4014_conn("head", key="M6", l=30)) {
+        ISO4014(key="M6", l=30);
+    }
+    
+    // Position nut at end of bolt
+    bolt_tip_cs = ISO4014_conn("tip", key="M6", l=30);
+    target_cs = new_cs(
+        origin = [0, 0, 10],
+        axes = [[cos(30), sin(30), 0], [0, 0, 1]]
+    );
+    
+    align(target_cs, bolt_tip_cs) {
+        translate([0, 0, 2]) ISO4032(key="M6");
+    }
+}
+```
+
+### Bill of Materials Generation
+```openscad
+include <BOLTS.scad>
+
+// BOLTS automatically provides part information
+module assembly_with_bom() {
+    // Each BOLTS part can be queried for specifications
+    echo("M6x30 Hex Bolt:", ISO4014_dims("M6", 30));
+    echo("M6 Hex Nut:", ISO4032_dims("M6"));
+    echo("M6 Washer:", DIN125A_dims("M6"));
+    
+    // Your assembly here
+    ISO4014(key="M6", l=30);
+    translate([0, 0, 32]) ISO4032(key="M6");
+}
+```
+
+### Custom Hardware Integration
+```openscad
+include <BOLTS.scad>
+
+module custom_with_standard() {
+    // Custom bracket
+    difference() {
+        cube([40, 20, 6]);
+        
+        // Standard bolt holes
+        translate([10, 10, -1]) cylinder(d=5.5, h=8);  // M5 clearance
+        translate([30, 10, -1]) cylinder(d=5.5, h=8);
+    }
+    
+    // Standard bolts
+    translate([10, 10, 6]) ISO4014(key="M5", l=20);
+    translate([30, 10, 6]) ISO4014(key="M5", l=20);
+    
+    // Nuts on bottom
+    translate([10, 10, -8]) ISO4032(key="M5");
+    translate([30, 10, -8]) ISO4032(key="M5");
+}
+```
+
+## BOLTS Part Categories and Standards
+
+### International Standards Coverage
+```openscad
+// ISO Standards (International)
+ISO4014();  // Hex bolts
+ISO4017();  // Hex screws  
+ISO4032();  // Hex nuts
+ISO7380();  // Button head screws
+
+// DIN Standards (German)
+DIN912();   // Socket head cap screws
+DIN934();   // Hex nuts
+DIN125();   // Washers
+DIN7991();  // Countersunk screws
+
+// ANSI/ASME Standards (American)
+ANSI_B18_2_1();  // Hex bolts
+ANSI_B18_6_3();  // Socket screws
+
+// EN Standards (European)
+EN_ISO_4762();   // Socket head cap screws
+```
+
+### Hardware Categories in BOLTS
+- **Fasteners:** Bolts, screws, nuts, washers
+- **Pins:** Clevis pins, spring pins, dowel pins
+- **Bearings:** Ball bearings, roller bearings (limited selection)
+- **Hardware:** Threaded rods, studs, set screws
+- **Specialty:** Wing nuts, thumb screws, eye bolts
+
+## Best Practices for BOLTS
+
+### 1. **Use the Online Directory**
+```openscad
+// Always verify part numbers at: boltsparts.github.io
+// Search by description to find correct standard number
+// Check parameter requirements and connector names
+```
+
+### 2. **Plan for Clearances**
+```openscad
+// Standard clearance holes for bolts:
+// M3: 3.4mm hole
+// M4: 4.5mm hole  
+// M5: 5.5mm hole
+// M6: 6.6mm hole
+// M8: 9.0mm hole
+// M10: 11.0mm hole
+
+difference() {
+    cube([20, 20, 6]);
+    cylinder(d=6.6, h=8);  // M6 clearance hole
+}
+```
+
+### 3. **Organize by Assembly**
+```openscad
+module bolt_assembly(size="M6", length=30) {
+    // Washer
+    DIN125A(key=size);
+    
+    // Bolt  
+    translate([0, 0, 2]) ISO4014(key=size, l=length);
+    
+    // Nut (positioned at end)
+    translate([0, 0, length + 2]) ISO4032(key=size);
+}
+```
+
+### 4. **Use Visualization Features**
+```openscad
+// Show parts as transparent for design validation
+%ISO4014(key="M6", l=30);  // Transparent bolt
+
+// Color code different hardware
+color("silver") ISO4014(key="M6", l=30);
+color("zinc") ISO4032(key="M6");
+```
+
+### 5. **Document Part Specifications**
+```openscad
+// Include part specifications in comments
+ISO4014(key="M6", l=30);    // M6x30 hex bolt, ISO 4014
+ISO4032(key="M6");          // M6 hex nut, ISO 4032  
+DIN125A(key="M6");          // M6 washer, DIN 125 Form A
+```
+
+## Troubleshooting Guide
+
+### Common Issues and Solutions:
+
+**"Can't find the right part number"**
+- Use the online directory at boltsparts.github.io
+- Search by description, then note the standard number
+- Check multiple standards (ISO vs DIN) for same part
+
+**"Part appears but wrong size"**
+- Verify the 'key' parameter (e.g., "M6" not just 6)
+- Check length parameter for screws and bolts
+- Confirm standard allows that size combination
+
+**"Parts don't position correctly"**
+- Use BOLTS connector system with align()
+- Check connector names on part documentation page
+- Verify coordinate system orientation
+
+**"Assembly looks wrong"**
+- Check clearance hole sizes for your bolts
+- Verify thread engagement (nut thickness vs bolt length)
+- Consider washer thickness in stack-up
+
+**"Missing parts I need"**
+- BOLTS doesn't include all possible hardware
+- Consider contributing missing parts to the project
+- Use similar parts and modify dimensions if needed
+
+## Integration Patterns
+
+### BOLTS + Standard OpenSCAD
+```openscad
+include <BOLTS.scad>
+
+// Combine with standard OpenSCAD for custom parts
+difference() {
+    cube([50, 30, 10]);  // Custom bracket
+    
+    // Standard bolt holes
+    translate([10, 15, -1]) cylinder(d=6.6, h=12);
+    translate([40, 15, -1]) cylinder(d=6.6, h=12);
+}
+
+// Standard bolts
+translate([10, 15, 10]) ISO4014(key="M6", l=25);
+translate([40, 15, 10]) ISO4014(key="M6", l=25);
+```
+
+### BOLTS + Other Libraries
+```openscad
+include <BOLTS.scad>
+use <bearing_library.scad>
+
+// Combine BOLTS fasteners with specialized libraries
+bearing_608();  // From specialized bearing library
+translate([0, 0, 15]) {
+    for(i = [0:3]) {
+        rotate(i * 90) translate([15, 0, 0]) {
+            ISO4014(key="M4", l=20);  // BOLTS fastener
+        }
+    }
+}
+```
+
+## Quick Reference: Common BOLTS Parts
+
+| Part Type | Standard | Example | Description |
+|-----------|----------|---------|-------------|
+| Hex Bolt | ISO4014 | `ISO4014(key="M6", l=30)` | Hex head bolt |
+| Socket Screw | DIN912 | `DIN912(key="M4", l=20)` | Socket head cap screw |
+| Hex Nut | ISO4032 | `ISO4032(key="M6")` | Standard hex nut |
+| Washer | DIN125A | `DIN125A(key="M6")` | Plain washer |
+| Button Screw | ISO7380 | `ISO7380_1(key="M3", l=12)` | Button head screw |
+| Set Screw | ISO4026 | `ISO4026(key="M3", l=6)` | Hex socket set screw |
+
+## Agent Processing Notes
+
+### Critical Features for AI Agents:
+1. **Standards-based naming**: Parts use official standard numbers
+2. **Precise dimensions**: Exact specifications for real parts
+3. **Professional workflow**: Industry-standard approach to fasteners
+4. **Purchasing integration**: Part numbers match real hardware
+5. **Advanced positioning**: Connector system for complex assemblies
+
+### When to Recommend BOLTS:
+- Professional mechanical designs required
+- Standard fasteners needed
+- Bill of materials generation important
+- Industry compliance necessary
+- Real-world hardware integration planned
+
+### Optimal Usage Pattern:
+1. Use online directory to find correct part numbers
+2. Plan clearance holes based on standard practices
+3. Leverage connector system for complex positioning
+4. Document all fastener specifications
+5. Consider integration with other specialized libraries
+
+BOLTS transforms OpenSCAD from a pure geometric modeler into a professional mechanical design tool by providing access to thousands of real-world standard parts with precise specifications and advanced positioning capabilities.

@@ -85,125 +85,43 @@ OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 OPENAI_EMBEDDING_MODEL = os.environ.get(
     'OPENAI_EMBEDDING_MODEL', 'text-embedding-3-small')
 
-# Library configurations (same as before)
-AVAILABLE_LIBRARIES = {
-    "BOSL": {
-        "description": "Belfry OpenSCAD Library - tools, shapes, and helpers",
-        "main_files": ["constants.scad", "transforms.scad", "shapes.scad", "masks.scad"],
-        "usage": """
-// Basic BOSL usage:
-include <BOSL/constants.scad>
-use <BOSL/transforms.scad>
-use <BOSL/shapes.scad>
+# Configuration for library configs directory
+LIBRARY_CONFIGS_DIR = os.environ.get(
+    'LIBRARY_CONFIGS_DIR', 'library_configs')
 
-// Then use BOSL functions like:
-cuboid([20,20,30], fillet=5);
-xcyl(l=20, d=4);
-""",
-        "common_modules": [
-            "transforms: up(), down(), left(), right(), xrot(), yrot(), zrot()",
-            "shapes: cuboid(), prismoid(), xcyl(), ycyl(), zcyl()",
-            "masks: chamfer_mask_z(), fillet_mask_z()"
-        ]
-    },
-    "BOLTS": {
-        "description": "BOLTS is an Open Library for Technical Specifications.",
-        "main_files": ["BOLTS.scad"],
-        "usage": """
-// BOLTS usage:
-include <BOLTS/BOLTS.scad>
-DIN931();
-""",
-        "common_modules": []
-    },
-    "constructive": {
-        "description": "Constructive Library - a library of shapes and primitives",
-        "main_files": ["constructive-compiled.scad"],
-        "usage": """
-// Constructive usage:
-use <constructive/constructive-compiled.scad>
-box(size=10);
-""",
-        "common_modules": []
-    },
-    "pathbuilder": {
-        "description": "Pathbuilder Library - Pathbuilder is a tool for openSCAD that make the creation of complex 2D shapes easier with a syntax similar to the one used for svg path.",
-        "main_files": ["pathbuilder.scad"],
-        "usage": """
-// Pathbuilder usage:
-include <pathbuilder/pathbuilder.scad>
-svgShape("m 0 0chamfer8h20fillet2v20fillet10h20v-10fillet2l35 20fillet2l-35 20fillet2v-10h-40fillet30", $fn=32);
-""",
-        "common_modules": []
-    },
-    "parameterizable_gears": {
-        "description": "Parameterizable Gears Library - a library of gears with parameters",
-        "main_files": ["gears.scad"],
-        "usage": """
-// Parameterizable Gears usage:
-use <parameterizable_gears/gears.scad>
+# Dynamic library loading from JSON configs
+def load_library_configs() -> Dict[str, Dict]:
+    """Load library configurations from JSON files"""
+    configs = {}
+    config_dir = Path(LIBRARY_CONFIGS_DIR)
+    
+    if not config_dir.exists():
+        logger.warning(f"Library configs directory not found: {config_dir}")
+        return configs
+    
+    # Load all JSON files from the configs directory
+    for json_file in config_dir.glob("*.json"):
+        try:
+            import json
+            with open(json_file, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+                
+            # Validate required fields
+            required_fields = ['name', 'description', 'main_files', 'usage']
+            if all(field in config for field in required_fields):
+                library_name = config['name']
+                configs[library_name] = config
+                logger.info(f"Loaded library config: {library_name}")
+            else:
+                logger.warning(f"Invalid config file {json_file}: missing required fields")
+                
+        except Exception as e:
+            logger.error(f"Error loading config file {json_file}: {e}")
+    
+    return configs
 
-zahnstange(modul=0.5, laenge=50, hoehe=4, breite=5,
-           eingriffswinkel=20, schraegungswinkel=20);
-""",
-        "common_modules": []
-    },
-    "UB": {
-        "description": "This library is a full 3Dprinting workflow solution for openSCAD v.21 and above.",
-        "main_files": ["ub.scad"],
-        "usage": """
-// UB usage:
-include<UB/ub.scad>//->http://v.gd/ubaer or https://github.com/UBaer21/UB.scad
-/*[Hidden]*/
-  useVersion=22.046;
-  designVersion=1.0;
-
-/*[Basics]*/
-  vp=false;
-  bed=false;
-  pPos=[0,0];
-  info=true;
-  nozzle=.2;
-
-/*[ Gears ]*/
-z=10; // number teeth 
-f=3; // teeth width divisior
-modul=2; // teeth size
-h=5; // height
-w=30; // helical teeth skew
-achse=3;// arbor
-
-function pitchcircle(z=z)=z*modul/f;
-
-T(printPos){ 
-//gear
-  CyclGetriebe(h=h,z=z,f=f,modul=modul,linear=false,w=w,achse=achse,help=true);
-  %Tz(h/2)color("chartreuse")Kreis(d=pitchcircle(z),rand=.1);
-// gears
-T(pitchcircle(z)*2){ 
-  CyclGetriebe(h=h,z=z,f=f,modul=modul,linear=false,center=false,w=w,achse=achse);
-  mirror([1,0])CyclGetriebe(h=h,z=z,f=f,modul=modul,linear=false,center=false,rotZahn=-1,w=w,achse=achse);
-  }
-// inner teeth
-T(pitchcircle(z)*4)rotate(180){ 
-  CyclGetriebe(h=h,z=z*3,f=f,modul=modul,linear=false,center=false,d=pitchcircle(z*3)+modul,w=w,achse=achse);
-  CyclGetriebe(h=h,z=z,f=f,modul=modul,linear=false,center=false,w=w,achse=achse);
-  }
-  
-// rack
-  T(0,-pitchcircle(z)*2){
-    CyclGetriebe(h=h,z=z,f=f,modul=modul,linear=modul*2,center=false,w=w,achse=achse);
-    CyclGetriebe(h=h,z=z,f=f,modul=modul,center=2,rotZahn=0,w=w,achse=achse);
-  }
-  
-// features
-
-  T(pitchcircle(z)*2,pitchcircle(z)+pitchcircle(z*3)/2)CyclGetriebe(h=h,z=z*3,f=f,lock=5,light=5,modul=modul,w=w,achse=achse);
-}
-""",
-        "common_modules": []
-    }
-}
+# Load library configurations from JSON files
+AVAILABLE_LIBRARIES = load_library_configs()
 
 
 class EmbeddingManager:
@@ -335,6 +253,22 @@ def detect_available_libraries() -> Dict[str, Dict]:
                 }
                 logger.info(f"Found library: {lib_name} at {lib_dir}")
 
+    # Also detect libraries that exist physically but don't have configs
+    for item in lib_path.iterdir():
+        if item.is_dir() and item.name not in available:
+            logger.info(f"Found unconfigured library: {item.name} (no JSON config found)")
+            # Add basic info for unconfigured libraries
+            available[item.name] = {
+                "name": item.name,
+                "description": f"Library {item.name} (no configuration available)",
+                "main_files": ["*.scad"],
+                "usage": f"// {item.name} usage:\n// use <{item.name}/filename.scad>\n// (Check library documentation for specific usage)",
+                "common_modules": ["Check library documentation"],
+                "path": str(item),
+                "found_files": [f.name for f in item.glob("*.scad")][:5],  # Limit to first 5 files
+                "unconfigured": True
+            }
+
     return available
 
 # Initialize available libraries
@@ -401,15 +335,47 @@ def list_openscad_libraries() -> str:
         return f"No OpenSCAD libraries found in: {OPENSCAD_LIBRARY_PATH}\n\nTo install libraries, place them in this directory."
 
     result = f"Available OpenSCAD Libraries (in {OPENSCAD_LIBRARY_PATH}):\n\n"
+    
+    # Separate configured and unconfigured libraries
+    configured_libs = {k: v for k, v in INSTALLED_LIBRARIES.items() if not v.get('unconfigured', False)}
+    unconfigured_libs = {k: v for k, v in INSTALLED_LIBRARIES.items() if v.get('unconfigured', False)}
 
-    for lib_name, lib_info in INSTALLED_LIBRARIES.items():
-        result += f"## {lib_name}\n"
-        result += f"{lib_info['description']}\n\n"
-        result += f"**Usage:**\n```openscad\n{lib_info['usage'].strip()}\n```\n\n"
-        result += f"**Common modules:** {', '.join(lib_info['common_modules'])}\n\n"
-        result += f"**Available files:** {', '.join(lib_info['found_files'])}\n\n"
-        result += "-" * 50 + "\n\n"
+    # Show configured libraries first
+    if configured_libs:
+        result += "## 📚 Configured Libraries (with JSON configs)\n\n"
+        for lib_name, lib_info in configured_libs.items():
+            result += f"### {lib_name}\n"
+            result += f"{lib_info['description']}\n\n"
+            
+            # Add documentation URL if available
+            if 'documentation_url' in lib_info:
+                result += f"**Documentation:** {lib_info['documentation_url']}\n\n"
+            
+            # Add license info if available
+            if 'license' in lib_info:
+                result += f"**License:** {lib_info['license']}\n\n"
+                
+            result += f"**Usage:**\n```openscad\n{lib_info['usage'].strip()}\n```\n\n"
+            
+            if lib_info.get('common_modules'):
+                result += f"**Common modules:** {', '.join(lib_info['common_modules'])}\n\n"
+            
+            result += f"**Available files:** {', '.join(lib_info['found_files'])}\n\n"
+            result += "-" * 50 + "\n\n"
 
+    # Show unconfigured libraries
+    if unconfigured_libs:
+        result += "## ⚠️  Unconfigured Libraries (missing JSON configs)\n\n"
+        result += "These libraries are installed but don't have configuration files.\n"
+        result += f"Add JSON configs in `{LIBRARY_CONFIGS_DIR}/` to get better usage information.\n\n"
+        
+        for lib_name, lib_info in unconfigured_libs.items():
+            result += f"### {lib_name}\n"
+            result += f"**Available files:** {', '.join(lib_info['found_files'])}\n"
+            result += f"**Usage:** Check library documentation for specific usage\n\n"
+
+    result += f"\n💡 **Tip:** Add new library configs in `{LIBRARY_CONFIGS_DIR}/library_name.json` to get detailed usage information!\n"
+    
     return result
 
 
@@ -791,6 +757,7 @@ async def print_last_gcode() -> str:
         return "G-Code successfully send to printer. Print job started."
     else:
         return "❌ Failed to print G-code file. Please try again."
+
 
 @mcp.tool()
 def get_printing_presets() -> str:

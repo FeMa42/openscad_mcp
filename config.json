@@ -12,6 +12,7 @@
                 "FAISS_INDEX_PATH": "path/to/openscad_mcp/faiss_index",
                 "OPENSCAD_EXECUTABLE": "path/to/openscad",
                 "OPENSCAD_USER_LIBRARY_PATH": "path/to/openscad/libraries",
+                "LIBRARY_CONFIGS_DIR": "path/to/openscad_mcp/library_configs",
                 "EMBEDDING_PROVIDER": "local",
                 "OPENAI_EMBEDDING_MODEL": "text-embedding-3-small",
                 "PRUSASLICER_PATH": "/Applications/PrusaSlicer.app/Contents/MacOS/PrusaSlicer"

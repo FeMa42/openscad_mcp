@@ -1,0 +1,13 @@
+{
+  "name": "BOSL",
+  "description": "Belfry OpenSCAD Library - tools, shapes, and helpers",
+  "main_files": ["constants.scad", "transforms.scad", "shapes.scad", "masks.scad"],
+  "usage": "// Basic BOSL usage:\ninclude <BOSL/constants.scad>\nuse <BOSL/transforms.scad>\nuse <BOSL/shapes.scad>\n\n// Then use BOSL functions like:\ncuboid([20,20,30], fillet=5);\nxcyl(l=20, d=4);",
+  "common_modules": [
+    "transforms: up(), down(), left(), right(), xrot(), yrot(), zrot()",
+    "shapes: cuboid(), prismoid(), xcyl(), ycyl(), zcyl()",
+    "masks: chamfer_mask_z(), fillet_mask_z()"
+  ],
+  "documentation_url": "https://github.com/revarbat/BOSL",
+  "license": "BSD-2-Clause"
+} 

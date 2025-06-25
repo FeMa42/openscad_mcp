@@ -1,0 +1,13 @@
+{
+  "name": "constructive",
+  "description": "Constructive Library - extends OpenSCAD for complex mechanical parts with stamping approach",
+  "main_files": ["constructive-compiled.scad"],
+  "usage": "// Constructive usage:\nuse <constructive/constructive-compiled.scad>\n\n// Basic shapes:\nbox(size=10);\ntube(height=20, outerDiameter=15, innerDiameter=10);\n\n// Mechanical parts:\nbearing(model=\"608\");\nnut(size=\"M8\");",
+  "common_modules": [
+    "shapes: box(), tube(), cylinder2()",
+    "mechanical: bearing(), nut(), bolt()",
+    "utilities: stamping operations"
+  ],
+  "documentation_url": "https://github.com/solidboredom/constructive",
+  "license": "GPL-2.0-only"
+} 

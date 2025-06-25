@@ -1,0 +1,14 @@
+{
+  "name": "BOLTS",
+  "description": "BOLTS is an Open Library for Technical Specifications - standard parts and fasteners",
+  "main_files": ["BOLTS.scad"],
+  "usage": "// BOLTS usage:\ninclude <BOLTS/BOLTS.scad>\n\n// Create standard bolts and nuts:\nDIN931(key=\"M8\", l=25);\nDIN934(key=\"M8\");\nISO4762(key=\"M6\", l=20);",
+  "common_modules": [
+    "bolts: DIN931(), DIN912(), ISO4762()",
+    "nuts: DIN934(), DIN985()", 
+    "washers: DIN125A(), DIN125B()",
+    "bearings: 608(), 6001()"
+  ],
+  "documentation_url": "https://bolts-library.org/en/index.html",
+  "license": "LGPL-2.1+"
+} 

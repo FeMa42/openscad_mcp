@@ -1,0 +1,13 @@
+{
+  "name": "parameterizable_gears",
+  "description": "Parameterizable Gears Library - comprehensive gear generation with DIN standards",
+  "main_files": ["gears.scad"],
+  "usage": "// Parameterizable Gears usage:\nuse <parameterizable_gears/gears.scad>\n\n// Spur gear:\nzahnstange(modul=0.5, laenge=50, hoehe=4, breite=5,\n           eingriffswinkel=20, schraegungswinkel=20);\n\n// Helical gear:\nstirnrad(modul=2, zahnzahl=20, breite=10, bohrung=5, eingriffswinkel=20);",
+  "common_modules": [
+    "gears: stirnrad(), zahnstange(), kegelrad()",
+    "parameters: modul, zahnzahl, eingriffswinkel, schraegungswinkel",
+    "utilities: evolvent(), kugelkoordinaten_nach_kartesisch()"
+  ],
+  "documentation_url": "https://github.com/chrisspen/gears",
+  "license": "LGPL-3.0"
+} 

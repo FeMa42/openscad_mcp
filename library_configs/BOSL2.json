@@ -1,0 +1,15 @@
+{
+  "name": "BOSL2",
+  "description": "Belfry OpenScad Library v2 - A library of tools, shapes, and helpers to make OpenScad easier to use",
+  "main_files": ["std.scad", "shapes.scad", "transforms.scad", "beziers.scad"],
+  "usage": "// BOSL2 usage:\ninclude <BOSL2/std.scad>\n\n// Then use BOSL2 functions like:\ncuboid([20,20,30], rounding=5);\ncyl(l=20, d=4);\nrotate_extrude() right(10) circle(d=2);",
+  "common_modules": [
+    "shapes2d: circle(), square(), rect(), trapezoid()",
+    "shapes3d: cube(), cuboid(), cylinder(), cyl(), sphere()",
+    "transforms: up(), down(), left(), right(), fwd(), back()",
+    "beziers: bezier_curve(), bezier_patch()",
+    "threading: threaded_rod(), threaded_nut()"
+  ],
+  "documentation_url": "https://github.com/revarbat/BOSL2/wiki",
+  "license": "BSD-2-Clause"
+} 

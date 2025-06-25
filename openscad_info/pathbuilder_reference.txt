@@ -1,0 +1,490 @@
+# Pathbuilder OpenSCAD Library Reference Guide
+
+## Library Overview
+**Author:** Paul van Dinther  
+**License:** Open Source  
+**Description:** A tool for OpenSCAD that makes the creation of complex 2D shapes easier with SVG path syntax  
+**Usage:** `include <pathbuilder.scad>`
+
+Pathbuilder enables the creation of complex 2D shapes using a syntax similar to SVG paths. It supports the complete SVG command set plus additional commands for fillets, chamfers, line extensions, and more. The library is self-contained in a single file with no dependencies.
+
+## When to Use Pathbuilder
+
+### Perfect For:
+- **Complex 2D profiles** - Intricate shapes that would be difficult with basic OpenSCAD
+- **SVG path integration** - Direct use of paths from vector graphics programs like Inkscape
+- **Parametric 2D design** - Dynamic shape generation with variables
+- **Filleted/chamfered shapes** - Easy addition of rounded or beveled edges
+- **Organic curves** - Smooth, flowing 2D forms
+- **Architectural profiles** - Moldings, trim, decorative elements
+
+### Key Advantages:
+- **SVG compatibility** - Copy paths directly from Inkscape, Illustrator, etc.
+- **Parametric control** - Full OpenSCAD variable integration
+- **Advanced features** - Fillets, chamfers, extensions beyond standard SVG
+- **No dependencies** - Single file solution
+- **Dual approach** - String-based SVG paths OR direct module calls
+
+## Installation and Setup
+
+### Basic Installation
+```openscad
+// Single include - no dependencies
+include <pathbuilder.scad>
+
+// Test with simple example
+svgShape("m 0 0 h 20 v 20 h -20 z", $fn=32);
+```
+
+### Quality Settings
+```openscad
+// Global pathbuilder settings
+$pb_spline = 10;    // Spline resolution for curves
+$fn = 32;           // Fragment count for curves
+$fa = 1;            // Minimum angle
+$fs = 0.4;          // Minimum size
+```
+
+## Two Approaches to Using Pathbuilder
+
+### Approach 1: SVG Path Strings (Copy from Vector Software)
+```openscad
+include <pathbuilder.scad>
+
+// Simple rectangle with fillet
+svgShape("m 0 0 h 20 fillet 2 v 20 fillet 10 h -20 fillet 2 v -20 z", $fn=32);
+
+// Complex shape from Inkscape
+complex_path = "M68.56-4L18.4-25.36Q12.16-28 7.92-28q-4.8 0-6.96 3.36-1.36 2.16-.8 5.48t2.96 7.08q2 3.04 6.56 8z";
+svgShape(complex_path, $fn=50);
+```
+
+### Approach 2: Direct Module Calls (Parametric)
+```openscad
+include <pathbuilder.scad>
+
+// Parametric shape using modules
+width = 30;
+height = 20;
+corner_radius = 5;
+
+m(0, 0)        // Move to start
+h(width)       // Horizontal line
+fillet(corner_radius)
+v(height)      // Vertical line  
+fillet(corner_radius)
+h(-width)      // Back to start
+fillet(corner_radius)
+v(-height)
+fillet(corner_radius);
+```
+
+## Core Pathbuilder Functions
+
+### Main Shape Creation Functions
+
+#### `svgShape()` - Create 2D Polygon
+```openscad
+// Create polygon from SVG path string
+svgShape(path_string, $fn=32);
+
+// Example: Rounded rectangle
+svgShape("m 0 0 chamfer 8 h 20 fillet 2 v 20 fillet 10 h 20 v -10 fillet 2 l 35 20 fillet 2 l -35 20 fillet 2 v -10 h -40 fillet 30", $fn=32);
+```
+
+#### `svgPoints()` - Get Point List  
+```openscad
+// Get points for manipulation before creating polygon
+points = svgPoints("m 0 0 h 20 v 20 h -20 z");
+polygon(points[0]);  // Use first point list
+
+// 3D version
+points_3d = svgPoints("m 0 0 h 20 v 20 h -20 z", z=5);
+```
+
+#### `svgTweenPath()` - Morph Between Paths
+```openscad
+// Create intermediate path between two similar paths
+path1 = "m 0 0 h 20 v 10 h -20 z";
+path2 = "m 0 0 h 30 v 20 h -30 z";
+tween_path = svgTweenPath(path1, path2, 0.5);  // 50% between
+svgShape(tween_path);
+```
+
+## SVG Path Commands Reference
+
+### Case Sensitivity Rule
+- **Uppercase commands** = Absolute coordinates
+- **Lowercase commands** = Relative coordinates from current point
+
+### Basic Movement Commands
+```openscad
+// Move commands
+m(x, y)        // Move to point (start new path)
+M(x, y)        // Move to absolute coordinates
+
+// Line commands  
+l(x, y)        // Line to relative point
+L(x, y)        // Line to absolute point
+h(distance)    // Horizontal line (relative)
+H(x)           // Horizontal line to absolute x
+v(distance)    // Vertical line (relative)  
+V(y)           // Vertical line to absolute y
+
+// Close path
+z()            // Close path (line back to start)
+Z()            // Close path (absolute)
+```
+
+### Curve Commands
+```openscad
+// Quadratic Bezier curves
+q(cx, cy, x, y)    // Quadratic curve (relative)
+Q(cx, cy, x, y)    // Quadratic curve (absolute)
+t(x, y)            // Smooth quadratic continuation
+T(x, y)            // Smooth quadratic (absolute)
+
+// Cubic Bezier curves  
+c(cx1, cy1, cx2, cy2, x, y)    // Cubic curve (relative)
+C(cx1, cy1, cx2, cy2, x, y)    // Cubic curve (absolute)
+s(cx2, cy2, x, y)              // Smooth cubic continuation
+S(cx2, cy2, x, y)              // Smooth cubic (absolute)
+
+// Arc commands
+a(rx, ry, rotation, large_arc, sweep, x, y)    // Arc (relative)
+A(rx, ry, rotation, large_arc, sweep, x, y)    // Arc (absolute)
+```
+
+## Pathbuilder Enhanced Commands
+
+### Fillets and Chamfers
+```openscad
+// Add fillet at current point
+fillet(radius)
+F(radius)      // Absolute version
+
+// Add chamfer at current point  
+chamfer(distance)
+C(distance)    // Absolute version
+
+// Examples
+m(0, 0) h(20) fillet(5) v(20) chamfer(3) h(-20) z();
+```
+
+### Advanced Line Operations
+```openscad
+// Extend line to boundary
+extend_to_boundary(boundary_shape);
+
+// Tangent operations
+tangent_arc(radius, end_point);
+tangent_line(end_point);
+
+// Example: Complex profile with extensions
+m(0, 0) 
+h(50) 
+extend_to_boundary(circle(60))
+fillet(10)
+v(30)
+chamfer(5);
+```
+
+## Practical Examples
+
+### Example 1: Architectural Molding Profile
+```openscad
+include <pathbuilder.scad>
+
+module crown_molding(length=100) {
+    // 2D profile
+    profile_path = "m 0 0 h 25 fillet 3 v 8 chamfer 2 l -5 15 fillet 5 l -15 -5 chamfer 2 v -8 z";
+    
+    // Extrude along length
+    linear_extrude(height=length) {
+        svgShape(profile_path, $fn=64);
+    }
+}
+
+crown_molding(200);
+```
+
+### Example 2: Parametric Logo/Emblem
+```openscad
+include <pathbuilder.scad>
+
+module parametric_emblem(size=20, detail=5) {
+    scale(size/20) {
+        // Outer ring
+        difference() {
+            svgShape("m 0 0 circle 20", $fn=64);
+            svgShape("m 0 0 circle 15", $fn=64);
+        }
+        
+        // Inner detail using parametric pathbuilder
+        m(0, 0)
+        for(i = [0:5]) {
+            rotate(i * 60) {
+                l(10, 0) fillet(detail) l(5, 5) fillet(detail/2) l(-15, -5);
+            }
+        }
+    }
+}
+
+parametric_emblem(30, 3);
+```
+
+### Example 3: Complex Housing Profile
+```openscad
+include <pathbuilder.scad>
+
+module housing_profile(width=50, height=30, wall=3, corner_r=5) {
+    // Outer profile
+    outer = str("m 0 0 h ", width, " fillet ", corner_r, 
+               " v ", height, " fillet ", corner_r,
+               " h -", width, " fillet ", corner_r, 
+               " v -", height, " fillet ", corner_r, " z");
+    
+    // Inner cutout
+    inner_w = width - 2*wall;
+    inner_h = height - 2*wall;
+    inner_r = max(1, corner_r - wall);
+    
+    inner = str("m ", wall, " ", wall, " h ", inner_w, " fillet ", inner_r,
+               " v ", inner_h, " fillet ", inner_r,
+               " h -", inner_w, " fillet ", inner_r,
+               " v -", inner_h, " fillet ", inner_r, " z");
+    
+    difference() {
+        svgShape(outer, $fn=32);
+        svgShape(inner, $fn=32);
+    }
+}
+
+linear_extrude(10) housing_profile(60, 40, 4, 8);
+```
+
+### Example 4: From Inkscape to OpenSCAD
+```openscad
+include <pathbuilder.scad>
+
+// Path copied directly from Inkscape XML
+inkscape_path = "m 15.875,79.375 c -8.854167,0 -15.875,7.020833 -15.875,15.875 0,8.854167 7.020833,15.875 15.875,15.875 8.854167,0 15.875,-7.020833 15.875,-15.875 0,-8.854167 -7.020833,-15.875 -15.875,-15.875 z";
+
+// Use directly in OpenSCAD
+linear_extrude(5) {
+    scale(0.5) {  // Scale down from Inkscape units
+        svgShape(inkscape_path, $fn=64);
+    }
+}
+```
+
+## Advanced Pathbuilder Techniques
+
+### 1. Multi-Part Shapes and Holes
+```openscad
+include <pathbuilder.scad>
+
+// Shape with internal holes
+outer_ring = "m 0 0 circle 20 z";
+inner_hole = "m 0 0 circle 8 z";
+mounting_holes = [
+    "m 12 0 circle 2 z",
+    "m -12 0 circle 2 z", 
+    "m 0 12 circle 2 z",
+    "m 0 -12 circle 2 z"
+];
+
+difference() {
+    svgShape(outer_ring, $fn=64);
+    svgShape(inner_hole, $fn=32);
+    for(hole = mounting_holes) {
+        svgShape(hole, $fn=16);
+    }
+}
+```
+
+### 2. Dynamic Path Generation
+```openscad
+include <pathbuilder.scad>
+
+function generate_star_path(points=5, outer_r=20, inner_r=8) = 
+    let(
+        angle_step = 360 / points,
+        path_commands = [
+            str("m ", outer_r, " 0"),
+            for(i = [1:points]) str(
+                " l ", cos(i*angle_step - angle_step/2) * inner_r - cos((i-1)*angle_step) * outer_r,
+                " ", sin(i*angle_step - angle_step/2) * inner_r - sin((i-1)*angle_step) * outer_r,
+                " l ", cos(i*angle_step) * outer_r - cos(i*angle_step - angle_step/2) * inner_r,
+                " ", sin(i*angle_step) * outer_r - sin(i*angle_step - angle_step/2) * inner_r
+            ),
+            " z"
+        ]
+    )
+    str(path_commands[0], for(cmd = [1:len(path_commands)-1]) path_commands[cmd]);
+
+// Generate parametric star
+star_path = generate_star_path(7, 25, 10);
+svgShape(star_path, $fn=32);
+```
+
+### 3. Path Morphing Animation
+```openscad
+include <pathbuilder.scad>
+
+// Animate between shapes
+path_start = "m 0 0 h 20 v 10 h -20 z";  // Rectangle
+path_end = "m 0 0 l 20 10 l 0 10 l -20 -10 z";    // Parallelogram
+
+// Use $t for animation (0 to 1)
+morphed_path = svgTweenPath(path_start, path_end, $t);
+svgShape(morphed_path, $fn=32);
+```
+
+### 4. 3D Extrusion with Path Profiles
+```openscad
+include <pathbuilder.scad>
+
+module extruded_profile(profile_path, height=10, twist=0, scale_factor=1) {
+    linear_extrude(
+        height=height, 
+        twist=twist, 
+        scale=scale_factor
+    ) {
+        svgShape(profile_path, $fn=32);
+    }
+}
+
+// Complex extruded shapes
+profile = "m 0 0 h 10 fillet 2 v 5 chamfer 1 l -5 3 fillet 3 l -5 -3 chamfer 1 v -5 z";
+
+extruded_profile(profile, 50, 90, 0.5);  // Twisted and tapered
+```
+
+## Integration with Meshbuilder
+
+Pathbuilder includes meshbuilder.scad for creating complex 3D shapes by morphing between 2D profiles:
+
+```openscad
+include <pathbuilder.scad>
+include <meshbuilder.scad>
+
+// Create 3D shape by stacking morphed 2D shapes
+base_profile = "m 0 0 h 20 v 10 h -20 z";
+top_profile = "m 0 0 h 10 v 5 h -10 z";
+
+layers = [];
+for(i = [0:10]) {
+    z = i * 2;
+    morph_factor = i / 10;
+    layer_profile = svgTweenPath(base_profile, top_profile, morph_factor);
+    layer_points = svgPoints(layer_profile, z);
+    layers = concat(layers, [layer_points[0]]);
+}
+
+// Create mesh from point layers
+mesh3D(layers);
+```
+
+## Best Practices for Pathbuilder
+
+### 1. **Start Simple, Build Complex**
+```openscad
+// Begin with basic shapes, add details incrementally
+basic_shape = "m 0 0 h 20 v 10 h -20 z";
+with_fillets = "m 0 0 h 20 fillet 2 v 10 fillet 2 h -20 fillet 2 v -10 fillet 2 z";
+```
+
+### 2. **Use Variables for Parametric Design**
+```openscad
+// Make shapes parametric
+width = 20;
+height = 10;
+corner_r = 2;
+profile = str("m 0 0 h ", width, " fillet ", corner_r, " v ", height, " fillet ", corner_r, " h -", width, " fillet ", corner_r, " v -", height, " fillet ", corner_r, " z");
+```
+
+### 3. **Test with High Fragment Counts**
+```openscad
+// Use high $fn for final models with curves
+svgShape(complex_path, $fn=128);  // Smooth curves
+```
+
+### 4. **Leverage SVG Software Integration**
+```openscad
+// Workflow: Design in Inkscape → Copy path → Use in OpenSCAD
+// 1. Create shape in Inkscape
+// 2. Convert to path (Path → Object to Path)
+// 3. Open XML editor, copy 'd' attribute
+// 4. Paste into pathbuilder
+```
+
+### 5. **Optimize for 3D Printing**
+```openscad
+// Add draft angles for better printing
+draft_profile = "m 0 0 h 20 l -2 10 h -16 l -2 -10 z";  // Tapered walls
+linear_extrude(15) svgShape(draft_profile);
+```
+
+## Troubleshooting Guide
+
+### Common Issues and Solutions:
+
+**"Path doesn't close properly"**
+- Ensure last command is `z` or `Z`
+- Check for missing coordinates in path string
+- Verify relative vs absolute coordinates
+
+**"Curves are too angular"**
+- Increase `$fn` value for smoother curves
+- Adjust `$pb_spline` for spline resolution
+- Use smaller segments in complex curves
+
+**"Fillet/chamfer not applied"**
+- Ensure fillet/chamfer commands are at correct points
+- Check that radius/distance values are appropriate for shape size
+- Verify command syntax (no spaces in path strings)
+
+**"SVG path from Inkscape doesn't work"**
+- Convert Bezier curves to simpler segments in Inkscape
+- Check for unsupported SVG commands
+- Verify path is single continuous path, not multiple paths
+
+**"Complex shapes render slowly"**
+- Reduce fragment count for preview (`$fn=16`)
+- Simplify path for testing
+- Use lower `$pb_spline` values during development
+
+## Quick Reference: Common Path Patterns
+
+| Pattern | Path String | Result |
+|---------|-------------|---------|
+| Rectangle | `"m 0 0 h 20 v 10 h -20 z"` | Basic rectangle |
+| Rounded Rectangle | `"m 0 0 h 20 fillet 2 v 10 fillet 2 h -20 fillet 2 v -10 fillet 2 z"` | All corners filleted |
+| Circle | `"m 10 0 a 10 10 0 1 0 -20 0 a 10 10 0 1 0 20 0 z"` | SVG circle |
+| Chamfered Corner | `"m 0 0 h 15 chamfer 3 v 10 h -15 z"` | One chamfered corner |
+
+## Agent Processing Notes
+
+### Critical Features for AI Agents:
+1. **SVG compatibility**: Direct integration with vector design tools
+2. **Parametric capability**: Full OpenSCAD variable integration
+3. **Advanced features**: Fillets, chamfers beyond basic SVG
+4. **Dual interface**: String-based AND module-based approaches
+5. **3D integration**: Easy extrusion and 3D manipulation
+
+### When to Recommend Pathbuilder:
+- User needs complex 2D shapes
+- Integration with vector graphics software required
+- Organic, flowing curves needed
+- Parametric 2D profiles for extrusion
+- Architectural or decorative elements
+
+### Optimal Usage Pattern:
+1. Start with simple shapes to learn syntax
+2. Use Inkscape integration for complex curves
+3. Add parametric control with variables
+4. Combine with linear_extrude for 3D parts
+5. Use morphing for animation or complex 3D shapes
+
+Pathbuilder bridges the gap between artistic vector design and parametric CAD, making it invaluable for creating sophisticated 2D profiles that would be difficult or impossible with basic OpenSCAD primitives.

@@ -1,0 +1,622 @@
+# Constructive OpenSCAD Library Reference Guide
+
+## Library Overview
+**Author:** PPROJ (solidboredom)  
+**License:** Dual-licensed under GPL 2.0 or CERN-OHL-W  
+**Description:** Extends OpenSCAD Language for complex and complementary mechanical parts with less mathematical code  
+**Usage:** `include <constructive-compiled.scad>`
+
+Constructive Library introduces a radically different approach to OpenSCAD syntax, offering a "Stamping" approach to quickly create mechanical parts that fit and complement one another. It serves as a replacement for Constraints known from other CAD systems, focusing on mechanical construction rather than mathematical concepts.
+
+## When to Use Constructive Library
+
+### Perfect For:
+- **Mechanical assemblies** - Parts that must fit together precisely
+- **Complex mechanical parts** - Gears, brackets, housings, mounts
+- **Constraint-based design** - Parts positioned relative to each other
+- **Production mechanical parts** - Professional-grade assemblies
+- **Hole patterns and mounting** - Easy creation of bolt holes, slots, mounts
+- **Parametric mechanical design** - Scalable, reusable mechanical components
+
+### Key Revolutionary Features:
+- **Stamping approach** - Create complementary parts that automatically fit
+- **Constraint replacement** - Positioning without complex mathematics
+- **Mechanical syntax** - Language aligned with mechanical construction
+- **Automatic hole creation** - Holes from modules without complex boolean operations
+- **Part-based organization** - Manage complex assemblies with named parts
+- **Simplified positioning** - Intuitive placement commands
+
+## Installation and Setup
+
+### Basic Installation
+```openscad
+// Single file approach - everything included
+include <constructive-compiled.scad>
+
+// Test with simple example
+box(10);  // Creates a centered 10mm cube
+```
+
+### Quick Start Template
+```openscad
+include <constructive-compiled.scad>
+
+// Your design here - all objects centered by default
+// No need for center=true like vanilla OpenSCAD
+box(side=10);
+```
+
+## Fundamental Syntax Differences
+
+### Vanilla OpenSCAD vs Constructive
+```openscad
+// Vanilla OpenSCAD approach
+translate([10, 0, 0]) 
+    cube([10, 10, 15], center=true);
+
+// Constructive approach
+X(10) box(10, h=15);
+```
+
+### Core Philosophy Changes
+- **Rarely need `difference()`** - Use `remove()` instead
+- **Rarely need `for()`** - Use `pieces()` and `every()` instead  
+- **Rarely need `intersection()`** - Use constraints and parts
+- **All objects centered by default** - Like `center=true` in vanilla OpenSCAD
+- **Mechanical thinking** - Focus on how parts connect, not mathematics
+
+## Core Constructive Building Blocks
+
+### Basic Shapes (Mechanical Focus)
+```openscad
+include <constructive-compiled.scad>
+
+// Basic building blocks
+box(side=10);                    // 10x10x10 cube (centered)
+box(10, y=25, h=15);            // 10x25x15 box
+box(10, x=35, h=15);            // 35x10x15 box
+
+tube(d=10, h=20);               // Cylinder, diameter 10, height 20
+tube(dOuter=15, dInner=8, h=10); // Tube with wall thickness
+tubeShell(d=20, wall=2, h=15);  // Tube defined by wall thickness
+
+ball(d=20);                     // Sphere, diameter 20
+ballShell(d=20, wall=3);        // Hollow sphere
+```
+
+### Advanced Mechanical Shapes
+```openscad
+// Bent strips for mechanical connections
+bentStripXZ(length=50, width=10, height=5, bend_radius=15);
+
+// Chamfered and filleted shapes
+chamfer(size=2) box(20);        // Box with chamfered edges
+fillet(radius=3) tube(d=15, h=20); // Tube with filleted edges
+```
+
+## Positioning and Alignment (Core Innovation)
+
+### Directional Positioning
+```openscad
+include <constructive-compiled.scad>
+
+// Movement in cardinal directions
+X(15) box(10);          // Move 15mm in X direction
+Y(-20) ball(8);         // Move -20mm in Y direction  
+Z(30) tube(d=5, h=10);  // Move 30mm in Z direction
+
+// Combined movements
+X(10) Y(20) Z(5) box(15);
+```
+
+### Alignment Commands
+```openscad
+// Alignment to surfaces
+TOUP() box(10);         // Align bottom of box to XY plane
+TORIGHT() box(10);      // Align left face to YZ plane
+TOFRONT() box(10);      // Align back face to XZ plane
+
+// Advanced alignment
+align(TOUP, TOLEFT, TOBACK) box(20);
+
+// Stack objects
+stack() {
+    box(10, h=5);       // Bottom piece
+    tube(d=8, h=10);    // Stacked on top
+    ball(d=6);          // On top of tube
+}
+```
+
+### Rotation (Simplified Syntax)
+```openscad
+// Intuitive rotation commands
+turnXY(45) box(10);     // Rotate 45° around Z-axis
+turnXZ(30) box(10);     // Rotate 30° around Y-axis  
+turnYZ(60) box(10);     // Rotate 60° around X-axis
+
+// Combined rotation and positioning
+X(20) turnXY(45) box(10);
+```
+
+## Revolutionary Pieces System (Replace for() loops)
+
+### Creating Multiple Objects
+```openscad
+include <constructive-compiled.scad>
+
+// Instead of for() loops
+pieces(7) X(every(20)) box(10);         // 7 boxes, spaced 20mm apart
+pieces(5) Y(every(15)) ball(8);         // 5 balls, 15mm spacing
+
+// Variable sizing
+pieces(7) X(every(20)) box(10, h=10+every(5));  // Increasing height
+
+// Circular arrangements  
+pieces(6) turnXY(every(60)) X(30) tube(d=5, h=15); // 6 tubes in circle
+```
+
+### Advanced Pieces Patterns
+```openscad
+// Two-sided arrangements
+two() X(sides(15)) ball(10);           // Two balls, ±15mm from center
+pieces(4) Y(sides(span())) box(5);     // Four boxes, spanning full range
+
+// Complex patterns
+pieces(3) pieces(3) X(every(20)) Y(every(15)) tube(d=3, h=8); // 3x3 grid
+```
+
+## Part-Based Design (Assembly Management)
+
+### Defining Parts
+```openscad
+include <constructive-compiled.scad>
+
+// Parts allow complex assembly management
+assemble("housing,gear,screws") {
+    // Housing part
+    add("housing") {
+        box(50, y=30, h=20);
+        remove("housing") X(15) Y(10) tube(d=5, h=25); // Mounting hole
+    }
+    
+    // Gear part  
+    add("gear") {
+        Z(25) tube(d=20, h=5);
+        remove("gear") tube(d=6, h=30); // Shaft hole
+    }
+    
+    // Screws part
+    add("screws") {
+        pieces(4) X(sides(20)) Y(sides(10)) tube(d=3, h=15);
+    }
+}
+```
+
+### Part Selection and Rendering
+```openscad
+// Render specific parts
+assemble("housing") { /* assembly code */ }      // Only housing
+assemble("gear,screws") { /* assembly code */ }  // Gear and screws
+assemble(ALL) { /* assembly code */ }           // Everything
+```
+
+## Advanced Hole Creation System
+
+### Automatic Hole Creation
+```openscad
+include <constructive-compiled.scad>
+
+// Revolutionary: create holes FROM modules
+difference() {
+    box(30);
+    
+    // Holes created from standard modules
+    X(10) tube(d=5, h=35);          // Through hole
+    Y(-8) box(6, h=35);             // Square hole
+    Z(12) ball(d=8);                // Spherical cavity
+}
+
+// Or use the constructive way
+box(30);
+remove() {
+    X(10) tube(d=5, h=35);
+    Y(-8) box(6, h=35);  
+    Z(12) ball(d=8);
+}
+```
+
+### Complex Mechanical Features
+```openscad
+// Bearing seat with automatic clearances
+bearing_mount() {
+    add() tube(dOuter=30, dInner=20, h=10);     // Outer housing
+    remove() Z(5) tube(d=22.2, h=6);            // Bearing seat (+0.2mm clearance)
+    remove() tube(d=8.2, h=15);                 // Shaft hole (+0.2mm clearance)
+}
+```
+
+## Mechanical Parts and Hardware
+
+### Metric Screws and Hardware
+```openscad
+include <constructive-compiled.scad>
+
+// Built-in metric hardware
+metricScrew(M3, length=20);         // M3x20 screw
+metricNut(M3);                      // M3 nut
+metricWasher(M3);                   // M3 washer
+
+// Screw holes with proper clearances
+remove() metricScrewHole(M3, length=25);  // M3 clearance hole
+remove() metricNutTrap(M3);               // M3 nut trap
+```
+
+### Assembly Hardware Patterns
+```openscad
+// Mounting bracket with hardware
+bracket() {
+    // Main bracket
+    add() box(40, y=6, h=30);
+    
+    // Mounting holes
+    remove() pieces(2) X(sides(15)) metricScrewHole(M4, 10);
+    
+    // Attachment point
+    add() TOUP() tube(d=12, h=8);
+    remove() tube(d=6.5, h=12);  // M6 clearance hole
+}
+```
+
+## Complex Assemblies and Constraints
+
+### Constraint-Based Assembly
+```openscad
+include <constructive-compiled.scad>
+
+// Motor mount assembly
+motor_mount() {
+    // Base plate
+    add("base") {
+        box(60, y=40, h=8);
+        remove("base") pieces(4) X(sides(25)) Y(sides(15)) metricScrewHole(M5, 12);
+    }
+    
+    // Motor bracket  
+    add("bracket") {
+        Z(4) TOUP() box(42, y=8, h=30);
+        remove("bracket") pieces(4) X(sides(15.5)) Y(0) Z(15) turnYZ(90) metricScrewHole(M3, 12);
+    }
+    
+    // Reinforcement gussets
+    add("gussets") {
+        pieces(2) Y(sides(20)) {
+            hull() {
+                Z(4) TOUP() TOBACK() box(8, y=8, h=1);
+                Z(20) TOUP() TOBACK() box(8, y=1, h=8);
+            }
+        }
+    }
+}
+```
+
+### Confinement System
+```openscad
+// Confinement for complex shapes
+intersection() {
+    confinement() {
+        confines("outer") tube(d=50, h=20);     // Confining shape
+    }
+    
+    assemble() {
+        add("part1") X(10) box(30);
+        add("part2") Y(-5) tube(d=15, h=25);
+        remove(confines("outer")) ball(d=8);    // Confined removal
+    }
+}
+```
+
+## Color and Visualization System
+
+### Automatic Part Coloring
+```openscad
+include <constructive-compiled.scad>
+
+// Color definitions
+partColors = [
+    ["housing", yellow, 0.8],
+    ["gears", orange, 0.3],
+    ["screws", grey, 0.4],
+    ["bearings", grey, 0.6]
+];
+
+// Automatic coloring based on parts
+autoColor(custom=partColors) {
+    assemble("housing,gears,screws") {
+        add("housing") box(50);
+        add("gears") Z(25) tube(d=20, h=5);
+        add("screws") pieces(4) metricScrew(M4, 20);
+    }
+}
+```
+
+### Basic Color Commands
+```openscad
+// Simple color applications
+opaq(red) box(10);              // Opaque red
+clear(blue) ball(8);            // Transparent blue
+silver() metricScrew(M3, 15);   // Metallic appearance
+```
+
+## Advanced Constructive Techniques
+
+### Parametric Mechanical Design
+```openscad
+include <constructive-compiled.scad>
+
+module parametric_gear_housing(gear_dia=40, wall=5, height=10) {
+    housing_size = gear_dia + 2*wall;
+    
+    add("housing") {
+        tube(d=housing_size, h=height);
+        remove("housing") tube(d=gear_dia + 0.5, h=height+2); // Gear clearance
+        remove("housing") tube(d=8.2, h=height+2);            // Shaft hole
+    }
+    
+    add("mounting") {
+        pieces(4) turnXY(every(90)) X(housing_size/2 + wall/2) {
+            tube(d=wall*2, h=height);
+            remove("mounting") metricScrewHole(M4, height+2);
+        }
+    }
+}
+
+parametric_gear_housing(gear_dia=50, wall=6, height=12);
+```
+
+### Stamping and Complementary Parts
+```openscad
+// Create mating parts automatically
+module connector_pair() {
+    // Male part
+    add("male") {
+        box(20, h=8);
+        TOUP() box(18, h=4);     // Tongue
+    }
+    
+    // Female part (automatically complementary)
+    X(30) add("female") {
+        box(20, h=8);
+        remove("female") TOUP() box(18.3, h=4.2); // Groove with clearance
+    }
+}
+
+connector_pair();
+```
+
+### Complex Mechanical Features
+```openscad
+// Dovetail joint with automatic clearances
+module dovetail_joint(width=20, depth=10, angle=15) {
+    // Male dovetail
+    add("male") {
+        hull() {
+            box(width, y=depth, h=2);
+            TOUP() box(width*0.8, y=depth, h=2);
+        }
+    }
+    
+    // Female dovetail
+    X(40) remove("female") {
+        hull() {
+            box(width+0.3, y=depth+0.2, h=2.2);     // Clearances added
+            TOUP() box(width*0.8+0.3, y=depth+0.2, h=2.2);
+        }
+    }
+    
+    X(40) add("female") box(width*1.5, y=depth*1.5, h=8);
+}
+```
+
+## Integration with Standard Libraries
+
+### Constructive + Standard Hardware
+```openscad
+include <constructive-compiled.scad>
+use <path/to/bearing_library.scad>
+
+module bearing_assembly() {
+    // Constructive housing
+    add("housing") {
+        tube(dOuter=50, dInner=30, h=15);
+        remove("housing") Z(7.5) tube(d=32.2, h=8);  // Bearing seat
+    }
+    
+    // Standard bearing from other library
+    add("bearing") Z(7.5) standard_bearing_608();
+    
+    // Constructive shaft
+    add("shaft") tube(d=8, h=40);
+}
+```
+
+## Best Practices for Constructive Library
+
+### 1. **Think Mechanically, Not Mathematically**
+```openscad
+// Instead of calculating positions
+// translate([cos(30)*20, sin(30)*20, 0]) cube(5);
+
+// Think about mechanical relationships
+turnXY(30) X(20) box(5);
+```
+
+### 2. **Use Parts to Organize Complex Assemblies**
+```openscad
+// Organize by function, not geometry
+assemble("structure,mechanism,hardware") {
+    add("structure") main_housing();
+    add("mechanism") gear_train();
+    add("hardware") all_screws_and_bearings();
+}
+```
+
+### 3. **Leverage Automatic Hole Creation**
+```openscad
+// Let constructive handle boolean operations
+main_part();
+remove() {
+    mounting_holes();
+    clearance_holes();
+    access_ports();
+}
+```
+
+### 4. **Use Pieces for Patterns**
+```openscad
+// Replace for() loops with intuitive pieces()
+pieces(bolt_count) turnXY(every(360/bolt_count)) X(bolt_circle_radius) 
+    metricScrewHole(M6, depth);
+```
+
+### 5. **Design for Manufacturing**
+```openscad
+// Build in clearances and tolerances
+bearing_seat_dia = bearing_outer_dia + 0.2;  // H7 fit
+shaft_hole_dia = shaft_dia + 0.3;            // Clearance fit
+```
+
+## Common Constructive Patterns
+
+### Pattern 1: Mounting Bracket
+```openscad
+include <constructive-compiled.scad>
+
+module mounting_bracket(width=40, height=30, thickness=6) {
+    // Main bracket body
+    add("bracket") {
+        box(width, y=thickness, h=height);
+        // Reinforcement gusset
+        hull() {
+            TODOWN() box(width, y=thickness, h=2);
+            TOFRONT() box(width, y=thickness*2, h=2);
+        }
+    }
+    
+    // Mounting holes
+    remove("bracket") {
+        pieces(2) X(sides(width*0.7)) metricScrewHole(M5, thickness+2);
+        TOUP() pieces(2) Y(sides(thickness)) metricScrewHole(M4, height);
+    }
+}
+```
+
+### Pattern 2: Gear Housing
+```openscad
+module gear_housing(gear_diameter, wall_thickness=5) {
+    housing_dia = gear_diameter + 2*wall_thickness;
+    
+    add("housing") {
+        // Main housing
+        tube(d=housing_dia, h=wall_thickness*2);
+        // Bearing bosses
+        pieces(2) Z(sides(wall_thickness)) tube(d=bearing_dia+wall_thickness, h=wall_thickness);
+    }
+    
+    remove("housing") {
+        // Gear clearance
+        tube(d=gear_diameter+1, h=wall_thickness*3);
+        // Bearing seats
+        pieces(2) Z(sides(wall_thickness)) tube(d=bearing_dia+0.1, h=wall_thickness+2);
+        // Shaft
+        tube(d=shaft_diameter+0.3, h=wall_thickness*4);
+    }
+}
+```
+
+### Pattern 3: Mechanical Assembly
+```openscad
+module complete_assembly() {
+    assemble("base,motor,coupling,output") {
+        // Base plate
+        add("base") {
+            box(100, y=80, h=10);
+            remove("base") pieces(4) X(sides(40)) Y(sides(30)) metricScrewHole(M6, 15);
+        }
+        
+        // Motor mount
+        add("motor") Z(5) TOUP() motor_mount_nema17();
+        
+        // Coupling
+        add("coupling") Z(15) TOUP() flexible_coupling();
+        
+        // Output mechanism
+        add("output") Z(25) TOUP() output_gear_assembly();
+    }
+}
+```
+
+## Troubleshooting Guide
+
+### Common Issues and Solutions:
+
+**"Objects not appearing where expected"**
+- Remember: all constructive objects are centered by default
+- Use `TOUP()`, `TORIGHT()`, etc. for surface alignment
+- Check positioning with `X()`, `Y()`, `Z()` commands
+
+**"Holes not cutting through properly"**
+- Use `remove()` instead of `difference()`
+- Ensure hole depth extends beyond part thickness
+- Check part organization with named parts
+
+**"Parts don't fit together"**
+- Add appropriate clearances (typically 0.1-0.3mm)
+- Use constructive's automatic tolerance features
+- Test fit with looser tolerances first
+
+**"Complex assemblies are confusing"**
+- Use part-based organization with `assemble()`
+- Color-code parts with `autoColor()`
+- Build incrementally, testing each part
+
+**"Performance issues with complex models"**
+- Use part selection to render only needed components
+- Disable complex features during development
+- Consider simplifying geometry for preview
+
+## Quick Reference: Constructive Commands
+
+| Command | Purpose | Example |
+|---------|---------|---------|
+| `box()` | Centered cube/box | `box(10, y=15, h=8)` |
+| `tube()` | Cylinder/tube | `tube(d=10, h=20)` |
+| `X()/Y()/Z()` | Positioning | `X(15) Y(-10) box(5)` |
+| `turnXY()` | Rotation | `turnXY(45) box(10)` |
+| `pieces()` | Multiple objects | `pieces(5) X(every(10)) ball(3)` |
+| `add()/remove()` | Part operations | `add("part1") box(10)` |
+| `assemble()` | Part selection | `assemble("gear,housing")` |
+
+## Agent Processing Notes
+
+### Critical Features for AI Agents:
+1. **Mechanical focus**: Language designed for mechanical construction
+2. **Constraint replacement**: Positioning without complex math
+3. **Part-based organization**: Natural assembly management
+4. **Automatic tolerances**: Built-in clearances and fits
+5. **Stamping approach**: Complementary parts creation
+
+### When to Recommend Constructive:
+- Complex mechanical assemblies required
+- Parts must fit together precisely
+- Traditional CAD constraint-like behavior needed
+- Mechanical thinking preferred over mathematical
+- Production-quality mechanical parts
+
+### Optimal Usage Pattern:
+1. Start with basic shapes and positioning
+2. Use part-based organization for complex assemblies  
+3. Leverage pieces() for patterns instead of for() loops
+4. Apply remove() for holes and cutouts
+5. Use automatic coloring and visualization for complex assemblies
+
+Constructive Library represents a paradigm shift toward mechanical thinking in OpenSCAD, making it invaluable for serious mechanical design and manufacturing applications.

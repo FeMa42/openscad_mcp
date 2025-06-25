@@ -1,0 +1,13 @@
+{
+  "name": "Round-Anything",
+  "description": "Round-Anything Library - A set of OpenSCAD utilities for adding radii and fillets",
+  "main_files": ["MinkowskiRound.scad", "ChamferLib.scad"],
+  "usage": "// Round-Anything usage:\nuse <Round-Anything/MinkowskiRound.scad>\n\n// Add rounding to any shape:\nminkowskiRound(r=2, useminkowski=false)\ncube([20,20,20]);\n\n// Polyline with rounding:\nbeamChain([[0,0,0],[10,0,0],[10,10,0]], r=2);",
+  "common_modules": [
+    "rounding: minkowskiRound(), polyRound()",
+    "chains: beamChain(), polyline3d()",
+    "utilities: shell(), addZcoord()"
+  ],
+  "documentation_url": "https://github.com/Irev-Dev/Round-Anything",
+  "license": "MIT"
+} 

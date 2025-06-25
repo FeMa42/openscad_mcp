@@ -1,0 +1,14 @@
+{
+  "name": "UB",
+  "description": "UB.scad - Full 3D printing workflow solution for OpenSCAD with tools for modifying and generating 3D objects",
+  "main_files": ["ub.scad"],
+  "usage": "// UB usage:\ninclude<UB/ub.scad>\n\n/*[Hidden]*/\nuseVersion=22.046;\ndesignVersion=1.0;\n\n/*[Basics]*/\nvp=false;\nbed=false;\npPos=[0,0];\ninfo=true;\nnozzle=.2;\n\n// Gear example:\nz=10; // number teeth \nf=3; // teeth width divisor\nmodul=2; // teeth size\nh=5; // height\n\nCyclGetriebe(h=h,z=z,f=f,modul=modul,linear=false,w=30,achse=3,help=true);",
+  "common_modules": [
+    "gears: CyclGetriebe(), gear functions",
+    "transforms: T(), Tz(), Rx(), Ry(), Rz()",
+    "shapes: Kreis(), Wuerfel(), Zylinder()",
+    "utilities: printPos, bed positioning"
+  ],
+  "documentation_url": "https://github.com/UBaer21/UB.scad",
+  "license": "CC0-1.0"
+} 

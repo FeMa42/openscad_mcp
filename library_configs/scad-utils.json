@@ -1,0 +1,14 @@
+{
+  "name": "scad-utils",
+  "description": "Scad-utils - Utility libraries for OpenSCAD including list comprehensions and functional programming",
+  "main_files": ["lists.scad", "transformations.scad", "shapes.scad", "morphology.scad"],
+  "usage": "// scad-utils usage:\nuse <scad-utils/lists.scad>\nuse <scad-utils/transformations.scad>\n\n// List operations:\necho(flatten([[1,2],[3,4]]));\necho(reverse([1,2,3,4]));\n\n// Transformations:\nfor_each_translation([[0,0,0],[10,0,0],[20,0,0]])\n  cube(5);",
+  "common_modules": [
+    "lists: flatten(), reverse(), slice(), zip()",
+    "transformations: for_each_translation(), for_each_rotation()",
+    "morphology: erode(), dilate()",
+    "shapes: rounded_cube(), pie_slice()"
+  ],
+  "documentation_url": "https://github.com/openscad/scad-utils",
+  "license": "LGPL-2.1+"
+} 
