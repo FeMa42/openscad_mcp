@@ -24,6 +24,7 @@ import tempfile
 import os
 import math
 import argparse
+import time
 
 # 3D processing imports
 try:
@@ -121,20 +122,40 @@ class STLProcessor:
         self.temp_dir = Path(tempfile.mkdtemp())
 
     def find_latest_stl(self, output_dirs: List[str]) -> Optional[Path]:
-        """Find the most recently created STL file"""
+        """Find the most recently created STL file, preferring current generation"""
         stl_files = []
+        current_time = time.time()
+        
+        # Only consider files modified in the last 5 minutes (300 seconds)
+        max_age_seconds = 300
 
         for output_dir in output_dirs:
             dir_path = Path(output_dir)
             if dir_path.exists():
-                stl_files.extend(dir_path.rglob("*.stl"))
+                for stl_file in dir_path.rglob("*.stl"):
+                    # Check if file is recent enough
+                    file_age = current_time - stl_file.stat().st_mtime
+                    if file_age <= max_age_seconds:
+                        stl_files.append(stl_file)
+                    else:
+                        print(f"⚠️ Skipping old STL file: {stl_file} (age: {file_age:.1f}s)")
 
         if not stl_files:
+            print("⚠️ No recent STL files found (within last 5 minutes)")
             return None
 
+        # Prefer files from generation-specific directories
+        generation_files = [f for f in stl_files if any(
+            part.startswith(('scad_output', 'output')) 
+            for part in f.parts
+        )]
+        
+        files_to_consider = generation_files if generation_files else stl_files
+
         # Return the most recently modified STL file
-        latest_stl = max(stl_files, key=lambda p: p.stat().st_mtime)
-        print(f"🔍 Found latest STL: {latest_stl}")
+        latest_stl = max(files_to_consider, key=lambda p: p.stat().st_mtime)
+        file_age = current_time - latest_stl.stat().st_mtime
+        print(f"🔍 Found latest STL: {latest_stl} (age: {file_age:.1f}s)")
         return latest_stl
 
     def convert_stl_to_glb(self, stl_path: Path, optimize: bool = True) -> Optional[Path]:
@@ -587,12 +608,17 @@ class Enhanced3DOpenSCADChat:
                         self.current_code = tool_call["args"].get("code", "")
                         print(f"✅ Extracted code from tool call")
 
-            # Check tool responses for images
+            # Check tool responses for images and errors
             if hasattr(msg, "name") and msg.name == "render_scad":
                 content = msg.content
-                print(
-                    f"🔍 Found render_scad response with content: {type(content)}")
+                print(f"🔍 Found render_scad response with content: {type(content)}")
 
+                # Check if the response contains an error
+                if isinstance(content, str) and any(error_word in content.lower() for error_word in ["error", "failed", "exception"]):
+                    print(f"❌ Detected error in render_scad response: {content}")
+                    # Don't try to process this as a successful render
+                    return
+                
                 # Try to process image content
                 self._process_image_content(content)
 
@@ -672,7 +698,15 @@ class Enhanced3DOpenSCADChat:
                     self._process_3d_output()
 
                 except Exception as e:
-                    print(f"❌ Direct MCP call failed: {e}")
+                    error_msg = str(e)
+                    print(f"❌ Direct MCP call failed: {error_msg}")
+                    
+                    # Update the chat history to show the error to the user
+                    if "OpenSCAD" in error_msg and ("failed" in error_msg or "error" in error_msg.lower()):
+                        # This is an OpenSCAD-specific error, show it to the user
+                        error_response = f"❌ OpenSCAD Error: {error_msg}\n\nPlease check your code and try again."
+                        history[-1] = {"role": "assistant", "content": error_response}
+                        print(f"🔄 Updated chat history with OpenSCAD error")
 
         except Exception as e:
             history[-1] = {"role": "assistant",

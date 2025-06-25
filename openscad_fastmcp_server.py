@@ -11,6 +11,7 @@ import base64
 import asyncio
 import subprocess
 import logging
+import re
 from pathlib import Path
 from typing import Optional, List, Dict
 from PIL import Image as PILImage
@@ -439,25 +440,69 @@ def render_scad(code: str, iteration: int = 0, auto_fix_libraries: bool = True, 
 
         scad_file = output_dir / "output.scad"
         png_file = output_dir / "output.png"
+        stl_file = output_dir / "output.stl"
 
         # Write SCAD code
         scad_file.write_text(code)
         logger.debug(f"Wrote SCAD file: {scad_file}")
 
-        # create stl file and check if it was created
-        stl_file = output_dir / "output.stl"
-        subprocess.run(
+        # Helper function to check for OpenSCAD errors in stderr
+        def check_openscad_errors(stderr_output: str, operation: str) -> None:
+            """Check stderr for OpenSCAD errors and raise exception if found"""
+            if not stderr_output:
+                return
+                
+            # Common OpenSCAD error patterns
+            error_patterns = [
+                "ERROR:",
+                "Assertion.*failed:",
+                "Can't open library",
+                "Can't open file",
+                "Parse error",
+                "Lexical error", 
+                "syntax error",
+                "WARNING: Object may not be a valid 2-manifold",
+                "CGAL error"
+            ]
+            
+            # Check for error patterns
+            for pattern in error_patterns:
+                if re.search(pattern, stderr_output, re.IGNORECASE):
+                    # Extract the specific error message
+                    error_lines = [line.strip() for line in stderr_output.split('\n') 
+                                 if line.strip() and any(re.search(p, line, re.IGNORECASE) for p in error_patterns)]
+                    main_error = error_lines[0] if error_lines else stderr_output.strip()
+                    
+                    raise Exception(f"OpenSCAD {operation} failed with error: {main_error}")
+
+        # First, create STL file and check for errors
+        logger.info("Creating STL file...")
+        stl_result = subprocess.run(
             [OPENSCAD_EXECUTABLE, '-o', str(stl_file), str(scad_file)],
             capture_output=True,
             text=True,
             timeout=60
         )
-        if stl_file.exists():
-            logger.info(f"STL file created: {stl_file}")
-        else:
-            logger.error(f"STL file was not created: {stl_file}")
         
-        # Render with library path
+        # Check STL generation errors
+        if stl_result.returncode != 0:
+            error_msg = stl_result.stderr if stl_result.stderr else stl_result.stdout
+            logger.error(f"STL generation failed with exit code {stl_result.returncode}: {error_msg}")
+            raise Exception(f"STL generation failed: {error_msg}")
+        
+        # Check STL stderr for errors even if exit code is 0
+        if stl_result.stderr:
+            logger.info(f"STL generation stderr: {stl_result.stderr}")
+            check_openscad_errors(stl_result.stderr, "STL generation")
+            
+        # Verify STL file was actually created
+        if not stl_file.exists():
+            raise Exception(f"STL file was not created at {stl_file}. Check your OpenSCAD code for errors.")
+        else:
+            logger.info(f"✅ STL file created successfully: {stl_file}")
+        
+        # Now create PNG render
+        logger.info("Creating PNG render...")
         cmd = [
             OPENSCAD_EXECUTABLE,
             '-o', str(png_file),
@@ -470,16 +515,17 @@ def render_scad(code: str, iteration: int = 0, auto_fix_libraries: bool = True, 
             cmd.extend(['--camera', validated_camera])
             logger.info(f"Using camera parameters: {validated_camera}")
 
-        result = subprocess.run(
+        png_result = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
             timeout=60
         )
         
-        if result.returncode != 0:
-            error_msg = result.stderr if result.stderr else result.stdout
-            logger.error(f"OpenSCAD rendering failed: {error_msg}")
+        # Check PNG generation errors  
+        if png_result.returncode != 0:
+            error_msg = png_result.stderr if png_result.stderr else png_result.stdout
+            logger.error(f"PNG rendering failed with exit code {png_result.returncode}: {error_msg}")
 
             # Check if it's a library issue
             if "Can't open library" in error_msg or "Can't open file" in error_msg:
@@ -487,15 +533,22 @@ def render_scad(code: str, iteration: int = 0, auto_fix_libraries: bool = True, 
                 raise Exception(
                     f"Library error. Available libraries:\n{libraries_info}\n\nOriginal error: {error_msg}")
 
-            raise Exception(f"Rendering failed: {error_msg}")
-        else:
-            # check for stdout and stderr and log them
-            logger.info(f"OpenSCAD stdout: {result.stdout}")
-            logger.info(f"OpenSCAD stderr: {result.stderr}")
+            raise Exception(f"PNG rendering failed: {error_msg}")
+        
+        # Check PNG stderr for errors even if exit code is 0 
+        if png_result.stderr:
+            logger.info(f"PNG generation stderr: {png_result.stderr}")
+            check_openscad_errors(png_result.stderr, "PNG rendering")
+        
+        # Log stdout/stderr for debugging
+        if png_result.stdout:
+            logger.info(f"OpenSCAD stdout: {png_result.stdout}")
 
+        # Verify PNG file was created
         if not png_file.exists():
-            raise Exception("PNG file was not created")
+            raise Exception(f"PNG file was not created at {png_file}. Rendering may have failed silently.")
 
+        # Process and return the image
         with PILImage.open(png_file) as img:
             # Convert to RGB
             if img.mode in ('RGBA', 'LA'):
@@ -514,12 +567,11 @@ def render_scad(code: str, iteration: int = 0, auto_fix_libraries: bool = True, 
             img.save(buffer, format='PNG', optimize=True)
             image_data = buffer.getvalue()
 
-            logger.info(
-                f"Rendered: {img.size[0]}x{img.size[1]} pixels, {len(image_data)} bytes")
+            logger.info(f"✅ Rendering successful: {img.size[0]}x{img.size[1]} pixels, {len(image_data)} bytes")
             return Image(data=image_data, format="png")
 
     except Exception as e:
-        logger.error(f"Error during rendering: {str(e)}")
+        logger.error(f"❌ Error during rendering: {str(e)}")
         raise
 
 
