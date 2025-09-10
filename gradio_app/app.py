@@ -17,6 +17,12 @@ from langchain_mcp_adapters.tools import load_mcp_tools
 from langgraph.prebuilt import create_react_agent
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
+try:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+    GOOGLE_GENAI_AVAILABLE = True
+except ImportError:
+    GOOGLE_GENAI_AVAILABLE = False
+    logger.warning("⚠️ langchain-google-genai not available. Install with: pip install langchain-google-genai")
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_core.tools import BaseTool
 import base64
@@ -206,8 +212,8 @@ class STLProcessor:
                 logger.info(f"🔧 Original mesh: {len(mesh.faces)} faces")
 
                 # Remove duplicate faces and vertices
-                mesh.remove_duplicate_faces()
-                mesh.remove_degenerate_faces()
+                mesh.update_faces(mesh.unique_faces())
+                mesh.update_faces(mesh.nondegenerate_faces())
                 mesh.merge_vertices()
 
                 # Simplify if too many faces (target max 50K for web performance)
@@ -325,13 +331,25 @@ class Enhanced3DOpenSCADChat:
         # Supported models configuration
         self.supported_models = {
             # OpenAI models
-            "gpt-4o": {"provider": "openai", "model": "gpt-4o", "display": "GPT-4o"},
-            "gpt-4o-mini": {"provider": "openai", "model": "gpt-4o-mini", "display": "GPT-4o Mini"},
-            "gpt-4-turbo": {"provider": "openai", "model": "gpt-4-turbo", "display": "GPT-4 Turbo"},
+            "gpt-5": {"provider": "openai", "model": "gpt-5-2025-08-07", "display": "GPT-5"},
+            "gpt-5-mini": {"provider": "openai", "model": "gpt-5-mini-2025-08-07", "display": "GPT-5 Mini"},
+            "gpt-oss": {"provider": "openai", "model": "gpt-oss-120b", "display": "GPT-OSS 120B"},
             
             # Anthropic Claude 4 models (latest)
             "claude-4-sonnet": {"provider": "anthropic", "model": "claude-sonnet-4-20250514", "display": "Claude 4 Sonnet"},
-            "claude-4-opus": {"provider": "anthropic", "model": "claude-opus-4-20250514", "display": "Claude 4 Opus"},
+            "claude-4-opus": {"provider": "anthropic", "model": "claude-opus-4-1-20250805", "display": "Claude 4 Opus"},
+            
+            # Google Gemini models
+            "gemini-2.5-pro": {"provider": "google", "model": "gemini-2.5-pro", "display": "Gemini 2.5 Pro"},
+            "gemini-2.5-flash": {"provider": "google", "model": "gemini-2.5-flash", "display": "Gemini 2.5 Flash"},
+            
+            # OpenRouter models
+            "qwen3-coder": {"provider": "openrouter", "model": "qwen/qwen3-coder", "display": "Qwen3-Coder 480B"},
+            "qwen3-coder-free": {"provider": "openrouter", "model": "qwen/qwen3-coder:free", "display": "Qwen3-Coder (Free)"},
+            "claude-3-sonnet-or": {"provider": "openrouter", "model": "anthropic/claude-3-sonnet", "display": "Claude 3 Sonnet (OR)"},
+            "llama-3-70b": {"provider": "openrouter", "model": "meta-llama/llama-3-70b-instruct", "display": "Llama 3 70B"},
+            "codestral": {"provider": "openrouter", "model": "mistralai/codestral-mamba", "display": "Codestral Mamba"},
+            "deepseek-coder": {"provider": "openrouter", "model": "deepseek/deepseek-coder", "display": "DeepSeek Coder"},
         }
 
     def _create_llm(self):
@@ -345,7 +363,7 @@ class Enhanced3DOpenSCADChat:
             # Default to OpenAI if model not recognized
             logger.warning(f"⚠️ Model '{self.model}' not recognized, defaulting to gpt-4o")
             provider = "openai"
-            model_name = "gpt-4o"
+            model_name = "gpt-5-2025-08-07"
 
         # Create LLM based on provider
         if provider == "anthropic":
@@ -354,6 +372,36 @@ class Enhanced3DOpenSCADChat:
                 model=model_name,
                 # temperature=0.7,
                 max_tokens=4096
+            )
+        elif provider == "google":
+            if not GOOGLE_GENAI_AVAILABLE:
+                raise ImportError("Google Gemini models require: pip install langchain-google-genai")
+            logger.info(f"🤖 Initializing Google Gemini model: {model_name}")
+            return ChatGoogleGenerativeAI(
+                model=model_name,
+                # temperature=0.7,
+                max_tokens=4096,
+                thinking_budget=512  # Control thinking output to prevent contamination
+            )
+        elif provider == "openrouter":
+            # OpenRouter configuration
+            api_key = os.getenv('OPENROUTER_API_KEY')
+            if not api_key:
+                raise ValueError("OPENROUTER_API_KEY environment variable is required for OpenRouter models")
+            
+            site_url = os.getenv('OPENROUTER_SITE_URL', 'http://localhost:7861')
+            site_name = os.getenv('OPENROUTER_SITE_NAME', 'OpenSCAD Assistant')
+            
+            logger.info(f"🤖 Initializing OpenRouter model: {model_name}")
+            return ChatOpenAI(
+                model=model_name,
+                # temperature=0.7,
+                api_key=api_key,
+                base_url="https://openrouter.ai/api/v1",
+                default_headers={
+                    'HTTP-Referer': site_url,
+                    'X-Title': site_name,
+                }
             )
         else:  # OpenAI
             logger.info(f"🤖 Initializing OpenAI model: {model_name}")
@@ -543,10 +591,30 @@ class Enhanced3DOpenSCADChat:
         self._initialize_conversation_history()
         self.current_image = None
         self.current_code = None
+        logger.info("🔍 reset_conversation: Setting current_3d_model to None")
         self.current_3d_model = None
         self.current_measurements = {}
         self.current_camera_position = [200, 200, 200]
 
+    def _filter_ai_thinking_content(self, value):
+        """Filter out Gemini thinking content from file paths only"""
+        if not isinstance(value, str):
+            return value
+            
+        # Only filter if this looks like thinking content being used as a file path
+        thinking_patterns = [
+            '### CRITIQUE', '### THOUGHT', '### PLAN', '### ANALYSIS'
+        ]
+        
+        # Only filter if it contains thinking patterns AND is being used as a file path
+        if any(pattern in value for pattern in thinking_patterns):
+            # If it's a long string with thinking content, it's probably not a valid file path
+            if len(value) > 200:
+                logger.warning(f"🧠 Filtered out AI thinking content: {repr(value[:100])}")
+                return ""
+            
+        return value
+        
     def _clear_current_outputs(self):
         """Clear current outputs to ensure fresh updates"""
         if self.current_image:
@@ -555,6 +623,7 @@ class Enhanced3DOpenSCADChat:
             except:
                 pass
         self.current_image = None
+        logger.info("🔍 _clear_current_outputs: Setting current_3d_model to None")
         self.current_3d_model = None
         self.current_measurements = {}
 
@@ -615,8 +684,9 @@ class Enhanced3DOpenSCADChat:
             optimized_model = self.stl_processor.convert_stl_to_glb(
                 latest_stl, optimize=True)
 
-            self.current_3d_model = str(
-                optimized_model) if optimized_model else None
+            processed_model_path = str(optimized_model) if optimized_model else None
+            logger.info(f"🔍 Setting current_3d_model to: {repr(processed_model_path)}")
+            self.current_3d_model = processed_model_path
             self.current_measurements = measurements
 
             logger.info(f"✅ 3D model processed: {self.current_3d_model}")
@@ -741,6 +811,11 @@ class Enhanced3DOpenSCADChat:
 
             if latest_ai_message:
                 ai_content = latest_ai_message.content
+                
+                # Log if Gemini thinking content is detected but don't filter chat content
+                if isinstance(ai_content, str) and any(section in ai_content for section in ["### CRITIQUE", "### THOUGHT", "### PLAN"]):
+                    logger.warning("🧠 Detected Gemini thinking content in response - filtering will be applied to file paths only")
+                
                 self.conversation_history.append(AIMessage(content=ai_content))
                 # Update the last message with the actual response
                 history[-1] = {"role": "assistant", "content": ai_content}
@@ -964,41 +1039,6 @@ def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
             logger.info(f"🎉 Startup complete: {result}")
             return result
 
-        async def handle_message(message, history):
-            """Handle user messages with smart 3D processing"""
-            if not message:
-                logger.warning("⚠️ Empty message received")
-                return "", history, None, "", None, "No measurements available", ""
-
-            # Process the message
-            updated_history, model_3d_path, code, measurements = await chat_assistant.chat(message, history)
-
-            # Create enhanced measurements display
-            measurements_text = "No measurements available"
-            if measurements.get('available', False):
-                measurements_text = chat_assistant.stl_processor.create_measurement_summary(
-                    measurements)
-                logger.info(f"📏 Generated measurements summary: {len(measurements_text)} chars")
-
-            # Update Model3D with smart camera position
-            updated_model_3d = gr.Model3D(
-                value=model_3d_path,
-                camera_position=chat_assistant.current_camera_position,
-                display_mode="solid",
-                height=400
-            ) if model_3d_path else None
-
-            if model_3d_path:
-                logger.info(f"🎯 Updated 3D model with camera position: {chat_assistant.current_camera_position}")
-
-            return (
-                "",  # Clear input
-                updated_history,  # Updated chat history
-                updated_model_3d,  # 3D model with smart camera
-                chat_assistant.current_image,  # 2D preview image
-                measurements_text,  # Enhanced measurements with camera info
-                code  # Generated code
-            )
 
         async def handle_message_chat_only(message, history):
             """Handle message and update only chat history (no loading on 3D/code)"""
@@ -1012,15 +1052,29 @@ def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
 
         async def update_3d_model():
             """Update 3D model separately (shows loading only when needed)"""
-            if chat_assistant.current_3d_model:
-                updated_model_3d = gr.Model3D(
-                    value=chat_assistant.current_3d_model,
-                    camera_position=chat_assistant.current_camera_position,
-                    display_mode="solid",
-                    height=400
-                )
-                return updated_model_3d
-            return None
+            model_path = chat_assistant.current_3d_model
+            
+            logger.info(f"🔍 update_3d_model called with: {type(model_path)} = {repr(model_path)[:200] if model_path else 'None'}")
+            
+            # Apply AI content filtering to prevent Gemini thinking contamination
+            filtered_path = chat_assistant._filter_ai_thinking_content(model_path)
+            
+            if filtered_path != model_path:
+                logger.error(f"❌ Gemini thinking content detected and filtered out from 3D model path")
+                return None
+            
+            # Additional validation for file paths
+            if filtered_path and isinstance(filtered_path, str):
+                # Check if file exists
+                from pathlib import Path
+                if not Path(filtered_path).exists():
+                    logger.warning(f"⚠️ 3D model file not found: {filtered_path}")
+                    return None
+                    
+                logger.info(f"✅ Valid 3D model path being returned: {filtered_path}")
+            
+            logger.info(f"🔄 update_3d_model returning: {repr(filtered_path)[:100] if filtered_path else 'None'}")
+            return filtered_path
 
         async def update_code_viewer():
             """Update code viewer separately (shows loading only when needed)"""
@@ -1029,8 +1083,11 @@ def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
         async def update_measurements():
             """Update measurements separately (shows loading only when needed)"""
             if chat_assistant.current_measurements.get('available', False):
-                return chat_assistant.stl_processor.create_measurement_summary(
+                summary = chat_assistant.stl_processor.create_measurement_summary(
                     chat_assistant.current_measurements)
+                # Ensure measurements don't contain AI thinking content
+                filtered_summary = chat_assistant._filter_ai_thinking_content(summary)
+                return filtered_summary if filtered_summary else "No measurements available"
             return "No measurements available"
 
         async def update_2d_preview():
@@ -1041,7 +1098,7 @@ def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
             """Clear conversation and outputs"""
             logger.info("🧹 Clearing chat conversation and outputs")
             chat_assistant.reset_conversation()
-            return [], None, None, None, "No measurements available", ""
+            return [], None, None, "No measurements available", ""
 
         async def cleanup():
             """Clean up resources"""
@@ -1126,7 +1183,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="OpenSCAD 3D Assistant")
     parser.add_argument('--model', type=str, default="claude-4-sonnet",
-                        help="Model to use (default: claude-4-sonnet)")
+                        help="Model to use (default: claude-4-sonnet). Available models include: gpt-5, claude-4-sonnet, qwen3-coder, qwen3-coder-free, llama-3-70b, codestral, deepseek-coder")
     parser.add_argument('--prompt-source', type=str, choices=['xml', 'instructions'], default='xml',
                         help="Source for system prompt: 'xml' for system_prompt.xml, 'instructions' for instructions.txt (default: xml)")
     parser.add_argument('--log-level', type=str, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default='INFO',
@@ -1147,11 +1204,14 @@ if __name__ == "__main__":
     # Check for at least one API key
     openai_key = os.getenv("OPENAI_API_KEY")
     anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+    google_key = os.getenv("GOOGLE_API_KEY")
+    openrouter_key = os.getenv("OPENROUTER_API_KEY")
     tavily_key = os.getenv("TAVILY_API_KEY")
     langsmith_key = os.getenv("LANGCHAIN_API_KEY")
     
-    if not openai_key and not anthropic_key:
-        logger.error("❌ Please set at least one of OPENAI_API_KEY or ANTHROPIC_API_KEY environment variables.")
+    if not openai_key and not anthropic_key and not google_key and not openrouter_key:
+        logger.error("❌ Please set at least one of OPENAI_API_KEY, ANTHROPIC_API_KEY, GOOGLE_API_KEY, or OPENROUTER_API_KEY environment variables.")
+        logger.info("   For OpenRouter models (including qwen/qwen3-coder): export OPENROUTER_API_KEY=your_key")
         exit(1)
     
     # Log available services
@@ -1160,6 +1220,10 @@ if __name__ == "__main__":
         services.append("OpenAI")
     if anthropic_key:
         services.append("Anthropic")
+    if google_key:
+        services.append("Google Gemini")
+    if openrouter_key:
+        services.append("OpenRouter")
     if tavily_key:
         services.append("Tavily Search")
     if langsmith_key:

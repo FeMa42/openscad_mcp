@@ -71,7 +71,7 @@ generation_id = str(uuid.uuid4())
 OPENSCAD_EXECUTABLE = os.environ.get('OPENSCAD_EXECUTABLE', 'openscad')
 OUTPUT_DIR = os.environ.get('OPENSCAD_OUTPUT_DIR', 'scad_output')
 FAISS_INDEX_PATH = os.environ.get(
-    'FAISS_INDEX_PATH', 'faiss_index_api_v1')  # Updated default path
+    'FAISS_INDEX_PATH', 'faiss_index_modern')  # Updated default path
 OPENSCAD_LIBRARY_PATH = os.environ.get(
     'OPENSCAD_USER_LIBRARY_PATH',
     str(Path.home() / "Documents" / "OpenSCAD" / "libraries")

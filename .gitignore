@@ -1,5 +1,7 @@
 faiss_index
 faiss_index_modern
+faiss_index_local
 faiss_index_modern_bge
 output
 __pycache__
+.DS_Store

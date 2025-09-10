@@ -21,12 +21,14 @@ from io import BytesIO
 from pathlib import Path
 import json
 import re
+import argparse
 
 class PersistentMCPOpenSCADChat:
     """OpenSCAD chat assistant with persistent MCP session management and proper conversation history"""
     
     def __init__(self, model="gpt-4o"):
         self.model = model
+        self.provider, self.model_name = self._parse_model(model)
         self.agent = None
         self.current_image = None
         self.current_code = None
@@ -67,8 +69,8 @@ class PersistentMCPOpenSCADChat:
         except FileNotFoundError:
             self.system_prompt = "You are a helpful OpenSCAD design assistant. Help users create 3D objects using OpenSCAD code."
         
-        # Create LLM
-        llm = ChatOpenAI(model=self.model, temperature=0.7)
+        # Create LLM based on provider
+        llm = self._create_llm()
         
         # Create agent with system prompt - use prompt parameter with function
         def _add_system_prompt(state):
@@ -88,7 +90,32 @@ class PersistentMCPOpenSCADChat:
         # Initialize conversation history with system message
         self._initialize_conversation_history()
 
-        return "✅ Ready with persistent MCP session and proper conversation history! Server will not restart on tool calls."
+        return f"✅ Ready with persistent MCP session using {self.provider}:{self.model_name}! Server will not restart on tool calls."
+    
+    def _create_llm(self):
+        """Create LLM instance based on provider configuration."""
+        if self.provider == 'openrouter':
+            # OpenRouter configuration
+            api_key = os.getenv('OPENROUTER_API_KEY')
+            if not api_key:
+                raise ValueError("OPENROUTER_API_KEY environment variable is required for OpenRouter models")
+            
+            site_url = os.getenv('OPENROUTER_SITE_URL', 'http://localhost:7861')
+            site_name = os.getenv('OPENROUTER_SITE_NAME', 'OpenSCAD MCP Assistant')
+            
+            return ChatOpenAI(
+                model=self.model_name,
+                temperature=0.7,
+                api_key=api_key,
+                base_url="https://openrouter.ai/api/v1",
+                default_headers={
+                    'HTTP-Referer': site_url,
+                    'X-Title': site_name,
+                }
+            )
+        else:
+            # Default to OpenAI
+            return ChatOpenAI(model=self.model_name, temperature=0.7)
     
     def _initialize_conversation_history(self):
         """Initialize conversation history with system message"""
@@ -163,6 +190,27 @@ class PersistentMCPOpenSCADChat:
             self._initialize_conversation_history()
             
         return self.conversation_history.copy()
+    
+    def _parse_model(self, model):
+        """Parse model string to determine provider and model name.
+        
+        Supports formats:
+        - 'gpt-4o' -> ('openai', 'gpt-4o')
+        - 'openrouter:qwen/qwen3-coder' -> ('openrouter', 'qwen/qwen3-coder')
+        - 'qwen/qwen3-coder' -> ('openrouter', 'qwen/qwen3-coder') [auto-detect]
+        """
+        if ':' in model:
+            provider, model_name = model.split(':', 1)
+            return provider, model_name
+        
+        # Auto-detect provider based on model name patterns
+        if '/' in model:  # OpenRouter models typically have org/model format
+            return 'openrouter', model
+        elif model.startswith(('gpt-', 'claude-', 'o1-')):
+            return 'openai', model
+        else:
+            # Default to openai for unknown patterns
+            return 'openai', model
     
     async def chat(self, message: str, history: List):
         """Process chat message with persistent session and proper history management"""
@@ -482,9 +530,9 @@ class PersistentMCPOpenSCADChat:
             print(f"Failed to load fallback image: {e}")
 
 
-def create_app():
+def create_app(model="gpt-4o"):
     """Create Gradio app with persistent MCP session"""
-    chat_assistant = PersistentMCPOpenSCADChat()
+    chat_assistant = PersistentMCPOpenSCADChat(model=model)
     
     with gr.Blocks(title="OpenSCAD Assistant", theme=gr.themes.Soft()) as app:
         gr.Markdown("# 🎨 OpenSCAD Design Assistant")
@@ -653,11 +701,27 @@ def create_app():
 if __name__ == "__main__":
     import os
     
-    # Check for API key
-    if not os.getenv("OPENAI_API_KEY"):
-        print("❌ Please set OPENAI_API_KEY environment variable")
+    # Parse command-line arguments
+    parser = argparse.ArgumentParser(description='OpenSCAD Chat Assistant with MCP')
+    parser.add_argument('--model', '-m', 
+                       default='gpt-4o',
+                       help='Model to use. Examples: gpt-4o, openrouter:qwen/qwen3-coder, qwen/qwen3-coder')
+    parser.add_argument('--port', '-p',
+                       type=int, default=7861,
+                       help='Port to run the server on (default: 7861)')
+    
+    args = parser.parse_args()
+    
+    # Check for API keys - either OpenAI or OpenRouter required
+    has_openai_key = bool(os.getenv("OPENAI_API_KEY"))
+    has_openrouter_key = bool(os.getenv("OPENROUTER_API_KEY"))
+    
+    if not (has_openai_key or has_openrouter_key):
+        print("❌ Please set either OPENAI_API_KEY or OPENROUTER_API_KEY environment variable")
+        print("   For OpenAI models: export OPENAI_API_KEY=your_key")
+        print("   For OpenRouter models: export OPENROUTER_API_KEY=your_key")
         exit(1)
     
-    print("🚀 Starting OpenSCAD Chat with Persistent MCP Session...")
-    app = create_app()
-    app.launch(server_port=7861)  # Different port to avoid conflicts 
+    print(f"🚀 Starting OpenSCAD Chat with model: {args.model}")
+    app = create_app(model=args.model)
+    app.launch(server_port=args.port) 

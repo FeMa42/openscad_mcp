@@ -32,9 +32,8 @@ except ImportError:
     LOCAL_EMBEDDINGS_AVAILABLE = False
 
 # Configuration
-DOCS_DIR = "openscad_test_documents"
-DB_FAISS_PATH = "faiss_index_modern"
-
+DOCS_DIR = "openscad_documentation"
+DB_FAISS_PATH = "faiss_index_local"
 
 class ModernDocumentProcessor:
     """
@@ -197,8 +196,7 @@ class ModernDocumentProcessor:
         elif LOCAL_EMBEDDINGS_AVAILABLE:
             print("Using local embeddings")
             return HuggingFaceEmbeddings(
-                # "Salesforce/SFR-Embedding-Code-2B_R", # "Salesforce/SFR-Embedding-2_R",  # BAAI/bge-base-en-v1.5
-                model_name="BAAI/bge-base-en-v1.5",
+                model_name="BAAI/bge-base-en-v1.5",  # Use the same model as the server
                 model_kwargs={'device': 'cpu'},
                 encode_kwargs={'normalize_embeddings': True}
             )
