@@ -1,15 +1,43 @@
 {
   "name": "BOSL2",
-  "description": "Belfry OpenScad Library v2 - A library of tools, shapes, and helpers to make OpenScad easier to use",
-  "main_files": ["std.scad", "shapes.scad", "transforms.scad", "beziers.scad"],
-  "usage": "// BOSL2 usage:\ninclude <BOSL2/std.scad>\n\n// Then use BOSL2 functions like:\ncuboid([20,20,30], rounding=5);\ncyl(l=20, d=4);\nrotate_extrude() right(10) circle(d=2);",
+  "description": "Belfry OpenScad Library v2 - A comprehensive library including advanced gear generation capabilities",
+  "main_files": ["std.scad", "gears.scad", "shapes.scad", "transforms.scad", "beziers.scad"],
+  "usage": "// BOSL2 with gears usage:\ninclude <BOSL2/std.scad>\ninclude <BOSL2/gears.scad>\n\n// Basic spur gear:\nspur_gear(circ_pitch=5, teeth=20, thickness=8, shaft_diam=5);\n\n// Meshing gears with automatic positioning:\ntranslate([gear_dist(circ_pitch=5, teeth1=20, teeth2=30), 0, 0])\n  spur_gear(circ_pitch=5, teeth=30, thickness=8, shaft_diam=5);\nspur_gear(circ_pitch=5, teeth=20, thickness=8, shaft_diam=5);",
   "common_modules": [
+    "gears: spur_gear(), ring_gear(), rack(), bevel_gear(), crown_gear(), worm(), worm_gear()",
+    "gear_helpers: gear_dist(), auto_profile_shift(), gear_shorten(), gear_skew_angle()",
     "shapes2d: circle(), square(), rect(), trapezoid()",
     "shapes3d: cube(), cuboid(), cylinder(), cyl(), sphere()",
     "transforms: up(), down(), left(), right(), fwd(), back()",
     "beziers: bezier_curve(), bezier_patch()",
     "threading: threaded_rod(), threaded_nut()"
   ],
-  "documentation_url": "https://github.com/revarbat/BOSL2/wiki",
+  "gear_features": {
+    "advantages": [
+      "English parameter names (circ_pitch vs modul)",
+      "Built-in mesh positioning with gear_dist()",
+      "Profile shifting support with auto_profile_shift()",
+      "Superior documentation and examples",
+      "Integrated with BOSL2 attachment system"
+    ],
+    "gear_types": [
+      "Spur gears (including helical and herringbone)",
+      "Ring gears (internal gears)", 
+      "Racks and rack-pinion systems",
+      "Bevel gears (straight, spiral, zerol)",
+      "Crown gears",
+      "Worms and worm gears"
+    ],
+    "key_parameters": {
+      "circ_pitch": "Circular pitch (replaces modul from parameterizable_gears)",
+      "teeth": "Number of teeth",
+      "thickness": "Gear thickness (replaces breite)", 
+      "shaft_diam": "Shaft diameter (replaces bohrung)",
+      "pressure_angle": "Pressure angle (default 20°, recommend 25° for 3D printing)",
+      "helical": "Helical angle for helical gears",
+      "profile_shift": "Profile shift to avoid undercutting"
+    }
+  },
+  "documentation_url": "https://github.com/revarbat/BOSL2/wiki/gears.scad",
   "license": "BSD-2-Clause"
 } 

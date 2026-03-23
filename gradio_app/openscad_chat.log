@@ -5651,3 +5651,907 @@ Traceback (most recent call last):
   File "/Users/damian/.local/share/uv/python/cpython-3.12.9-macos-aarch64-none/lib/python3.12/contextlib.py", line 231, in __aexit__
     await self.gen.athrow(value)
 RuntimeError: athrow(): asynchronous generator is already running
+2026-03-23 11:10:30,425 - __main__ - INFO - 🚀 OpenSCAD 3D Assistant Starting Up
+2026-03-23 11:10:30,425 - __main__ - INFO - 🤖 Selected model: qwen3-coder
+2026-03-23 11:10:30,425 - __main__ - INFO - 📝 Prompt source: xml
+2026-03-23 11:10:30,425 - __main__ - INFO - 📊 Log level: INFO
+2026-03-23 11:10:30,425 - __main__ - INFO - 🔑 Available services: OpenAI, Anthropic, Google Gemini, OpenRouter, Tavily Search
+2026-03-23 11:10:30,425 - __main__ - INFO - 💡 For advanced tool tracing, set LANGCHAIN_API_KEY for LangSmith
+2026-03-23 11:10:30,425 - __main__ - INFO -    Sign up at: https://smith.langchain.com/
+2026-03-23 11:10:30,425 - __main__ - INFO - ✅ Trimesh available for 3D processing
+2026-03-23 11:10:30,425 - __main__ - INFO - ✅ TavilySearch available for web search
+2026-03-23 11:10:30,425 - __main__ - INFO - ✅ LangSmith available for advanced tracing
+2026-03-23 11:10:30,425 - __main__ - INFO - 🌐 Starting Smart 3D OpenSCAD Chat with Model: qwen3-coder
+2026-03-23 11:10:30,425 - __main__ - INFO - 📝 Using prompt source: xml
+2026-03-23 11:10:30,515 - __main__ - INFO - 🎯 Gradio app created successfully
+2026-03-23 11:10:30,515 - __main__ - INFO - 🌐 Launching on http://localhost:7861
+2026-03-23 11:10:30,613 - httpx - INFO - HTTP Request: GET http://127.0.0.1:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2026-03-23 11:10:30,626 - httpx - INFO - HTTP Request: HEAD http://127.0.0.1:7861/ "HTTP/1.1 200 OK"
+2026-03-23 11:10:31,463 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2026-03-23 11:10:48,297 - __main__ - INFO - 🎬 Starting Gradio app startup sequence...
+2026-03-23 11:10:48,297 - __main__ - INFO - 🚀 Starting OpenSCAD Chat initialization...
+2026-03-23 11:10:48,298 - __main__ - INFO - 🔍 Using basic Python logging for tool tracking
+2026-03-23 11:10:48,298 - __main__ - INFO - 📋 Configuration loaded: ['mcpServers']
+2026-03-23 11:10:48,298 - __main__ - INFO - 🔌 Created MultiServerMCP client
+2026-03-23 11:10:48,298 - __main__ - INFO - 🔌 Creating persistent MCP session...
+2026-03-23 11:10:52,191 - __main__ - INFO - 🔧 Loaded 14 MCP tools: ['openscad_doc_search', 'list_openscad_libraries', 'render_scad', 'render_scad_multi', 'get_available_views', 'get_view', 'get_instructions', 'get_bosl_examples', 'get_gear_parameter', 'get_gear_generation_instructions', 'get_bosl2_gear_docs', 'generate_gcode', 'print_last_gcode', 'get_printing_presets']
+2026-03-23 11:10:52,192 - __main__ - INFO - 🌐 Web search with basic logging enabled
+2026-03-23 11:10:52,192 - __main__ - INFO - 🌐 Web search enabled with TavilySearch
+2026-03-23 11:10:52,192 - __main__ - INFO - 🔧 Total tools available: 15 (MCP: 14, Web: 1)
+2026-03-23 11:10:52,192 - __main__ - INFO - 🔍 Tracing mode: basic
+2026-03-23 11:10:52,192 - __main__ - INFO - 📄 Loading system prompt...
+2026-03-23 11:10:52,192 - __main__ - INFO - ✅ Loaded advanced system prompt from XML (5630 characters)
+2026-03-23 11:10:52,193 - __main__ - INFO - 📄 System prompt loaded: 5607 characters
+2026-03-23 11:10:52,193 - __main__ - INFO - 🤖 Initializing LLM: qwen3-coder
+2026-03-23 11:10:52,193 - __main__ - INFO - 🤖 Initializing OpenRouter model: qwen/qwen3-coder
+2026-03-23 11:10:52,390 - __main__ - INFO - 🧠 Creating React agent...
+2026-03-23 11:10:52,406 - __main__ - INFO - 💾 Initialized conversation history
+2026-03-23 11:10:52,406 - __main__ - INFO - ✅ Ready with smart camera positioning, auto-rotation, and 15 tools (with web search)!
+2026-03-23 11:10:52,406 - __main__ - INFO - 🎉 Startup complete: ✅ Ready with smart camera positioning, auto-rotation, and 15 tools (with web search)!
+2026-03-23 11:10:54,657 - __main__ - INFO - 💬 User message: Make a large gear with 50 teeth
+2026-03-23 11:10:54,657 - __main__ - INFO - 🔍 _clear_current_outputs: Setting current_3d_model to None
+2026-03-23 11:10:54,658 - __main__ - INFO - 🤖 Invoking agent with 2 messages
+2026-03-23 11:10:55,405 - langsmith.client - WARNING - Failed to multipart ingest runs: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:10:55,759 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:10:57,761 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:10:58,241 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:02,319 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:02,747 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:07,250 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:08,171 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:08,861 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:09,059 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:09,550 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:09,926 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:10,186 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:10,808 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:11,443 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:16,041 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:16,461 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:26,269 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:26,653 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:34,317 - __main__ - INFO - 🔧 Tool call: list_openscad_libraries with args: []
+2026-03-23 11:11:34,317 - __main__ - INFO - 📤 Tool response: list_openscad_libraries returned str
+2026-03-23 11:11:34,317 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code']
+2026-03-23 11:11:34,317 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:11:34,317 - __main__ - INFO - 🔧 Tool call: render_scad_multi with args: ['code']
+2026-03-23 11:11:34,317 - __main__ - INFO - 📤 Tool response: render_scad_multi returned str
+2026-03-23 11:11:34,317 - __main__ - INFO - 🔧 Tool call: get_available_views with args: []
+2026-03-23 11:11:34,317 - __main__ - INFO - 📤 Tool response: get_available_views returned str
+2026-03-23 11:11:34,318 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-23 11:11:34,318 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-23 11:11:34,318 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-23 11:11:34,318 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-23 11:11:34,318 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-23 11:11:34,318 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-23 11:11:34,318 - __main__ - INFO - 🔧 Tool call: get_instructions with args: []
+2026-03-23 11:11:34,318 - __main__ - INFO - 📤 Tool response: get_instructions returned str
+2026-03-23 11:11:34,318 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code']
+2026-03-23 11:11:34,318 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:11:34,318 - __main__ - INFO - 🛠️  Total tool calls in this conversation: list_openscad_libraries([]), render_scad(['code']), render_scad_multi(['code']), get_available_views([]), get_view(['view_id']), get_view(['view_id']), get_view(['view_id']), get_instructions([]), render_scad(['code'])
+2026-03-23 11:11:34,318 - __main__ - INFO - 📨 Total tool responses: list_openscad_libraries(str), render_scad(str), render_scad_multi(str), get_available_views(str), get_view(str), get_view(str), get_view(str), get_instructions(str), render_scad(str)
+2026-03-23 11:11:34,318 - __main__ - WARNING - 🧠 Detected Gemini thinking content in response - filtering will be applied to file paths only
+2026-03-23 11:11:34,318 - __main__ - INFO - 🤖 Agent response: The final attempt with a minimal gear (zahnzahl=10, modul=1) also resulted in a blank image. This confirms that the `parameterizable_gears` library, or at least the `stirnrad` function within the curr...
+2026-03-23 11:11:34,318 - __main__ - INFO - 🔍 _extract_outputs: Processing 21 messages
+2026-03-23 11:11:34,318 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-23 11:11:34,318 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-23 11:11:34,318 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-23 11:11:34,318 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-23 11:11:34,323 - __main__ - INFO - Skipping old STL file: ../output/27be0f71-c73b-426b-99b2-9750996645c6/0/output.stl (age: 16915237.4s)
+2026-03-23 11:11:34,324 - __main__ - INFO - Skipping old STL file: ../output/b6412a2f-f65e-4c48-82fa-af2ef79a4dcb/0/output.stl (age: 16914308.2s)
+2026-03-23 11:11:34,324 - __main__ - INFO - Skipping old STL file: ../output/579ec65e-448a-484e-98ec-9b621c70c419/0/output.stl (age: 17799030.4s)
+2026-03-23 11:11:34,324 - __main__ - INFO - Skipping old STL file: ../output/cbc968a6-440c-4a8b-abff-62b611649272/0/output.stl (age: 16516573.6s)
+2026-03-23 11:11:34,325 - __main__ - INFO - Skipping old STL file: ../output/1a8c5f57-90da-45e4-b4c9-0157d5425b1e/0/output.stl (age: 16753182.9s)
+2026-03-23 11:11:34,325 - __main__ - INFO - Skipping old STL file: ../output/7707318b-c1ce-4aa3-880f-f0647548182b/0/output.stl (age: 16772467.5s)
+2026-03-23 11:11:34,326 - __main__ - INFO - Skipping old STL file: ../output/b15998d4-1bde-4d99-b17d-4304ebe62a25/0/output.stl (age: 16674843.7s)
+2026-03-23 11:11:34,326 - __main__ - INFO - Skipping old STL file: ../output/66fbea73-c822-4853-8ca0-8452e816523e/0/output.stl (age: 17800168.3s)
+2026-03-23 11:11:34,327 - __main__ - INFO - Skipping old STL file: ../output/aeed50ff-a3cf-4477-be5d-7c2384565f3d/0/output.stl (age: 16773044.6s)
+2026-03-23 11:11:34,327 - __main__ - INFO - Skipping old STL file: ../output/7beedc2b-fb28-44a4-9b9f-626286c61a0e/0/output.stl (age: 16769244.2s)
+2026-03-23 11:11:34,328 - __main__ - INFO - Skipping old STL file: ../output/4f7e2b3a-ced3-4221-b117-92143700508e/2/output.stl (age: 16672890.9s)
+2026-03-23 11:11:34,328 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/0/output.stl (age: 16915704.2s)
+2026-03-23 11:11:34,329 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/7/output.stl (age: 16917670.5s)
+2026-03-23 11:11:34,329 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/6/output.stl (age: 16920094.0s)
+2026-03-23 11:11:34,329 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/1/output.stl (age: 16920160.8s)
+2026-03-23 11:11:34,330 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/10/output.stl (age: 16917586.3s)
+2026-03-23 11:11:34,331 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/4/output.stl (age: 16917758.1s)
+2026-03-23 11:11:34,331 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/3/output.stl (age: 16920121.1s)
+2026-03-23 11:11:34,331 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/2/output.stl (age: 16920140.4s)
+2026-03-23 11:11:34,332 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/5/output.stl (age: 16917748.3s)
+2026-03-23 11:11:34,332 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/0/output.stl (age: 16925709.2s)
+2026-03-23 11:11:34,333 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/3/output.stl (age: 16926785.4s)
+2026-03-23 11:11:34,333 - __main__ - INFO - Skipping old STL file: ../output/3840b271-5925-44f0-a9df-04f74a21a48f/0/output.stl (age: 17797678.4s)
+2026-03-23 11:11:34,333 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/9/output.stl (age: 16592280.0s)
+2026-03-23 11:11:34,333 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/0/output.stl (age: 16592802.6s)
+2026-03-23 11:11:34,334 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/11/output.stl (age: 16592182.8s)
+2026-03-23 11:11:34,334 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/7/output.stl (age: 16592404.8s)
+2026-03-23 11:11:34,334 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/16/output.stl (age: 16586944.4s)
+2026-03-23 11:11:34,334 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/6/output.stl (age: 16592712.0s)
+2026-03-23 11:11:34,334 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/17/output.stl (age: 16586540.3s)
+2026-03-23 11:11:34,335 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/1/output.stl (age: 16592789.7s)
+2026-03-23 11:11:34,335 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/10/output.stl (age: 16592216.0s)
+2026-03-23 11:11:34,335 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/8/output.stl (age: 16592350.6s)
+2026-03-23 11:11:34,335 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/4/output.stl (age: 16592748.5s)
+2026-03-23 11:11:34,335 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/15/output.stl (age: 16587104.2s)
+2026-03-23 11:11:34,335 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/3/output.stl (age: 16592772.5s)
+2026-03-23 11:11:34,335 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/12/output.stl (age: 16592112.0s)
+2026-03-23 11:11:34,336 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/2/output.stl (age: 16592782.3s)
+2026-03-23 11:11:34,336 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/13/output.stl (age: 16587735.8s)
+2026-03-23 11:11:34,336 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/14/output.stl (age: 16587147.1s)
+2026-03-23 11:11:34,337 - __main__ - INFO - Skipping old STL file: ../output/94412d63-9f20-40a3-ba7b-02ad38c6883e/0/output.stl (age: 16480517.3s)
+2026-03-23 11:11:34,337 - __main__ - INFO - Skipping old STL file: ../output/7f647177-99a7-4962-9983-6123a7c383e9/0/output.stl (age: 16484501.9s)
+2026-03-23 11:11:34,338 - __main__ - INFO - Skipping old STL file: ../output/436447ad-5851-4b9c-bfb7-2a6150845b06/0/output.stl (age: 16913957.1s)
+2026-03-23 11:11:34,339 - __main__ - INFO - 🔍 Found latest STL: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl (age: 8.6s)
+2026-03-23 11:11:34,339 - __main__ - INFO - 🎯 Processing 3D model: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl
+2026-03-23 11:11:34,355 - __main__ - INFO - 📏 Extracted measurements: {'length': 11.989855280940924, 'width': 11.555476078544592, 'height': 5.0}
+2026-03-23 11:11:34,355 - __main__ - INFO - Calculated optimal camera position: [30.61862178478973, 30.618621784789728, 27.499999999999996]
+2026-03-23 11:11:34,355 - __main__ - INFO - Object dimensions: {'length': 11.989855280940924, 'width': 11.555476078544592, 'height': 5.0}
+2026-03-23 11:11:34,355 - __main__ - INFO - Max dimension: 11.99mm, Distance: 50.00mm
+2026-03-23 11:11:34,366 - __main__ - INFO - 🔧 Original mesh: 2400 faces
+2026-03-23 11:11:34,368 - __main__ - INFO - ✅ Converted STL to GLB: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb
+2026-03-23 11:11:34,368 - __main__ - INFO - 🔍 Setting current_3d_model to: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb'
+2026-03-23 11:11:34,368 - __main__ - INFO - ✅ 3D model processed: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb
+2026-03-23 11:11:34,368 - __main__ - INFO - 📸 Camera positioned at: [30.61862178478973, 30.618621784789728, 27.499999999999996]
+2026-03-23 11:11:34,368 - __main__ - INFO - 🔧 Attempting direct MCP call for immediate OpenSCAD rendering
+2026-03-23 11:11:34,659 - __main__ - INFO - 🔍 Processing potential image content: <class 'list'>
+2026-03-23 11:11:34,664 - __main__ - INFO - ✅ Loaded image from ImageContent
+2026-03-23 11:11:35,317 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:35,669 - __main__ - INFO - Skipping old STL file: ../output/27be0f71-c73b-426b-99b2-9750996645c6/0/output.stl (age: 16915238.7s)
+2026-03-23 11:11:35,669 - __main__ - INFO - Skipping old STL file: ../output/b6412a2f-f65e-4c48-82fa-af2ef79a4dcb/0/output.stl (age: 16914309.6s)
+2026-03-23 11:11:35,670 - __main__ - INFO - Skipping old STL file: ../output/579ec65e-448a-484e-98ec-9b621c70c419/0/output.stl (age: 17799031.7s)
+2026-03-23 11:11:35,670 - __main__ - INFO - Skipping old STL file: ../output/cbc968a6-440c-4a8b-abff-62b611649272/0/output.stl (age: 16516574.9s)
+2026-03-23 11:11:35,670 - __main__ - INFO - Skipping old STL file: ../output/1a8c5f57-90da-45e4-b4c9-0157d5425b1e/0/output.stl (age: 16753184.3s)
+2026-03-23 11:11:35,671 - __main__ - INFO - Skipping old STL file: ../output/7707318b-c1ce-4aa3-880f-f0647548182b/0/output.stl (age: 16772468.9s)
+2026-03-23 11:11:35,671 - __main__ - INFO - Skipping old STL file: ../output/b15998d4-1bde-4d99-b17d-4304ebe62a25/0/output.stl (age: 16674845.1s)
+2026-03-23 11:11:35,671 - __main__ - INFO - Skipping old STL file: ../output/66fbea73-c822-4853-8ca0-8452e816523e/0/output.stl (age: 17800169.7s)
+2026-03-23 11:11:35,671 - __main__ - INFO - Skipping old STL file: ../output/aeed50ff-a3cf-4477-be5d-7c2384565f3d/0/output.stl (age: 16773045.9s)
+2026-03-23 11:11:35,672 - __main__ - INFO - Skipping old STL file: ../output/7beedc2b-fb28-44a4-9b9f-626286c61a0e/0/output.stl (age: 16769245.6s)
+2026-03-23 11:11:35,672 - __main__ - INFO - Skipping old STL file: ../output/4f7e2b3a-ced3-4221-b117-92143700508e/2/output.stl (age: 16672892.2s)
+2026-03-23 11:11:35,673 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/0/output.stl (age: 16915705.6s)
+2026-03-23 11:11:35,673 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/7/output.stl (age: 16917671.8s)
+2026-03-23 11:11:35,673 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/6/output.stl (age: 16920095.3s)
+2026-03-23 11:11:35,674 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/1/output.stl (age: 16920162.2s)
+2026-03-23 11:11:35,674 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/10/output.stl (age: 16917587.7s)
+2026-03-23 11:11:35,674 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/4/output.stl (age: 16917759.4s)
+2026-03-23 11:11:35,674 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/3/output.stl (age: 16920122.4s)
+2026-03-23 11:11:35,674 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/2/output.stl (age: 16920141.8s)
+2026-03-23 11:11:35,674 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/5/output.stl (age: 16917749.7s)
+2026-03-23 11:11:35,675 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/0/output.stl (age: 16925710.6s)
+2026-03-23 11:11:35,675 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/3/output.stl (age: 16926786.7s)
+2026-03-23 11:11:35,675 - __main__ - INFO - Skipping old STL file: ../output/3840b271-5925-44f0-a9df-04f74a21a48f/0/output.stl (age: 17797679.7s)
+2026-03-23 11:11:35,676 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/9/output.stl (age: 16592281.3s)
+2026-03-23 11:11:35,676 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/0/output.stl (age: 16592803.9s)
+2026-03-23 11:11:35,676 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/11/output.stl (age: 16592184.1s)
+2026-03-23 11:11:35,676 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/7/output.stl (age: 16592406.1s)
+2026-03-23 11:11:35,676 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/16/output.stl (age: 16586945.7s)
+2026-03-23 11:11:35,677 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/6/output.stl (age: 16592713.3s)
+2026-03-23 11:11:35,677 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/17/output.stl (age: 16586541.7s)
+2026-03-23 11:11:35,677 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/1/output.stl (age: 16592791.0s)
+2026-03-23 11:11:35,677 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/10/output.stl (age: 16592217.3s)
+2026-03-23 11:11:35,677 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/8/output.stl (age: 16592352.0s)
+2026-03-23 11:11:35,677 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/4/output.stl (age: 16592749.8s)
+2026-03-23 11:11:35,677 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/15/output.stl (age: 16587105.6s)
+2026-03-23 11:11:35,677 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/3/output.stl (age: 16592773.8s)
+2026-03-23 11:11:35,677 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/12/output.stl (age: 16592113.3s)
+2026-03-23 11:11:35,677 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/2/output.stl (age: 16592783.7s)
+2026-03-23 11:11:35,678 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/13/output.stl (age: 16587737.1s)
+2026-03-23 11:11:35,678 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/14/output.stl (age: 16587148.5s)
+2026-03-23 11:11:35,679 - __main__ - INFO - Skipping old STL file: ../output/94412d63-9f20-40a3-ba7b-02ad38c6883e/0/output.stl (age: 16480518.7s)
+2026-03-23 11:11:35,679 - __main__ - INFO - Skipping old STL file: ../output/7f647177-99a7-4962-9983-6123a7c383e9/0/output.stl (age: 16484503.3s)
+2026-03-23 11:11:35,680 - __main__ - INFO - Skipping old STL file: ../output/436447ad-5851-4b9c-bfb7-2a6150845b06/0/output.stl (age: 16913958.4s)
+2026-03-23 11:11:35,680 - __main__ - INFO - 🔍 Found latest STL: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl (age: 1.2s)
+2026-03-23 11:11:35,680 - __main__ - INFO - 🎯 Processing 3D model: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl
+2026-03-23 11:11:35,703 - __main__ - INFO - 📏 Extracted measurements: {'length': 11.989855280940924, 'width': 11.555476078544592, 'height': 5.0}
+2026-03-23 11:11:35,703 - __main__ - INFO - Calculated optimal camera position: [30.61862178478973, 30.618621784789728, 27.499999999999996]
+2026-03-23 11:11:35,703 - __main__ - INFO - Object dimensions: {'length': 11.989855280940924, 'width': 11.555476078544592, 'height': 5.0}
+2026-03-23 11:11:35,703 - __main__ - INFO - Max dimension: 11.99mm, Distance: 50.00mm
+2026-03-23 11:11:35,718 - __main__ - INFO - 🔧 Original mesh: 2400 faces
+2026-03-23 11:11:35,720 - __main__ - INFO - ✅ Converted STL to GLB: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb
+2026-03-23 11:11:35,720 - __main__ - INFO - 🔍 Setting current_3d_model to: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb'
+2026-03-23 11:11:35,720 - __main__ - INFO - ✅ 3D model processed: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb
+2026-03-23 11:11:35,720 - __main__ - INFO - 📸 Camera positioned at: [30.61862178478973, 30.618621784789728, 27.499999999999996]
+2026-03-23 11:11:35,720 - __main__ - INFO - 📊 Chat complete - 3D model: ✅, Code: ✅, Measurements: ✅
+2026-03-23 11:11:35,773 - __main__ - INFO - 🔍 update_3d_model called with: <class 'str'> = '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb'
+2026-03-23 11:11:35,773 - __main__ - INFO - ✅ Valid 3D model path being returned: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb
+2026-03-23 11:11:35,773 - __main__ - INFO - 🔄 update_3d_model returning: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb'
+2026-03-23 11:11:51,780 - __main__ - INFO - 💬 User message: Make a customizable box with rounded corners
+2026-03-23 11:11:51,781 - __main__ - INFO - 🔍 _clear_current_outputs: Setting current_3d_model to None
+2026-03-23 11:11:51,781 - __main__ - INFO - 🤖 Invoking agent with 4 messages
+2026-03-23 11:11:52,499 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:52,820 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:53,825 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:54,247 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:54,766 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:54,956 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:56,919 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:57,025 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:11:58,762 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:11:58,921 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:00,325 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:00,748 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:01,581 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:01,997 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:02,741 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:03,133 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:03,878 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:04,271 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:05,142 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:05,310 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:06,054 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:06,466 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:07,685 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:07,796 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:07,921 - __main__ - INFO - 🔧 Tool call: openscad_doc_search with args: ['query']
+2026-03-23 11:12:07,921 - __main__ - INFO - 📤 Tool response: openscad_doc_search returned str
+2026-03-23 11:12:07,921 - __main__ - INFO - 🔧 Tool call: list_openscad_libraries with args: []
+2026-03-23 11:12:07,921 - __main__ - INFO - 📤 Tool response: list_openscad_libraries returned str
+2026-03-23 11:12:07,921 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code']
+2026-03-23 11:12:07,921 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:12:07,921 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code']
+2026-03-23 11:12:07,921 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:12:07,921 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code']
+2026-03-23 11:12:07,921 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:12:07,921 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code']
+2026-03-23 11:12:07,921 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:12:07,921 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code']
+2026-03-23 11:12:07,921 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:12:07,921 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code']
+2026-03-23 11:12:07,921 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:12:07,921 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code']
+2026-03-23 11:12:07,921 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:12:07,921 - __main__ - INFO - 🔧 Tool call: render_scad with args: []
+2026-03-23 11:12:07,922 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:12:07,922 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code']
+2026-03-23 11:12:07,922 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:12:07,922 - __main__ - INFO - 🛠️  Total tool calls in this conversation: openscad_doc_search(['query']), list_openscad_libraries([]), render_scad(['code']), render_scad(['code']), render_scad(['code']), render_scad(['code']), render_scad(['code']), render_scad(['code']), render_scad(['code']), render_scad([]), render_scad(['code'])
+2026-03-23 11:12:07,922 - __main__ - INFO - 📨 Total tool responses: openscad_doc_search(str), list_openscad_libraries(str), render_scad(str), render_scad(str), render_scad(str), render_scad(str), render_scad(str), render_scad(str), render_scad(str), render_scad(str), render_scad(str)
+2026-03-23 11:12:07,922 - __main__ - INFO - 🤖 Agent response: I need to provide actual OpenSCAD code. Let me create a proper script.
+
+...
+
+......
+2026-03-23 11:12:07,922 - __main__ - INFO - 🔍 _extract_outputs: Processing 27 messages
+2026-03-23 11:12:07,922 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-23 11:12:07,922 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-23 11:12:07,922 - __main__ - ERROR - ❌ Detected error in render_scad response: Error: ToolException("Error calling tool 'render_scad': STL generation failed: ERROR: Parser error: syntax error in file ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.scad, line 1\nCan't parse file '/Users/damian/software/openscad_mcp/output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.scad'!\n\n")
+ Please fix your mistakes.
+2026-03-23 11:12:07,922 - __main__ - INFO - 🔧 Attempting direct MCP call for immediate OpenSCAD rendering
+2026-03-23 11:12:08,027 - __main__ - INFO - 🔍 Processing potential image content: <class 'list'>
+2026-03-23 11:12:08,625 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:09,034 - __main__ - INFO - Skipping old STL file: ../output/27be0f71-c73b-426b-99b2-9750996645c6/0/output.stl (age: 16915272.1s)
+2026-03-23 11:12:09,035 - __main__ - INFO - Skipping old STL file: ../output/b6412a2f-f65e-4c48-82fa-af2ef79a4dcb/0/output.stl (age: 16914342.9s)
+2026-03-23 11:12:09,035 - __main__ - INFO - Skipping old STL file: ../output/579ec65e-448a-484e-98ec-9b621c70c419/0/output.stl (age: 17799065.1s)
+2026-03-23 11:12:09,036 - __main__ - INFO - Skipping old STL file: ../output/cbc968a6-440c-4a8b-abff-62b611649272/0/output.stl (age: 16516608.3s)
+2026-03-23 11:12:09,036 - __main__ - INFO - Skipping old STL file: ../output/1a8c5f57-90da-45e4-b4c9-0157d5425b1e/0/output.stl (age: 16753217.6s)
+2026-03-23 11:12:09,037 - __main__ - INFO - Skipping old STL file: ../output/7707318b-c1ce-4aa3-880f-f0647548182b/0/output.stl (age: 16772502.2s)
+2026-03-23 11:12:09,037 - __main__ - INFO - Skipping old STL file: ../output/b15998d4-1bde-4d99-b17d-4304ebe62a25/0/output.stl (age: 16674878.4s)
+2026-03-23 11:12:09,038 - __main__ - INFO - Skipping old STL file: ../output/66fbea73-c822-4853-8ca0-8452e816523e/0/output.stl (age: 17800203.0s)
+2026-03-23 11:12:09,039 - __main__ - INFO - Skipping old STL file: ../output/aeed50ff-a3cf-4477-be5d-7c2384565f3d/0/output.stl (age: 16773079.3s)
+2026-03-23 11:12:09,040 - __main__ - INFO - Skipping old STL file: ../output/7beedc2b-fb28-44a4-9b9f-626286c61a0e/0/output.stl (age: 16769278.9s)
+2026-03-23 11:12:09,041 - __main__ - INFO - Skipping old STL file: ../output/4f7e2b3a-ced3-4221-b117-92143700508e/2/output.stl (age: 16672925.6s)
+2026-03-23 11:12:09,042 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/0/output.stl (age: 16915739.0s)
+2026-03-23 11:12:09,042 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/7/output.stl (age: 16917705.2s)
+2026-03-23 11:12:09,042 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/6/output.stl (age: 16920128.7s)
+2026-03-23 11:12:09,043 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/1/output.stl (age: 16920195.6s)
+2026-03-23 11:12:09,043 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/10/output.stl (age: 16917621.0s)
+2026-03-23 11:12:09,043 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/4/output.stl (age: 16917792.8s)
+2026-03-23 11:12:09,044 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/3/output.stl (age: 16920155.8s)
+2026-03-23 11:12:09,044 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/2/output.stl (age: 16920175.2s)
+2026-03-23 11:12:09,044 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/5/output.stl (age: 16917783.0s)
+2026-03-23 11:12:09,045 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/0/output.stl (age: 16925743.9s)
+2026-03-23 11:12:09,046 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/3/output.stl (age: 16926820.1s)
+2026-03-23 11:12:09,047 - __main__ - INFO - Skipping old STL file: ../output/3840b271-5925-44f0-a9df-04f74a21a48f/0/output.stl (age: 17797713.1s)
+2026-03-23 11:12:09,047 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/9/output.stl (age: 16592314.7s)
+2026-03-23 11:12:09,047 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/0/output.stl (age: 16592837.3s)
+2026-03-23 11:12:09,048 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/11/output.stl (age: 16592217.5s)
+2026-03-23 11:12:09,048 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/7/output.stl (age: 16592439.5s)
+2026-03-23 11:12:09,048 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/16/output.stl (age: 16586979.1s)
+2026-03-23 11:12:09,048 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/6/output.stl (age: 16592746.7s)
+2026-03-23 11:12:09,049 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/17/output.stl (age: 16586575.0s)
+2026-03-23 11:12:09,049 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/1/output.stl (age: 16592824.4s)
+2026-03-23 11:12:09,049 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/10/output.stl (age: 16592250.7s)
+2026-03-23 11:12:09,050 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/8/output.stl (age: 16592385.3s)
+2026-03-23 11:12:09,050 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/4/output.stl (age: 16592783.2s)
+2026-03-23 11:12:09,050 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/15/output.stl (age: 16587138.9s)
+2026-03-23 11:12:09,050 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/3/output.stl (age: 16592807.2s)
+2026-03-23 11:12:09,051 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/12/output.stl (age: 16592146.7s)
+2026-03-23 11:12:09,051 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/2/output.stl (age: 16592817.0s)
+2026-03-23 11:12:09,051 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/13/output.stl (age: 16587770.5s)
+2026-03-23 11:12:09,051 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/14/output.stl (age: 16587181.8s)
+2026-03-23 11:12:09,053 - __main__ - INFO - Skipping old STL file: ../output/94412d63-9f20-40a3-ba7b-02ad38c6883e/0/output.stl (age: 16480552.0s)
+2026-03-23 11:12:09,053 - __main__ - INFO - Skipping old STL file: ../output/7f647177-99a7-4962-9983-6123a7c383e9/0/output.stl (age: 16484536.6s)
+2026-03-23 11:12:09,054 - __main__ - INFO - Skipping old STL file: ../output/436447ad-5851-4b9c-bfb7-2a6150845b06/0/output.stl (age: 16913991.8s)
+2026-03-23 11:12:09,055 - __main__ - INFO - 🔍 Found latest STL: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl (age: 34.6s)
+2026-03-23 11:12:09,055 - __main__ - INFO - 🎯 Processing 3D model: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl
+2026-03-23 11:12:09,074 - __main__ - INFO - 📏 Extracted measurements: {'length': 11.989855280940924, 'width': 11.555476078544592, 'height': 5.0}
+2026-03-23 11:12:09,074 - __main__ - INFO - Calculated optimal camera position: [30.61862178478973, 30.618621784789728, 27.499999999999996]
+2026-03-23 11:12:09,074 - __main__ - INFO - Object dimensions: {'length': 11.989855280940924, 'width': 11.555476078544592, 'height': 5.0}
+2026-03-23 11:12:09,074 - __main__ - INFO - Max dimension: 11.99mm, Distance: 50.00mm
+2026-03-23 11:12:09,088 - __main__ - INFO - 🔧 Original mesh: 2400 faces
+2026-03-23 11:12:09,091 - __main__ - INFO - ✅ Converted STL to GLB: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb
+2026-03-23 11:12:09,091 - __main__ - INFO - 🔍 Setting current_3d_model to: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb'
+2026-03-23 11:12:09,091 - __main__ - INFO - ✅ 3D model processed: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb
+2026-03-23 11:12:09,091 - __main__ - INFO - 📸 Camera positioned at: [30.61862178478973, 30.618621784789728, 27.499999999999996]
+2026-03-23 11:12:09,091 - __main__ - INFO - 📊 Chat complete - 3D model: ✅, Code: ✅, Measurements: ✅
+2026-03-23 11:12:09,143 - __main__ - INFO - 🔍 update_3d_model called with: <class 'str'> = '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb'
+2026-03-23 11:12:09,144 - __main__ - INFO - ✅ Valid 3D model path being returned: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb
+2026-03-23 11:12:09,144 - __main__ - INFO - 🔄 update_3d_model returning: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmpsp5qn0z8/output.glb'
+2026-03-23 11:12:16,949 - __main__ - INFO - 🧹 Clearing chat conversation and outputs
+2026-03-23 11:12:16,949 - __main__ - INFO - 🔍 reset_conversation: Setting current_3d_model to None
+2026-03-23 11:12:20,347 - __main__ - INFO - 💬 User message: Make a customizable box with rounded corners
+2026-03-23 11:12:20,348 - __main__ - INFO - 🔍 _clear_current_outputs: Setting current_3d_model to None
+2026-03-23 11:12:20,348 - __main__ - INFO - 🤖 Invoking agent with 2 messages
+2026-03-23 11:12:21,084 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:21,303 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:22,409 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:22,769 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:23,123 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:23,471 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:24,194 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:24,627 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:25,160 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:25,554 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:26,346 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:26,752 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:27,286 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:27,674 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:30,820 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:31,235 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:33,633 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:33,987 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:37,207 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:37,614 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:40,490 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:40,984 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:43,376 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:43,772 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:48,102 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:12:48,525 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:12:50,887 - __main__ - ERROR - 💥 Chat processing error: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+2026-03-23 11:12:50,888 - __main__ - INFO - 📊 Chat complete - 3D model: ❌, Code: ❌, Measurements: ❌
+2026-03-23 11:12:50,962 - __main__ - INFO - 🔍 update_3d_model called with: <class 'NoneType'> = None
+2026-03-23 11:12:50,962 - __main__ - INFO - 🔄 update_3d_model returning: None
+2026-03-23 11:12:51,603 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:13:04,582 - asyncio - ERROR - an error occurred during closing of asynchronous generator <async_generator object stdio_client at 0x119ae5540>
+asyncgen: <async_generator object stdio_client at 0x119ae5540>
+  + Exception Group Traceback (most recent call last):
+  |   File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 772, in __aexit__
+  |     raise BaseExceptionGroup(
+  | BaseExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/mcp/client/stdio/__init__.py", line 187, in stdio_client
+    |     yield read_stream, write_stream
+    | GeneratorExit
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/mcp/client/stdio/__init__.py", line 181, in stdio_client
+    anyio.create_task_group() as tg,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 778, in __aexit__
+    if self.cancel_scope.__exit__(type(exc), exc, exc.__traceback__):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 457, in __exit__
+    raise RuntimeError(
+RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+2026-03-23 11:13:04,584 - asyncio - ERROR - an error occurred during closing of asynchronous generator <async_generator object create_session at 0x1185ec150>
+asyncgen: <async_generator object create_session at 0x1185ec150>
+  + Exception Group Traceback (most recent call last):
+  |   File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 772, in __aexit__
+  |     raise BaseExceptionGroup(
+  | BaseExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/sessions.py", line 224, in _create_stdio_session
+    |     yield session
+    |   File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/sessions.py", line 395, in create_session
+    |     yield session
+    | GeneratorExit
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/sessions.py", line 222, in _create_stdio_session
+    ClientSession(read, write, **(session_kwargs or {})) as session,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/mcp/shared/session.py", line 218, in __aexit__
+    return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 778, in __aexit__
+    if self.cancel_scope.__exit__(type(exc), exc, exc.__traceback__):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 457, in __exit__
+    raise RuntimeError(
+RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/sessions.py", line 394, in create_session
+    async with _create_stdio_session(**params) as session:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/.local/share/uv/python/cpython-3.12.9-macos-aarch64-none/lib/python3.12/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(value)
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/sessions.py", line 221, in _create_stdio_session
+    stdio_client(server_params) as (read, write),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/.local/share/uv/python/cpython-3.12.9-macos-aarch64-none/lib/python3.12/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(value)
+RuntimeError: athrow(): asynchronous generator is already running
+2026-03-23 11:13:04,586 - asyncio - ERROR - an error occurred during closing of asynchronous generator <async_generator object MultiServerMCPClient.session at 0x119aede40>
+asyncgen: <async_generator object MultiServerMCPClient.session at 0x119aede40>
+Traceback (most recent call last):
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/client.py", line 116, in session
+    yield session
+GeneratorExit
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/client.py", line 113, in session
+    async with create_session(self.connections[server_name]) as session:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/.local/share/uv/python/cpython-3.12.9-macos-aarch64-none/lib/python3.12/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(value)
+RuntimeError: athrow(): asynchronous generator is already running
+2026-03-23 11:13:04,587 - asyncio - ERROR - an error occurred during closing of asynchronous generator <async_generator object _create_stdio_session at 0x119ad1f80>
+asyncgen: <async_generator object _create_stdio_session at 0x119ad1f80>
+RuntimeError: aclose(): asynchronous generator is already running
+2026-03-23 11:19:29,472 - __main__ - INFO - 🚀 OpenSCAD 3D Assistant Starting Up
+2026-03-23 11:19:29,473 - __main__ - INFO - 🤖 Selected model: claude-sonnet-4.6-or
+2026-03-23 11:19:29,473 - __main__ - INFO - 📝 Prompt source: xml
+2026-03-23 11:19:29,473 - __main__ - INFO - 📊 Log level: INFO
+2026-03-23 11:19:29,473 - __main__ - INFO - 🔑 Available services: OpenAI, Anthropic, Google Gemini, OpenRouter, Tavily Search
+2026-03-23 11:19:29,473 - __main__ - INFO - 💡 For advanced tool tracing, set LANGCHAIN_API_KEY for LangSmith
+2026-03-23 11:19:29,473 - __main__ - INFO -    Sign up at: https://smith.langchain.com/
+2026-03-23 11:19:29,473 - __main__ - INFO - ✅ Trimesh available for 3D processing
+2026-03-23 11:19:29,473 - __main__ - INFO - ✅ TavilySearch available for web search
+2026-03-23 11:19:29,473 - __main__ - INFO - ✅ LangSmith available for advanced tracing
+2026-03-23 11:19:29,473 - __main__ - INFO - 🌐 Starting Smart 3D OpenSCAD Chat with Model: claude-sonnet-4.6-or
+2026-03-23 11:19:29,473 - __main__ - INFO - 📝 Using prompt source: xml
+2026-03-23 11:19:29,551 - __main__ - INFO - 🎯 Gradio app created successfully
+2026-03-23 11:19:29,552 - __main__ - INFO - 🌐 Launching on http://localhost:7861
+2026-03-23 11:19:29,635 - httpx - INFO - HTTP Request: GET http://127.0.0.1:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2026-03-23 11:19:29,646 - httpx - INFO - HTTP Request: HEAD http://127.0.0.1:7861/ "HTTP/1.1 200 OK"
+2026-03-23 11:19:30,518 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2026-03-23 11:19:36,339 - __main__ - INFO - 🎬 Starting Gradio app startup sequence...
+2026-03-23 11:19:36,339 - __main__ - INFO - 🚀 Starting OpenSCAD Chat initialization...
+2026-03-23 11:19:36,339 - __main__ - INFO - 🔍 Using basic Python logging for tool tracking
+2026-03-23 11:19:36,340 - __main__ - INFO - 📋 Configuration loaded: ['mcpServers']
+2026-03-23 11:19:36,340 - __main__ - INFO - 🔌 Created MultiServerMCP client
+2026-03-23 11:19:36,340 - __main__ - INFO - 🔌 Creating persistent MCP session...
+2026-03-23 11:19:37,779 - __main__ - INFO - 🔧 Loaded 14 MCP tools: ['openscad_doc_search', 'list_openscad_libraries', 'render_scad', 'render_scad_multi', 'get_available_views', 'get_view', 'get_instructions', 'get_bosl_examples', 'get_gear_parameter', 'get_gear_generation_instructions', 'get_bosl2_gear_docs', 'generate_gcode', 'print_last_gcode', 'get_printing_presets']
+2026-03-23 11:19:37,779 - __main__ - INFO - 🌐 Web search with basic logging enabled
+2026-03-23 11:19:37,779 - __main__ - INFO - 🌐 Web search enabled with TavilySearch
+2026-03-23 11:19:37,779 - __main__ - INFO - 🔧 Total tools available: 15 (MCP: 14, Web: 1)
+2026-03-23 11:19:37,779 - __main__ - INFO - 🔍 Tracing mode: basic
+2026-03-23 11:19:37,779 - __main__ - INFO - 📄 Loading system prompt...
+2026-03-23 11:19:37,780 - __main__ - INFO - ✅ Loaded advanced system prompt from XML (5630 characters)
+2026-03-23 11:19:37,780 - __main__ - INFO - 📄 System prompt loaded: 5607 characters
+2026-03-23 11:19:37,780 - __main__ - INFO - 🤖 Initializing LLM: claude-sonnet-4.6-or
+2026-03-23 11:19:37,780 - __main__ - INFO - 🤖 Initializing OpenRouter model: anthropic/claude-sonnet-4.6
+2026-03-23 11:19:37,950 - __main__ - INFO - 🧠 Creating React agent...
+2026-03-23 11:19:37,966 - __main__ - INFO - 💾 Initialized conversation history
+2026-03-23 11:19:37,966 - __main__ - INFO - ✅ Ready with smart camera positioning, auto-rotation, and 15 tools (with web search)!
+2026-03-23 11:19:37,967 - __main__ - INFO - 🎉 Startup complete: ✅ Ready with smart camera positioning, auto-rotation, and 15 tools (with web search)!
+2026-03-23 11:19:43,393 - __main__ - INFO - 💬 User message: Make a customizable box with rounded corners
+2026-03-23 11:19:43,393 - __main__ - INFO - 🔍 _clear_current_outputs: Setting current_3d_model to None
+2026-03-23 11:19:43,394 - __main__ - INFO - 🤖 Invoking agent with 2 messages
+2026-03-23 11:19:44,100 - langsmith.client - WARNING - Failed to multipart ingest runs: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:19:45,076 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:19:50,431 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:19:50,743 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:20:16,846 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:20:18,492 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:20:20,931 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:20:21,989 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:20:22,855 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:20:24,246 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:20:24,679 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:20:25,633 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:20:25,690 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:20:47,826 - __main__ - INFO - 🔧 Tool call: get_instructions with args: []
+2026-03-23 11:20:47,827 - __main__ - INFO - 🔧 Tool call: list_openscad_libraries with args: []
+2026-03-23 11:20:47,827 - __main__ - INFO - 📤 Tool response: get_instructions returned str
+2026-03-23 11:20:47,827 - __main__ - INFO - 📤 Tool response: list_openscad_libraries returned str
+2026-03-23 11:20:47,827 - __main__ - INFO - 🔧 Tool call: render_scad_multi with args: ['code', 'iteration']
+2026-03-23 11:20:47,827 - __main__ - INFO - 📤 Tool response: render_scad_multi returned str
+2026-03-23 11:20:47,827 - __main__ - INFO - 🔧 Tool call: get_available_views with args: []
+2026-03-23 11:20:47,827 - __main__ - INFO - 📤 Tool response: get_available_views returned str
+2026-03-23 11:20:47,827 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-23 11:20:47,827 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-23 11:20:47,827 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-23 11:20:47,827 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-23 11:20:47,828 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-23 11:20:47,828 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-23 11:20:47,828 - __main__ - INFO - 🛠️  Total tool calls in this conversation: get_instructions([]), list_openscad_libraries([]), render_scad_multi(['code', 'iteration']), get_available_views([]), get_view(['view_id']), get_view(['view_id']), get_view(['view_id'])
+2026-03-23 11:20:47,828 - __main__ - INFO - 📨 Total tool responses: get_instructions(str), list_openscad_libraries(str), render_scad_multi(str), get_available_views(str), get_view(str), get_view(str), get_view(str)
+2026-03-23 11:20:47,828 - __main__ - WARNING - 🧠 Detected Gemini thinking content in response - filtering will be applied to file paths only
+2026-03-23 11:20:47,828 - __main__ - INFO - 🤖 Agent response: ### CRITIQUE
+The renders look great! The box has clean rounded corners, proper wall thickness, an open top, and the lid is displayed floating above for clarity. All views confirm:
+- ✅ Rounded vertical...
+2026-03-23 11:20:47,828 - __main__ - INFO - 🔍 _extract_outputs: Processing 15 messages
+2026-03-23 11:20:47,828 - __main__ - INFO - 📊 Chat complete - 3D model: ❌, Code: ❌, Measurements: ❌
+2026-03-23 11:20:47,898 - __main__ - INFO - 🔍 update_3d_model called with: <class 'NoneType'> = None
+2026-03-23 11:20:47,898 - __main__ - INFO - 🔄 update_3d_model returning: None
+2026-03-23 11:20:48,530 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:21:03,766 - __main__ - INFO - 🧹 Clearing chat conversation and outputs
+2026-03-23 11:21:03,766 - __main__ - INFO - 🔍 reset_conversation: Setting current_3d_model to None
+2026-03-23 11:21:05,581 - __main__ - INFO - 💬 User message: Make a large gear with 50 teeth
+2026-03-23 11:21:05,582 - __main__ - INFO - 🔍 _clear_current_outputs: Setting current_3d_model to None
+2026-03-23 11:21:05,582 - __main__ - INFO - 🤖 Invoking agent with 2 messages
+2026-03-23 11:21:06,299 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:21:06,909 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:21:12,106 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:21:13,937 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:21:27,865 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:21:29,418 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:21:30,561 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:21:31,495 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:21:31,903 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:21:33,691 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:21:33,995 - httpx - INFO - HTTP Request: POST https://openrouter.ai/api/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-23 11:21:41,914 - __main__ - INFO - 🔧 Tool call: list_openscad_libraries with args: []
+2026-03-23 11:21:41,914 - __main__ - INFO - 🔧 Tool call: get_instructions with args: []
+2026-03-23 11:21:41,915 - __main__ - INFO - 📤 Tool response: list_openscad_libraries returned str
+2026-03-23 11:21:41,915 - __main__ - INFO - 📤 Tool response: get_instructions returned str
+2026-03-23 11:21:41,915 - __main__ - INFO - 🔧 Tool call: render_scad_multi with args: ['code', 'iteration']
+2026-03-23 11:21:41,915 - __main__ - INFO - 📤 Tool response: render_scad_multi returned str
+2026-03-23 11:21:41,915 - __main__ - INFO - 🔧 Tool call: get_available_views with args: []
+2026-03-23 11:21:41,915 - __main__ - INFO - 📤 Tool response: get_available_views returned str
+2026-03-23 11:21:41,915 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-23 11:21:41,915 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-23 11:21:41,915 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-23 11:21:41,915 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-23 11:21:41,915 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-23 11:21:41,915 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-23 11:21:41,915 - __main__ - INFO - 🛠️  Total tool calls in this conversation: list_openscad_libraries([]), get_instructions([]), render_scad_multi(['code', 'iteration']), get_available_views([]), get_view(['view_id']), get_view(['view_id']), get_view(['view_id'])
+2026-03-23 11:21:41,915 - __main__ - INFO - 📨 Total tool responses: list_openscad_libraries(str), get_instructions(str), render_scad_multi(str), get_available_views(str), get_view(str), get_view(str), get_view(str)
+2026-03-23 11:21:41,915 - __main__ - INFO - 🤖 Agent response: Here is your **large 50-tooth spur gear**, rendered successfully! 🎉
+
+---
+
+## ✅ Result Summary
+
+### Key Calculations
+| Parameter | Value |
+|---|---|
+| **Teeth** | 50 |
+| **Module (modul)** | 3 mm |
+| *...
+2026-03-23 11:21:41,916 - __main__ - INFO - 🔍 _extract_outputs: Processing 14 messages
+2026-03-23 11:21:41,916 - __main__ - INFO - 📊 Chat complete - 3D model: ❌, Code: ❌, Measurements: ❌
+2026-03-23 11:21:41,952 - __main__ - INFO - 🔍 update_3d_model called with: <class 'NoneType'> = None
+2026-03-23 11:21:41,952 - __main__ - INFO - 🔄 update_3d_model returning: None
+2026-03-23 11:21:42,619 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:22:59,836 - asyncio - ERROR - an error occurred during closing of asynchronous generator <async_generator object stdio_client at 0x119c51540>
+asyncgen: <async_generator object stdio_client at 0x119c51540>
+  + Exception Group Traceback (most recent call last):
+  |   File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 772, in __aexit__
+  |     raise BaseExceptionGroup(
+  | BaseExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/mcp/client/stdio/__init__.py", line 187, in stdio_client
+    |     yield read_stream, write_stream
+    | GeneratorExit
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/mcp/client/stdio/__init__.py", line 181, in stdio_client
+    anyio.create_task_group() as tg,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 778, in __aexit__
+    if self.cancel_scope.__exit__(type(exc), exc, exc.__traceback__):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 457, in __exit__
+    raise RuntimeError(
+RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+2026-03-23 11:22:59,838 - asyncio - ERROR - an error occurred during closing of asynchronous generator <async_generator object MultiServerMCPClient.session at 0x119c69340>
+asyncgen: <async_generator object MultiServerMCPClient.session at 0x119c69340>
+  + Exception Group Traceback (most recent call last):
+  |   File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 772, in __aexit__
+  |     raise BaseExceptionGroup(
+  | BaseExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)
+  +-+---------------- 1 ----------------
+    | Traceback (most recent call last):
+    |   File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/sessions.py", line 224, in _create_stdio_session
+    |     yield session
+    |   File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/sessions.py", line 395, in create_session
+    |     yield session
+    |   File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/client.py", line 116, in session
+    |     yield session
+    | GeneratorExit
+    +------------------------------------
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/sessions.py", line 222, in _create_stdio_session
+    ClientSession(read, write, **(session_kwargs or {})) as session,
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/mcp/shared/session.py", line 218, in __aexit__
+    return await self._task_group.__aexit__(exc_type, exc_val, exc_tb)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 778, in __aexit__
+    if self.cancel_scope.__exit__(type(exc), exc, exc.__traceback__):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/anyio/_backends/_asyncio.py", line 457, in __exit__
+    raise RuntimeError(
+RuntimeError: Attempted to exit cancel scope in a different task than it was entered in
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/client.py", line 113, in session
+    async with create_session(self.connections[server_name]) as session:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/.local/share/uv/python/cpython-3.12.9-macos-aarch64-none/lib/python3.12/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(value)
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/sessions.py", line 394, in create_session
+    async with _create_stdio_session(**params) as session:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/.local/share/uv/python/cpython-3.12.9-macos-aarch64-none/lib/python3.12/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(value)
+  File "/Users/damian/software/openscad_mcp/.venv/lib/python3.12/site-packages/langchain_mcp_adapters/sessions.py", line 221, in _create_stdio_session
+    stdio_client(server_params) as (read, write),
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/damian/.local/share/uv/python/cpython-3.12.9-macos-aarch64-none/lib/python3.12/contextlib.py", line 231, in __aexit__
+    await self.gen.athrow(value)
+RuntimeError: athrow(): asynchronous generator is already running
+2026-03-23 11:22:59,840 - asyncio - ERROR - an error occurred during closing of asynchronous generator <async_generator object create_session at 0x119c66350>
+asyncgen: <async_generator object create_session at 0x119c66350>
+RuntimeError: aclose(): asynchronous generator is already running
+2026-03-23 11:22:59,840 - asyncio - ERROR - an error occurred during closing of asynchronous generator <async_generator object _create_stdio_session at 0x119c55bc0>
+asyncgen: <async_generator object _create_stdio_session at 0x119c55bc0>
+RuntimeError: aclose(): asynchronous generator is already running
+2026-03-23 11:23:13,197 - __main__ - INFO - 🚀 OpenSCAD 3D Assistant Starting Up
+2026-03-23 11:23:13,197 - __main__ - INFO - 🤖 Selected model: claude-sonnet-4-6
+2026-03-23 11:23:13,197 - __main__ - INFO - 📝 Prompt source: xml
+2026-03-23 11:23:13,197 - __main__ - INFO - 📊 Log level: INFO
+2026-03-23 11:23:13,197 - __main__ - INFO - 🔑 Available services: OpenAI, Anthropic, Google Gemini, OpenRouter, Tavily Search
+2026-03-23 11:23:13,197 - __main__ - INFO - 💡 For advanced tool tracing, set LANGCHAIN_API_KEY for LangSmith
+2026-03-23 11:23:13,197 - __main__ - INFO -    Sign up at: https://smith.langchain.com/
+2026-03-23 11:23:13,197 - __main__ - INFO - ✅ Trimesh available for 3D processing
+2026-03-23 11:23:13,197 - __main__ - INFO - ✅ TavilySearch available for web search
+2026-03-23 11:23:13,197 - __main__ - INFO - ✅ LangSmith available for advanced tracing
+2026-03-23 11:23:13,197 - __main__ - INFO - 🌐 Starting Smart 3D OpenSCAD Chat with Model: claude-sonnet-4-6
+2026-03-23 11:23:13,197 - __main__ - INFO - 📝 Using prompt source: xml
+2026-03-23 11:23:13,277 - __main__ - INFO - 🎯 Gradio app created successfully
+2026-03-23 11:23:13,277 - __main__ - INFO - 🌐 Launching on http://localhost:7861
+2026-03-23 11:23:13,367 - httpx - INFO - HTTP Request: GET http://127.0.0.1:7861/gradio_api/startup-events "HTTP/1.1 200 OK"
+2026-03-23 11:23:13,377 - httpx - INFO - HTTP Request: HEAD http://127.0.0.1:7861/ "HTTP/1.1 200 OK"
+2026-03-23 11:23:14,551 - httpx - INFO - HTTP Request: GET https://api.gradio.app/pkg-version "HTTP/1.1 200 OK"
+2026-03-23 11:23:21,489 - __main__ - INFO - 🎬 Starting Gradio app startup sequence...
+2026-03-23 11:23:21,489 - __main__ - INFO - 🚀 Starting OpenSCAD Chat initialization...
+2026-03-23 11:23:21,489 - __main__ - INFO - 🔍 Using basic Python logging for tool tracking
+2026-03-23 11:23:21,489 - __main__ - INFO - 📋 Configuration loaded: ['mcpServers']
+2026-03-23 11:23:21,489 - __main__ - INFO - 🔌 Created MultiServerMCP client
+2026-03-23 11:23:21,489 - __main__ - INFO - 🔌 Creating persistent MCP session...
+2026-03-23 11:23:22,906 - __main__ - INFO - 🔧 Loaded 14 MCP tools: ['openscad_doc_search', 'list_openscad_libraries', 'render_scad', 'render_scad_multi', 'get_available_views', 'get_view', 'get_instructions', 'get_bosl_examples', 'get_gear_parameter', 'get_gear_generation_instructions', 'get_bosl2_gear_docs', 'generate_gcode', 'print_last_gcode', 'get_printing_presets']
+2026-03-23 11:23:22,906 - __main__ - INFO - 🌐 Web search with basic logging enabled
+2026-03-23 11:23:22,906 - __main__ - INFO - 🌐 Web search enabled with TavilySearch
+2026-03-23 11:23:22,906 - __main__ - INFO - 🔧 Total tools available: 15 (MCP: 14, Web: 1)
+2026-03-23 11:23:22,906 - __main__ - INFO - 🔍 Tracing mode: basic
+2026-03-23 11:23:22,906 - __main__ - INFO - 📄 Loading system prompt...
+2026-03-23 11:23:22,907 - __main__ - INFO - ✅ Loaded advanced system prompt from XML (5630 characters)
+2026-03-23 11:23:22,907 - __main__ - INFO - 📄 System prompt loaded: 5607 characters
+2026-03-23 11:23:22,907 - __main__ - INFO - 🤖 Initializing LLM: claude-sonnet-4-6
+2026-03-23 11:23:22,907 - __main__ - INFO - 🤖 Initializing Claude model: claude-sonnet-4-6
+2026-03-23 11:23:22,911 - __main__ - INFO - 🧠 Creating React agent...
+2026-03-23 11:23:22,927 - __main__ - INFO - 💾 Initialized conversation history
+2026-03-23 11:23:22,927 - __main__ - INFO - ✅ Ready with smart camera positioning, auto-rotation, and 15 tools (with web search)!
+2026-03-23 11:23:22,927 - __main__ - INFO - 🎉 Startup complete: ✅ Ready with smart camera positioning, auto-rotation, and 15 tools (with web search)!
+2026-03-23 11:23:29,103 - __main__ - INFO - 💬 User message: Make a large gear with 50 teeth
+2026-03-23 11:23:29,104 - __main__ - INFO - 🔍 _clear_current_outputs: Setting current_3d_model to None
+2026-03-23 11:23:29,104 - __main__ - INFO - 🤖 Invoking agent with 2 messages
+2026-03-23 11:23:29,744 - langsmith.client - WARNING - Failed to multipart ingest runs: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:23:34,878 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:23:35,609 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:23:44,014 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:23:45,064 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:23:47,572 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:23:48,299 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:23:49,663 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:23:51,304 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:23:52,068 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:23:53,744 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:23:54,547 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:23:57,328 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:23:58,362 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:24:02,761 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:24:03,798 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:24:12,620 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:24:12,633 - __main__ - INFO - 🔧 Tool call: list_openscad_libraries with args: []
+2026-03-23 11:24:12,634 - __main__ - INFO - 📤 Tool response: list_openscad_libraries returned str
+2026-03-23 11:24:12,634 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code', 'iteration']
+2026-03-23 11:24:12,634 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:24:12,634 - __main__ - INFO - 🔧 Tool call: render_scad_multi with args: ['code', 'iteration']
+2026-03-23 11:24:12,634 - __main__ - INFO - 📤 Tool response: render_scad_multi returned str
+2026-03-23 11:24:12,634 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-23 11:24:12,634 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-23 11:24:12,634 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-23 11:24:12,634 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-23 11:24:12,634 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code', 'iteration', 'camera']
+2026-03-23 11:24:12,634 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:24:12,634 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code', 'iteration']
+2026-03-23 11:24:12,634 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-23 11:24:12,635 - __main__ - INFO - 🛠️  Total tool calls in this conversation: list_openscad_libraries([]), render_scad(['code', 'iteration']), render_scad_multi(['code', 'iteration']), get_view(['view_id']), get_view(['view_id']), render_scad(['code', 'iteration', 'camera']), render_scad(['code', 'iteration'])
+2026-03-23 11:24:12,635 - __main__ - INFO - 📨 Total tool responses: list_openscad_libraries(str), render_scad(str), render_scad_multi(str), get_view(str), get_view(str), render_scad(str), render_scad(str)
+2026-03-23 11:24:12,635 - __main__ - INFO - 🤖 Agent response: The model has been generated successfully (no compiler errors on all render attempts). Here is a summary of what was created:
+
+---
+
+## ✅ Large Spur Gear — 50 Teeth
+
+The gear was generated using the `p...
+2026-03-23 11:24:12,635 - __main__ - INFO - 🔍 _extract_outputs: Processing 17 messages
+2026-03-23 11:24:12,635 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-23 11:24:12,635 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-23 11:24:12,636 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-23 11:24:12,636 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-23 11:24:12,636 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-23 11:24:12,636 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-23 11:24:12,643 - __main__ - INFO - Skipping old STL file: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl (age: 758.2s)
+2026-03-23 11:24:12,643 - __main__ - INFO - Skipping old STL file: ../output/27be0f71-c73b-426b-99b2-9750996645c6/0/output.stl (age: 16915995.7s)
+2026-03-23 11:24:12,644 - __main__ - INFO - Skipping old STL file: ../output/b6412a2f-f65e-4c48-82fa-af2ef79a4dcb/0/output.stl (age: 16915066.5s)
+2026-03-23 11:24:12,644 - __main__ - INFO - Skipping old STL file: ../output/579ec65e-448a-484e-98ec-9b621c70c419/0/output.stl (age: 17799788.7s)
+2026-03-23 11:24:12,645 - __main__ - INFO - Skipping old STL file: ../output/cbc968a6-440c-4a8b-abff-62b611649272/0/output.stl (age: 16517331.9s)
+2026-03-23 11:24:12,646 - __main__ - INFO - Skipping old STL file: ../output/1a8c5f57-90da-45e4-b4c9-0157d5425b1e/0/output.stl (age: 16753941.2s)
+2026-03-23 11:24:12,646 - __main__ - INFO - Skipping old STL file: ../output/7707318b-c1ce-4aa3-880f-f0647548182b/0/output.stl (age: 16773225.9s)
+2026-03-23 11:24:12,646 - __main__ - INFO - Skipping old STL file: ../output/b15998d4-1bde-4d99-b17d-4304ebe62a25/0/output.stl (age: 16675602.0s)
+2026-03-23 11:24:12,647 - __main__ - INFO - Skipping old STL file: ../output/66fbea73-c822-4853-8ca0-8452e816523e/0/output.stl (age: 17800926.6s)
+2026-03-23 11:24:12,648 - __main__ - INFO - Skipping old STL file: ../output/aeed50ff-a3cf-4477-be5d-7c2384565f3d/0/output.stl (age: 16773802.9s)
+2026-03-23 11:24:12,648 - __main__ - INFO - Skipping old STL file: ../output/7beedc2b-fb28-44a4-9b9f-626286c61a0e/0/output.stl (age: 16770002.5s)
+2026-03-23 11:24:12,650 - __main__ - INFO - Skipping old STL file: ../output/4f7e2b3a-ced3-4221-b117-92143700508e/2/output.stl (age: 16673649.2s)
+2026-03-23 11:24:12,651 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/0/output.stl (age: 16916462.6s)
+2026-03-23 11:24:12,651 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/7/output.stl (age: 16918428.8s)
+2026-03-23 11:24:12,651 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/6/output.stl (age: 16920852.3s)
+2026-03-23 11:24:12,652 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/1/output.stl (age: 16920919.2s)
+2026-03-23 11:24:12,652 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/10/output.stl (age: 16918344.6s)
+2026-03-23 11:24:12,652 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/4/output.stl (age: 16918516.4s)
+2026-03-23 11:24:12,652 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/3/output.stl (age: 16920879.4s)
+2026-03-23 11:24:12,653 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/2/output.stl (age: 16920898.8s)
+2026-03-23 11:24:12,653 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/5/output.stl (age: 16918506.6s)
+2026-03-23 11:24:12,654 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/0/output.stl (age: 16926467.6s)
+2026-03-23 11:24:12,655 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/3/output.stl (age: 16927543.7s)
+2026-03-23 11:24:12,656 - __main__ - INFO - Skipping old STL file: ../output/3840b271-5925-44f0-a9df-04f74a21a48f/0/output.stl (age: 17798436.7s)
+2026-03-23 11:24:12,656 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/9/output.stl (age: 16593038.3s)
+2026-03-23 11:24:12,656 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/0/output.stl (age: 16593560.9s)
+2026-03-23 11:24:12,657 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/11/output.stl (age: 16592941.1s)
+2026-03-23 11:24:12,658 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/7/output.stl (age: 16593163.1s)
+2026-03-23 11:24:12,660 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/16/output.stl (age: 16587702.7s)
+2026-03-23 11:24:12,660 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/6/output.stl (age: 16593470.3s)
+2026-03-23 11:24:12,661 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/17/output.stl (age: 16587298.7s)
+2026-03-23 11:24:12,661 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/1/output.stl (age: 16593548.0s)
+2026-03-23 11:24:12,661 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/10/output.stl (age: 16592974.3s)
+2026-03-23 11:24:12,661 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/8/output.stl (age: 16593108.9s)
+2026-03-23 11:24:12,661 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/4/output.stl (age: 16593506.8s)
+2026-03-23 11:24:12,662 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/15/output.stl (age: 16587862.5s)
+2026-03-23 11:24:12,662 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/3/output.stl (age: 16593530.8s)
+2026-03-23 11:24:12,662 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/12/output.stl (age: 16592870.3s)
+2026-03-23 11:24:12,662 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/2/output.stl (age: 16593540.6s)
+2026-03-23 11:24:12,662 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/13/output.stl (age: 16588494.1s)
+2026-03-23 11:24:12,663 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/14/output.stl (age: 16587905.5s)
+2026-03-23 11:24:12,664 - __main__ - INFO - Skipping old STL file: ../output/94412d63-9f20-40a3-ba7b-02ad38c6883e/0/output.stl (age: 16481275.6s)
+2026-03-23 11:24:12,664 - __main__ - INFO - Skipping old STL file: ../output/7f647177-99a7-4962-9983-6123a7c383e9/0/output.stl (age: 16485260.2s)
+2026-03-23 11:24:12,665 - __main__ - INFO - Skipping old STL file: ../output/436447ad-5851-4b9c-bfb7-2a6150845b06/0/output.stl (age: 16914715.4s)
+2026-03-23 11:24:12,665 - __main__ - INFO - 🔍 Found latest STL: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/3/output.stl (age: 9.7s)
+2026-03-23 11:24:12,666 - __main__ - INFO - 🎯 Processing 3D model: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/3/output.stl
+2026-03-23 11:24:12,714 - __main__ - INFO - 📏 Extracted measurements: {'length': 155.9861169286778, 'width': 155.80899259152568, 'height': 20.0}
+2026-03-23 11:24:12,715 - __main__ - INFO - Calculated optimal camera position: [334.3255942542021, 334.32559425420203, 282.9757046251861]
+2026-03-23 11:24:12,715 - __main__ - INFO - Object dimensions: {'length': 155.9861169286778, 'width': 155.80899259152568, 'height': 20.0}
+2026-03-23 11:24:12,715 - __main__ - INFO - Max dimension: 155.99mm, Distance: 545.95mm
+2026-03-23 11:24:12,750 - __main__ - INFO - 🔧 Original mesh: 8220 faces
+2026-03-23 11:24:12,753 - __main__ - INFO - ✅ Converted STL to GLB: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp50uzehm2/output.glb
+2026-03-23 11:24:12,753 - __main__ - INFO - 🔍 Setting current_3d_model to: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp50uzehm2/output.glb'
+2026-03-23 11:24:12,753 - __main__ - INFO - ✅ 3D model processed: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp50uzehm2/output.glb
+2026-03-23 11:24:12,753 - __main__ - INFO - 📸 Camera positioned at: [334.3255942542021, 334.32559425420203, 282.9757046251861]
+2026-03-23 11:24:12,753 - __main__ - INFO - 🔧 Attempting direct MCP call for immediate OpenSCAD rendering
+2026-03-23 11:24:13,041 - __main__ - INFO - 🔍 Processing potential image content: <class 'list'>
+2026-03-23 11:24:13,046 - __main__ - INFO - ✅ Loaded image from ImageContent
+2026-03-23 11:24:13,352 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:24:14,050 - __main__ - INFO - Skipping old STL file: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl (age: 759.6s)
+2026-03-23 11:24:14,051 - __main__ - INFO - Skipping old STL file: ../output/27be0f71-c73b-426b-99b2-9750996645c6/0/output.stl (age: 16915997.1s)
+2026-03-23 11:24:14,051 - __main__ - INFO - Skipping old STL file: ../output/b6412a2f-f65e-4c48-82fa-af2ef79a4dcb/0/output.stl (age: 16915067.9s)
+2026-03-23 11:24:14,051 - __main__ - INFO - Skipping old STL file: ../output/579ec65e-448a-484e-98ec-9b621c70c419/0/output.stl (age: 17799790.1s)
+2026-03-23 11:24:14,051 - __main__ - INFO - Skipping old STL file: ../output/cbc968a6-440c-4a8b-abff-62b611649272/0/output.stl (age: 16517333.3s)
+2026-03-23 11:24:14,052 - __main__ - INFO - Skipping old STL file: ../output/1a8c5f57-90da-45e4-b4c9-0157d5425b1e/0/output.stl (age: 16753942.7s)
+2026-03-23 11:24:14,052 - __main__ - INFO - Skipping old STL file: ../output/7707318b-c1ce-4aa3-880f-f0647548182b/0/output.stl (age: 16773227.3s)
+2026-03-23 11:24:14,052 - __main__ - INFO - Skipping old STL file: ../output/b15998d4-1bde-4d99-b17d-4304ebe62a25/0/output.stl (age: 16675603.4s)
+2026-03-23 11:24:14,052 - __main__ - INFO - Skipping old STL file: ../output/66fbea73-c822-4853-8ca0-8452e816523e/0/output.stl (age: 17800928.0s)
+2026-03-23 11:24:14,053 - __main__ - INFO - Skipping old STL file: ../output/aeed50ff-a3cf-4477-be5d-7c2384565f3d/0/output.stl (age: 16773804.3s)
+2026-03-23 11:24:14,053 - __main__ - INFO - Skipping old STL file: ../output/7beedc2b-fb28-44a4-9b9f-626286c61a0e/0/output.stl (age: 16770004.0s)
+2026-03-23 11:24:14,054 - __main__ - INFO - Skipping old STL file: ../output/4f7e2b3a-ced3-4221-b117-92143700508e/2/output.stl (age: 16673650.6s)
+2026-03-23 11:24:14,055 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/0/output.stl (age: 16916464.0s)
+2026-03-23 11:24:14,056 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/7/output.stl (age: 16918430.2s)
+2026-03-23 11:24:14,056 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/6/output.stl (age: 16920853.7s)
+2026-03-23 11:24:14,056 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/1/output.stl (age: 16920920.6s)
+2026-03-23 11:24:14,056 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/10/output.stl (age: 16918346.1s)
+2026-03-23 11:24:14,056 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/4/output.stl (age: 16918517.8s)
+2026-03-23 11:24:14,056 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/3/output.stl (age: 16920880.8s)
+2026-03-23 11:24:14,057 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/2/output.stl (age: 16920900.2s)
+2026-03-23 11:24:14,057 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/5/output.stl (age: 16918508.1s)
+2026-03-23 11:24:14,057 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/0/output.stl (age: 16926469.0s)
+2026-03-23 11:24:14,058 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/3/output.stl (age: 16927545.1s)
+2026-03-23 11:24:14,058 - __main__ - INFO - Skipping old STL file: ../output/3840b271-5925-44f0-a9df-04f74a21a48f/0/output.stl (age: 17798438.1s)
+2026-03-23 11:24:14,058 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/9/output.stl (age: 16593039.7s)
+2026-03-23 11:24:14,058 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/0/output.stl (age: 16593562.3s)
+2026-03-23 11:24:14,058 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/11/output.stl (age: 16592942.5s)
+2026-03-23 11:24:14,058 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/7/output.stl (age: 16593164.5s)
+2026-03-23 11:24:14,058 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/16/output.stl (age: 16587704.1s)
+2026-03-23 11:24:14,058 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/6/output.stl (age: 16593471.7s)
+2026-03-23 11:24:14,058 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/17/output.stl (age: 16587300.1s)
+2026-03-23 11:24:14,058 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/1/output.stl (age: 16593549.4s)
+2026-03-23 11:24:14,058 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/10/output.stl (age: 16592975.7s)
+2026-03-23 11:24:14,059 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/8/output.stl (age: 16593110.4s)
+2026-03-23 11:24:14,059 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/4/output.stl (age: 16593508.2s)
+2026-03-23 11:24:14,059 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/15/output.stl (age: 16587864.0s)
+2026-03-23 11:24:14,059 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/3/output.stl (age: 16593532.2s)
+2026-03-23 11:24:14,059 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/12/output.stl (age: 16592871.7s)
+2026-03-23 11:24:14,059 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/2/output.stl (age: 16593542.0s)
+2026-03-23 11:24:14,059 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/13/output.stl (age: 16588495.5s)
+2026-03-23 11:24:14,059 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/14/output.stl (age: 16587906.9s)
+2026-03-23 11:24:14,059 - __main__ - INFO - Skipping old STL file: ../output/94412d63-9f20-40a3-ba7b-02ad38c6883e/0/output.stl (age: 16481277.0s)
+2026-03-23 11:24:14,060 - __main__ - INFO - Skipping old STL file: ../output/7f647177-99a7-4962-9983-6123a7c383e9/0/output.stl (age: 16485261.6s)
+2026-03-23 11:24:14,060 - __main__ - INFO - Skipping old STL file: ../output/436447ad-5851-4b9c-bfb7-2a6150845b06/0/output.stl (age: 16914716.8s)
+2026-03-23 11:24:14,060 - __main__ - INFO - 🔍 Found latest STL: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/0/output.stl (age: 1.2s)
+2026-03-23 11:24:14,060 - __main__ - INFO - 🎯 Processing 3D model: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/0/output.stl
+2026-03-23 11:24:14,100 - __main__ - INFO - 📏 Extracted measurements: {'length': 155.9861169286778, 'width': 155.80899259152568, 'height': 20.0}
+2026-03-23 11:24:14,101 - __main__ - INFO - Calculated optimal camera position: [334.3255942542021, 334.32559425420203, 282.9757046251861]
+2026-03-23 11:24:14,101 - __main__ - INFO - Object dimensions: {'length': 155.9861169286778, 'width': 155.80899259152568, 'height': 20.0}
+2026-03-23 11:24:14,101 - __main__ - INFO - Max dimension: 155.99mm, Distance: 545.95mm
+2026-03-23 11:24:14,144 - __main__ - INFO - 🔧 Original mesh: 8220 faces
+2026-03-23 11:24:14,148 - __main__ - INFO - ✅ Converted STL to GLB: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp50uzehm2/output.glb
+2026-03-23 11:24:14,148 - __main__ - INFO - 🔍 Setting current_3d_model to: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp50uzehm2/output.glb'
+2026-03-23 11:24:14,148 - __main__ - INFO - ✅ 3D model processed: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp50uzehm2/output.glb
+2026-03-23 11:24:14,148 - __main__ - INFO - 📸 Camera positioned at: [334.3255942542021, 334.32559425420203, 282.9757046251861]
+2026-03-23 11:24:14,148 - __main__ - INFO - 📊 Chat complete - 3D model: ✅, Code: ✅, Measurements: ✅
+2026-03-23 11:24:39,508 - __main__ - INFO - 🔍 update_3d_model called with: <class 'str'> = '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp50uzehm2/output.glb'
+2026-03-23 11:24:39,508 - __main__ - INFO - ✅ Valid 3D model path being returned: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp50uzehm2/output.glb
+2026-03-23 11:24:39,508 - __main__ - INFO - 🔄 update_3d_model returning: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp50uzehm2/output.glb'
+2026-03-23 11:25:16,006 - __main__ - INFO - 🧹 Clearing chat conversation and outputs
+2026-03-23 11:25:16,006 - __main__ - INFO - 🔍 reset_conversation: Setting current_3d_model to None
+2026-03-23 11:25:17,480 - __main__ - INFO - 💬 User message: Konstruiere ein zweistufiges Getriebe (Compound Gear Train). Stufe 1: 10 Zähne auf 30 Zähne. Stufe 2: 15 Zähne auf 45 Zähne. Modul 1. Die Zahnräder 30Z und 15Z sitzen fest auf derselben Zwischenwelle. Richte alle vier Räder korrekt aus.
+2026-03-23 11:25:17,480 - __main__ - INFO - 🔍 _clear_current_outputs: Setting current_3d_model to None
+2026-03-23 11:25:17,480 - __main__ - INFO - 🤖 Invoking agent with 2 messages
+2026-03-23 11:25:18,201 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:25:23,362 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:25:24,092 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:25:54,922 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:25:56,095 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:26:06,665 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:26:07,387 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:26:09,117 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:26:11,062 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:26:11,804 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:26:13,396 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:26:14,175 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:26:15,895 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:26:16,662 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:26:46,038 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:26:47,218 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:26:56,381 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:27:02,053 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:27:05,446 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:27:10,352 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:27:11,241 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:27:11,367 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:27:12,063 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:27:14,048 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:27:19,166 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:27:45,505 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:27:51,242 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:27:55,925 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-23 11:27:55,941 - __main__ - ERROR - 💥 Chat processing error: Recursion limit of 25 reached without hitting a stop condition. You can increase the limit by setting the `recursion_limit` config key.
+For troubleshooting, visit: https://python.langchain.com/docs/troubleshooting/errors/GRAPH_RECURSION_LIMIT
+2026-03-23 11:27:55,941 - __main__ - INFO - 📊 Chat complete - 3D model: ❌, Code: ❌, Measurements: ❌
+2026-03-23 11:27:56,639 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-23 11:30:52,755 - __main__ - INFO - 🔍 update_3d_model called with: <class 'NoneType'> = None
+2026-03-23 11:30:52,755 - __main__ - INFO - 🔄 update_3d_model returning: None

@@ -392,11 +392,25 @@ With the expanded search capabilities, adopt this research-first approach:
 The OpenSCAD MCP server provides integrated tools that enhance the entire design-to-print workflow:
 
 #### **Core Design Tools**
-- **`render_scad(code, iteration=0, auto_fix_libraries=True, camera=None)`**: Primary visualization tool
+- **`render_scad(code, iteration=0, auto_fix_libraries=True, camera=None)`**: Single-view visualization tool
   - Auto-fixes library paths and renders OpenSCAD code
-  - Use frequently during development for visual feedback
+  - Use for simple objects and quick iterations
   - Optional camera parameter for custom viewpoints
   
+- **`render_scad_multi(code, iteration=0, auto_fix_libraries=True)`**: Multi-view visualization tool
+  - Renders from 8 predefined camera angles (front, back, left, right, top, bottom, isometric views)
+  - Returns default isometric view, saves all others for retrieval
+  - **Essential for**: complex geometries, gears, assemblies, debugging
+  
+- **`get_available_views()`**: List available camera angles from last multi-view rendering
+  - Shows which views can be retrieved (isometric, front, top, etc.)
+  - Call after `render_scad_multi()` to see exploration options
+  
+- **`get_view(view_id)`**: Retrieve specific view by ID
+  - Available views: front, back, left, right, top, bottom, isometric, isometric2  
+  - Use for systematic exploration of complex 3D objects
+  - Perfect for debugging geometric issues and validating designs
+
 - **`list_openscad_libraries()`**: Library discovery and reference
   - Shows configured vs unconfigured libraries  
   - Provides usage examples and documentation links
@@ -433,8 +447,12 @@ The OpenSCAD MCP server provides integrated tools that enhance the entire design
 **Phase 2: Iterative Design**
 ```
 1. Write parametric OpenSCAD code
-2. render_scad(code) 
-3. Examine visual output
+2. Choose appropriate rendering:
+   - render_scad(code) for simple objects
+   - render_scad_multi(code) for complex geometries
+3. Examine visual output:
+   - Single view: Check overall design
+   - Multi-view: Use get_view(view_id) for detailed inspection
 4. Refine based on visual feedback
 5. Repeat steps 2-4 until satisfied
 ```
@@ -464,11 +482,13 @@ list_openscad_libraries()  // See what's available
 ```
 
 #### **Visual-Driven Iteration**
-Use frequent rendering to catch issues early:
+Use appropriate rendering tools to catch issues early:
 ```
-render_scad(initial_design)     // Basic shape
-render_scad(with_features)      // Add details
-render_scad(final_assembly)     // Complete design
+render_scad(initial_design)           // Basic shape - single view sufficient
+render_scad_multi(with_features)      // Complex details - need multiple angles
+get_view("front")                     // Check specific features
+get_view("top")                       // Verify dimensions
+render_scad_multi(final_assembly)     // Complete design - full inspection
 ```
 
 ### **Integration with External Resources**

@@ -17,7 +17,8 @@ from typing import Optional, List, Dict
 from PIL import Image as PILImage
 from io import BytesIO
 
-from fastmcp import FastMCP, Image
+from fastmcp import FastMCP
+from fastmcp.utilities.types import Image
 
 
 # Import the printing pipeline
@@ -89,6 +90,64 @@ OPENAI_EMBEDDING_MODEL = os.environ.get(
 # Configuration for library configs directory
 LIBRARY_CONFIGS_DIR = os.environ.get(
     'LIBRARY_CONFIGS_DIR', 'library_configs')
+
+# Predefined camera positions for multi-view rendering
+# Format: "translate_x,y,z,rot_x,y,z,dist" (7 values)
+PREDEFINED_VIEWS = {
+    'front': {
+        'name': 'Front View',
+        'description': 'Front-facing orthographic view',
+        'camera': '0,0,0,0,0,0,200',
+        'default': False
+    },
+    'back': {
+        'name': 'Back View', 
+        'description': 'Back-facing view (180° rotation)',
+        'camera': '0,0,0,0,0,180,200',
+        'default': False
+    },
+    'left': {
+        'name': 'Left Side View',
+        'description': 'Left side orthographic view',
+        'camera': '0,0,0,0,0,90,200',
+        'default': False
+    },
+    'right': {
+        'name': 'Right Side View',
+        'description': 'Right side orthographic view', 
+        'camera': '0,0,0,0,0,270,200',
+        'default': False
+    },
+    'top': {
+        'name': 'Top View',
+        'description': 'Top-down orthographic view',
+        'camera': '0,0,0,90,0,0,200',
+        'default': False
+    },
+    'bottom': {
+        'name': 'Bottom View',
+        'description': 'Bottom-up orthographic view',
+        'camera': '0,0,0,-90,0,0,200',
+        'default': False
+    },
+    'isometric': {
+        'name': 'Isometric View',
+        'description': '3D isometric perspective view',
+        'camera': '0,0,0,60,0,45,200',
+        'default': True
+    },
+    'isometric2': {
+        'name': 'Isometric View 2',
+        'description': 'Alternative 3D isometric view',
+        'camera': '0,0,0,60,0,135,200',
+        'default': False
+    }
+}
+
+# Global storage for multi-view rendering sessions
+current_views_session = {}
+# Track the most recently created multi-view session key for reliable retrieval
+LAST_VIEWS_SESSION_KEY: Optional[str] = None
 
 # Dynamic library loading from JSON configs
 def load_library_configs() -> Dict[str, Dict]:
@@ -575,6 +634,277 @@ def render_scad(code: str, iteration: int = 0, auto_fix_libraries: bool = True, 
         raise
 
 
+@mcp.tool()
+def render_scad_multi(code: str, iteration: int = 0, auto_fix_libraries: bool = True) -> Image:
+    """
+    Render OpenSCAD code from multiple camera angles and return the default view.
+    
+    This function renders the same OpenSCAD code from multiple predefined camera positions
+    (front, back, left, right, top, bottom, isometric views) and saves all views to disk.
+    Returns the default isometric view as an Image object and stores session info for 
+    retrieving other views with get_view().
+    
+    Args:
+        code: The OpenSCAD code to render
+        iteration: The iteration number (default: 0)  
+        auto_fix_libraries: Automatically fix library include paths (default: True)
+    
+    Returns:
+        Default isometric view as PNG Image. Use get_available_views() to see other angles,
+        then get_view(view_id) to retrieve specific views.
+    """
+    global current_views_session
+    
+    try:
+        # Auto-fix library paths if needed
+        if auto_fix_libraries:
+            code = fix_library_includes(code)
+
+        # Create directories  
+        output_dir = Path(OUTPUT_DIR) / generation_id / str(iteration)
+        views_dir = output_dir / "views"
+        views_dir.mkdir(parents=True, exist_ok=True)
+
+        scad_file = output_dir / "multi_views.scad"
+        
+        # Write SCAD code
+        scad_file.write_text(code)
+        logger.info(f"Wrote SCAD file for multi-view rendering: {scad_file}")
+
+        # Store session information for this rendering
+        session_key = f"{generation_id}_{iteration}"
+        current_views_session[session_key] = {
+            'scad_file': str(scad_file),
+            'views_dir': str(views_dir), 
+            'available_views': {},
+            'code': code,
+            'timestamp': time.time()
+        }
+        # Record the latest session created
+        global LAST_VIEWS_SESSION_KEY
+        LAST_VIEWS_SESSION_KEY = session_key
+
+        # Render all predefined views
+        default_image = None
+        default_view_id = None
+        
+        for view_id, view_info in PREDEFINED_VIEWS.items():
+            view_file = views_dir / f"{view_id}.png"
+            
+            logger.info(f"Rendering {view_info['name']} ({view_id})...")
+            
+            # Build OpenSCAD command with specific camera
+            cmd = [
+                OPENSCAD_EXECUTABLE,
+                '-o', str(view_file),
+                '--camera', view_info['camera'],
+                str(scad_file)
+            ]
+
+            # Execute rendering
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+            
+            if result.returncode != 0:
+                error_msg = result.stderr if result.stderr else result.stdout
+                logger.warning(f"Failed to render {view_id}: {error_msg}")
+                continue
+                
+            # Check if file was created
+            if not view_file.exists():
+                logger.warning(f"View file not created: {view_file}")
+                continue
+                
+            # Store view info in session
+            current_views_session[session_key]['available_views'][view_id] = {
+                'name': view_info['name'],
+                'description': view_info['description'], 
+                'file_path': str(view_file),
+                'default': view_info['default']
+            }
+            
+            # If this is the default view, load it to return
+            if view_info['default']:
+                default_view_id = view_id
+                with PILImage.open(view_file) as img:
+                    # Convert to RGB
+                    if img.mode in ('RGBA', 'LA'):
+                        background = PILImage.new('RGB', img.size, (255, 255, 255))
+                        if img.mode == 'RGBA':
+                            background.paste(img, mask=img.split()[-1])
+                        else:
+                            background.paste(img)
+                        img = background
+                    elif img.mode != 'RGB':
+                        img = img.convert('RGB')
+
+                    # Resize if too large
+                    buffer = BytesIO()
+                    img.thumbnail((1024, 1024), PILImage.Resampling.LANCZOS)
+                    img.save(buffer, format='PNG', optimize=True)
+                    image_data = buffer.getvalue()
+                    default_image = Image(data=image_data, format="png")
+                    
+            logger.info(f"✅ Rendered {view_info['name']}: {view_file}")
+
+        if not default_image:
+            raise Exception("Failed to render default isometric view")
+            
+        # Create summary of available views for the model
+        available_views = current_views_session[session_key]['available_views']
+        view_list = []
+        for vid, vinfo in available_views.items():
+            marker = " (default)" if vinfo['default'] else ""
+            view_list.append(f"- {vid}: {vinfo['name']}{marker} - {vinfo['description']}")
+            
+        summary = f"✅ Multi-view rendering completed! Default view: {default_view_id}\n\n"
+        summary += f"Available views ({len(available_views)} total):\n" + "\n".join(view_list)
+        summary += f"\n\nUse get_view('view_id') to retrieve specific views."
+        
+        logger.info(summary)
+        logger.info(f"Session stored: {session_key} with {len(available_views)} views")
+        
+        return default_image
+
+    except Exception as e:
+        logger.error(f"❌ Error during multi-view rendering: {str(e)}")
+        raise
+
+
+@mcp.tool() 
+def get_available_views() -> str:
+    """
+    List all available views from the most recent multi-view rendering.
+    
+    Shows which camera angles are available to retrieve with get_view().
+    Call this after render_scad_multi() to see what views you can access.
+    
+    Returns:
+        Text list of available view IDs, names, and descriptions
+    """
+    global current_views_session
+    
+    if not current_views_session:
+        return "No multi-view rendering session found. Call render_scad_multi() first to generate multiple views."
+    
+    # Prefer explicitly tracked latest session; fallback to most recent timestamp
+    latest_session_key = None
+    if LAST_VIEWS_SESSION_KEY and LAST_VIEWS_SESSION_KEY in current_views_session:
+        latest_session_key = LAST_VIEWS_SESSION_KEY
+    else:
+        # Fallback: choose by greatest timestamp if available, otherwise lexicographic max
+        try:
+            latest_session_key = max(
+                current_views_session.keys(),
+                key=lambda k: current_views_session[k].get('timestamp', 0)
+            )
+        except ValueError:
+            # Empty dict safety (should be caught earlier)
+            return "No multi-view rendering session found. Call render_scad_multi() first to generate multiple views."
+    session = current_views_session[latest_session_key]
+    
+    if not session['available_views']:
+        return f"No views available in session {latest_session_key}. The rendering may have failed."
+    
+    available_views = session['available_views']
+    view_list = []
+    default_view = None
+    
+    for view_id, view_info in available_views.items():
+        marker = ""
+        if view_info['default']:
+            marker = " ⭐ (current default)"
+            default_view = view_id
+        view_list.append(f"**{view_id}**: {view_info['name']}{marker}")
+        view_list.append(f"  └─ {view_info['description']}")
+    
+    result = f"📷 Available Views from Session {latest_session_key}\n\n"
+    result += "\n".join(view_list)
+    result += f"\n\n💡 **Usage**: Use `get_view('view_id')` to retrieve any specific view"
+    result += f"\n   Example: `get_view('front')` or `get_view('top')`"
+    
+    if default_view:
+        result += f"\n\n⭐ **Currently showing**: {default_view} view"
+    
+    return result
+
+
+@mcp.tool()
+def get_view(view_id: str) -> Image:
+    """
+    Retrieve a specific view from the most recent multi-view rendering.
+    
+    Use this after render_scad_multi() to get different camera angles of the same object.
+    Call get_available_views() first to see which view IDs are available.
+    
+    Args:
+        view_id: The view identifier (e.g., 'front', 'top', 'left', 'right', 'back', 'bottom', 'isometric', 'isometric2')
+    
+    Returns:
+        PNG image of the requested view
+    """
+    global current_views_session
+    
+    if not current_views_session:
+        raise Exception("No multi-view rendering session found. Call render_scad_multi() first to generate views.")
+    
+    # Get the most recent session using tracked key or timestamp
+    if LAST_VIEWS_SESSION_KEY and LAST_VIEWS_SESSION_KEY in current_views_session:
+        latest_session_key = LAST_VIEWS_SESSION_KEY
+    else:
+        latest_session_key = max(
+            current_views_session.keys(),
+            key=lambda k: current_views_session[k].get('timestamp', 0)
+        )
+    session = current_views_session[latest_session_key]
+    
+    if not session['available_views']:
+        raise Exception(f"No views available in session {latest_session_key}. The rendering may have failed.")
+    
+    available_views = session['available_views']
+    
+    if view_id not in available_views:
+        available_ids = list(available_views.keys())
+        raise Exception(f"View '{view_id}' not found. Available views: {', '.join(available_ids)}")
+    
+    view_info = available_views[view_id]
+    view_file = Path(view_info['file_path'])
+    
+    if not view_file.exists():
+        raise Exception(f"View file not found: {view_file}. The view may have been deleted or rendering failed.")
+    
+    try:
+        # Load and process the image
+        with PILImage.open(view_file) as img:
+            # Convert to RGB if needed
+            if img.mode in ('RGBA', 'LA'):
+                background = PILImage.new('RGB', img.size, (255, 255, 255))
+                if img.mode == 'RGBA':
+                    background.paste(img, mask=img.split()[-1])
+                else:
+                    background.paste(img)
+                img = background
+            elif img.mode != 'RGB':
+                img = img.convert('RGB')
+
+            # Resize if too large 
+            buffer = BytesIO()
+            img.thumbnail((1024, 1024), PILImage.Resampling.LANCZOS)
+            img.save(buffer, format='PNG', optimize=True)
+            image_data = buffer.getvalue()
+            
+            logger.info(f"✅ Retrieved view '{view_id}' ({view_info['name']}): {img.size[0]}x{img.size[1]} pixels")
+            return Image(data=image_data, format="png")
+            
+    except Exception as e:
+        logger.error(f"Error loading view '{view_id}': {str(e)}")
+        raise Exception(f"Failed to load view '{view_id}': {str(e)}")
+
+
 def fix_library_includes(code: str) -> str:
     """Fix library include/use statements to use correct paths"""
     lines = code.split('\n')
@@ -656,11 +986,58 @@ def get_bosl_examples() -> str:
 
 @mcp.tool()
 def get_gear_parameter() -> str:
-    """OpenSCAD Parameterizable Gears Library Reference and parameter examples for DIN gears"""
+    """BOSL2 gear parameter reference and examples (preferred).
 
+    Also appends a short MCAD gear quick reference to support MCAD benchmarks.
+    """
+
+    # First try BOSL2 gear examples (new preferred method)
+    bosl2_examples_path = Path(OPENSCAD_INFO_DIR) / "bosl2_gear_examples.txt"
+    if bosl2_examples_path.exists():
+        base = bosl2_examples_path.read_text()
+        # Append concise MCAD quick reference for benchmark coverage
+        mcad_quick = """
+
+================================================================================
+## MCAD Gear Quick Reference (for MCAD prompts)
+
+File usage:
+use <MCAD/involute_gears.scad>
+$fa=1; $fs=0.4;
+
+Formulas:
+center_distance = (t1 + t2) * circular_pitch / (2 * PI)
+pitch_radius   = (teeth * circular_pitch) / (2 * PI)
+phase_deg      = 180 / teeth  // half tooth pitch for meshing
+
+Basic gear:
+gear(number_of_teeth=24, circular_pitch=5, gear_thickness=10, rim_thickness=10);
+
+Two meshing gears:
+cp=5; t1=20; t2=30;
+cd=(t1+t2)*cp/(2*PI);
+gear(number_of_teeth=t1, circular_pitch=cp, gear_thickness=8, rim_thickness=8);
+translate([cd,0,0]) rotate([0,0,180/t2])
+    gear(number_of_teeth=t2, circular_pitch=cp, gear_thickness=8, rim_thickness=8);
+
+Notes:
+- MCAD gears require gear_thickness and rim_thickness.
+- MCAD uses circular_pitch (not module), default pressure angle 28°.
+- For motors, include <MCAD/units.scad> before <MCAD/stepper.scad>.
+"""
+        return base + mcad_quick
+    
+    # Fallback to original parameterizable_gears for compatibility
     gears_library_path = Path(OPENSCAD_INFO_DIR) / "gears_library.txt"
     if gears_library_path.exists():
-        text = ""
+        # Add note about BOSL2 being preferred
+        bosl2_note = """# NOTICE: BOSL2 Gears Now Preferred
+# This function now recommends using BOSL2 gears instead of parameterizable_gears.
+# BOSL2 offers English parameters, better documentation, and automatic meshing.
+# Use get_bosl2_gear_docs() for BOSL2-specific guidance.
+
+"""
+        text = bosl2_note
         for line in gears_library_path.read_text().split("\n"):
             if line.startswith("{"):
                 text += line + "\n"
@@ -673,12 +1050,50 @@ def get_gear_parameter() -> str:
 
 @mcp.tool()
 def get_gear_generation_instructions() -> str:
-    """Detailed instructions for gear generation."""
+    """Detailed instructions for gear generation using BOSL2 (preferred).
 
-    gears_instructions_path = Path(
-        OPENSCAD_INFO_DIR) / "gears_instructions.txt"
+    Appends a short MCAD gear quick reference to support MCAD tasks.
+    Falls back to parameterizable_gears if BOSL2 files are not available.
+    """
+
+    # First try BOSL2 gear instructions (new preferred method)
+    bosl2_instructions_path = Path(OPENSCAD_INFO_DIR) / "bosl2_gears_instructions.txt"
+    if bosl2_instructions_path.exists():
+        base = bosl2_instructions_path.read_text()
+        mcad_quick = """
+
+================================================================================
+## MCAD Gear Quick Reference (for MCAD prompts)
+
+Usage files:
+- use <MCAD/involute_gears.scad>
+- include <MCAD/units.scad> then include <MCAD/stepper.scad> for motors
+
+Key rules:
+- Compute center distance manually: (t1+t2)*circular_pitch/(2*PI)
+- Apply rotation phase on one gear: rotate([0,0,180/teeth])
+- Gears require gear_thickness and rim_thickness
+
+Example (two gears):
+cp=5; t1=20; t2=30;
+cd=(t1+t2)*cp/(2*PI);
+gear(number_of_teeth=t1, circular_pitch=cp, gear_thickness=8, rim_thickness=8);
+translate([cd,0,0]) rotate([0,0,180/t2])
+    gear(number_of_teeth=t2, circular_pitch=cp, gear_thickness=8, rim_thickness=8);
+"""
+        return base + mcad_quick
+
+    # Fallback to original parameterizable_gears instructions
+    gears_instructions_path = Path(OPENSCAD_INFO_DIR) / "gears_instructions.txt"
     if gears_instructions_path.exists():
-        text = ""
+        # Add note about BOSL2 being preferred
+        bosl2_note = """# NOTICE: BOSL2 Gears Now Preferred
+# These instructions are for parameterizable_gears. For better results, use BOSL2 gears instead.
+# BOSL2 offers English parameters, automatic meshing calculations, and superior documentation.
+# Call get_bosl2_gear_docs() for BOSL2-specific instructions.
+
+"""
+        text = bosl2_note
         for line in gears_instructions_path.read_text().split("\n"):
             if line.startswith("{"):
                 text += line + "\n"
@@ -687,6 +1102,51 @@ def get_gear_generation_instructions() -> str:
         return text
     else:
         return "Instructions for gears not found. Add it in: " + OPENSCAD_INFO_DIR + "/gears_instructions.txt"
+
+
+@mcp.tool()
+def get_bosl2_gear_docs() -> str:
+    """Get comprehensive BOSL2 gear documentation and examples - recommended for all gear generation tasks"""
+    
+    # Try to return both instructions and examples
+    bosl2_instructions_path = Path(OPENSCAD_INFO_DIR) / "bosl2_gears_instructions.txt"
+    bosl2_examples_path = Path(OPENSCAD_INFO_DIR) / "bosl2_gear_examples.txt"
+    
+    result = "# BOSL2 Gear Library Documentation\n\n"
+    
+    if bosl2_instructions_path.exists():
+        result += "## BOSL2 Gear Instructions\n\n"
+        result += bosl2_instructions_path.read_text()
+        result += "\n\n" + "="*80 + "\n\n"
+    
+    if bosl2_examples_path.exists():
+        result += "## BOSL2 Gear Examples\n\n"
+        result += bosl2_examples_path.read_text()
+    
+    if not bosl2_instructions_path.exists() and not bosl2_examples_path.exists():
+        return """# BOSL2 Gear Documentation Not Found
+        
+The BOSL2 gear documentation files are missing. Expected files:
+- """ + str(bosl2_instructions_path) + """
+- """ + str(bosl2_examples_path) + """
+
+BOSL2 provides superior gear generation with:
+- English parameter names (circ_pitch vs modul)
+- Automatic meshing with gear_dist() function
+- Profile shifting with auto_profile_shift()
+- Comprehensive gear types: spur, helical, herringbone, ring, rack, bevel, crown, worm
+- Better 3D printing optimization
+
+Basic BOSL2 gear usage:
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+
+spur_gear(circ_pitch=5, teeth=20, thickness=8, shaft_diam=5);
+```
+        """
+    
+    return result
 
 
 @mcp.tool()
@@ -877,6 +1337,9 @@ def main():
 
     logger.info("Available tools:")
     logger.info("  - render_scad: Render OpenSCAD code with auto library detection")
+    logger.info("  - render_scad_multi: Render multiple camera views, return default + view list")
+    logger.info("  - get_available_views: List available views from multi-view rendering") 
+    logger.info("  - get_view: Retrieve specific view by ID")
     logger.info("  - list_openscad_libraries: List installed libraries")
     logger.info("  - openscad_doc_search: Search documentation (API-powered)")
     logger.info("  - generate_gcode: Generate G-code with variable density optimization, and start print job automatically")

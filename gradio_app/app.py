@@ -336,6 +336,9 @@ class Enhanced3DOpenSCADChat:
             "gpt-oss": {"provider": "openai", "model": "gpt-oss-120b", "display": "GPT-OSS 120B"},
             
             # Anthropic Claude 4 models (latest)
+            "claude-opus-4-6": {"provider": "anthropic", "model": "claude-opus-4-6", "display": "Claude Opus 4.6"},
+            "claude-sonnet-4-6": {"provider": "anthropic", "model": "claude-sonnet-4-6", "display": "Claude Sonnet 4.6"},
+            "claude-haiku-4-5-20251001": {"provider": "anthropic", "model": "claude-haiku-4-5-20251001", "display": "Claude Haiku 4.5"},
             "claude-4-sonnet": {"provider": "anthropic", "model": "claude-sonnet-4-20250514", "display": "Claude 4 Sonnet"},
             "claude-4-opus": {"provider": "anthropic", "model": "claude-opus-4-1-20250805", "display": "Claude 4 Opus"},
             
@@ -344,6 +347,11 @@ class Enhanced3DOpenSCADChat:
             "gemini-2.5-flash": {"provider": "google", "model": "gemini-2.5-flash", "display": "Gemini 2.5 Flash"},
             
             # OpenRouter models
+            "gemini-3.1-or": {"provider": "openrouter", "model": "google/gemini-3.1-pro-preview", "display": "Gemini 3.1 (OR)"},
+            "claude-sonnet-4.6-or": {"provider": "openrouter", "model": "anthropic/claude-sonnet-4.6", "display": "Claude Sonnet 4.6 (OR)"},
+            "claude-opus-4-6-or": {"provider": "openrouter", "model": "anthropic/claude-opus-4-6", "display": "Claude Opus 4.6 (OR)"},
+            "qwen3-coder-next": {"provider": "openrouter", "model": "qwen/qwen3-coder-next", "display": "Qwen3-Coder Next"},
+            "qwen3": {"provider": "openrouter", "model": "qwen/qwen3-235b-a22b-2507", "display": "Qwen3"},
             "qwen3-coder": {"provider": "openrouter", "model": "qwen/qwen3-coder", "display": "Qwen3-Coder 480B"},
             "qwen3-coder-free": {"provider": "openrouter", "model": "qwen/qwen3-coder:free", "display": "Qwen3-Coder (Free)"},
             "claude-3-sonnet-or": {"provider": "openrouter", "model": "anthropic/claude-3-sonnet", "display": "Claude 3 Sonnet (OR)"},

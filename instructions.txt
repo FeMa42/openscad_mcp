@@ -1,0 +1,207 @@
+# OpenSCAD MCP Benchmark Base Instructions (BOSL2 + MCAD)
+
+Purpose: Generate correct, collision‑free OpenSCAD code for the following tasks (gears, racks, motors, bearings, small assemblies). Prefer BOSL2 for gears unless the prompt explicitly requests MCAD; use MCAD for motors, bearings, boxes, and simple mechanical mockups.
+
+## MCP‑First Policy (Mandatory)
+- Always use the OpenSCAD MCP server tools to plan, validate, and present results. Code‑only answers are not acceptable for benchmark tasks.
+- Before showing a final answer, you must: (1) pick/verify libraries, (2) render the code, and (3) fetch at least front and top views.
+- If rendering fails, read the tool error, correct the code, and re‑render up to two times before reporting the issue with the error text and your next fix.
+
+### Default MCP Workflow
+1) list_openscad_libraries() to confirm BOSL2/MCAD availability and usage notes.
+2) openscad_doc_search() for any uncertain function/parameter or when switching libraries.
+3) Generate parametric code (BOSL2‑first for gears; MCAD for motors/bearings/boxes).
+4) render_scad_multi(code) for assemblies, else render_scad(code) for quick single parts.
+5) get_available_views() then get_view('front') and get_view('top'); add more (e.g., 'iso') if helpful.
+6) If misalignment/collision: adjust with gear_dist()/phase/positions and re‑render.
+7) Present: brief plan + final code. Note key calculations (center distance, pitch radius).
+
+## Agent Workflow
+- Clarify task: gear type/teeth/pitch/thickness, assemblies, or components.
+- Choose library: BOSL2 for gears; MCAD for motors/bearings/boxes; mixed when required.
+- Set includes and quality: add `$fa`, `$fs`, `$fn` and required library includes.
+- Compute parameters: circular pitch, pitch radius, center distances; use `gear_dist()` in BOSL2, manual formula in MCAD.
+- Write code: parametric, simple variables, clear transforms; avoid reserved names like `module`.
+- Render and verify: call `render_scad_multi(code)`; inspect `get_view('front')` and `get_view('top')` for meshing/spacing.
+- Correct iteratively: fix rotations/positions first, then tolerances/backlash as needed.
+
+## MCP Tools (server)
+- `list_openscad_libraries()` — verify installed libraries and usage snippets.
+- `openscad_doc_search(query)` — search bundled docs for functions and examples.
+- `render_scad(code)`, `render_scad_multi(code)` — render one or many views.
+- `get_available_views()`, `get_view('front'|'top'|...)` — fetch specific camera images.
+
+## Global Setup (put at top of code)
+```openscad
+$fa = 1; $fs = 0.4; $fn = 64;  // quality
+```
+
+## Library Selection
+- Use BOSL2 for all gears unless MCAD is explicitly required.
+- Use MCAD for: `motor(...)` (stepper), `bearing(model=...)`, `roundedBox(...)`, fasteners, and simple mockups.
+- Mixed setups: MCAD motor + BOSL2 gears is common; ensure consistent units (mm) and orientation.
+
+---
+
+## BOSL2 Essentials (Gears and Positioning)
+
+Required includes:
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+```
+
+Frequently used modules:
+- `spur_gear(circ_pitch, teeth, thickness, shaft_diam, helical, profile_shift)`
+- `ring_gear(circ_pitch, teeth, thickness, backing)`
+- `rack(pitch, teeth, thickness, backing, width)`
+- `gear_dist(circ_pitch, teeth1, teeth2)` — center distance between meshing gears
+
+Key calculations and rules:
+- Circular pitch from outside diameter: `circ_pitch ≈ (OD * PI) / teeth`
+- Pitch diameter: `pd = (teeth * circ_pitch) / PI`
+- Center distance: `cd = gear_dist(circ_pitch=cp, teeth1=t1, teeth2=t2)`
+- Helical pairs on parallel shafts must use opposite angles (e.g., +15° and −15°)
+- Optional phasing: `gear_spin = 180/teeth` aligns tooth-to-gap if needed
+
+Templates:
+```openscad
+// Single spur gear
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa=1; $fs=0.4; $fn=64;
+spur_gear(circ_pitch=5, teeth=20, thickness=8, shaft_diam=5);
+
+// Meshing pair using gear_dist()
+cp=4.71; t1=12; t2=36; 
+cd = gear_dist(circ_pitch=cp, teeth1=t1, teeth2=t2);
+spur_gear(circ_pitch=cp, teeth=t1, thickness=8, shaft_diam=4);
+translate([cd,0,0]) spur_gear(circ_pitch=cp, teeth=t2, thickness=8, shaft_diam=6);
+
+// Rack and pinion
+cp=5; pinion=16;
+pitch_r = (pinion*cp)/(2*PI);
+rack(pitch=cp, teeth=round(80*PI/cp), thickness=6, backing=4, width=8);
+translate([0,pitch_r,0]) spur_gear(circ_pitch=cp, teeth=pinion, thickness=8, shaft_diam=4);
+
+// Helical gear pair (opposite angles)
+cp=5; teeth=20; helix=15;
+cd = gear_dist(circ_pitch=cp, teeth1=teeth, teeth2=teeth);
+spur_gear(circ_pitch=cp, teeth=teeth, thickness=12, shaft_diam=5, helical= helix);
+translate([cd,0,0]) spur_gear(circ_pitch=cp, teeth=teeth, thickness=12, shaft_diam=5, helical=-helix);
+```
+
+Notes:
+- Prefer `profile_shift="auto"` to avoid undercut on small tooth counts.
+- If tooth collision is suspected, add `gear_spin=180/teeth` or rotate by that phase.
+
+---
+
+## MCAD Essentials (Motors, Bearings, Simple Gears/Boxes)
+
+File usage:
+- Gears: `use <MCAD/involute_gears.scad>`
+- Motors: `include <MCAD/units.scad>` then `include <MCAD/stepper.scad>`
+- Bearings: `use <MCAD/bearing.scad>`
+- Boxes: `use <MCAD/boxes.scad>`
+
+Critical requirements:
+- MCAD gears require `gear_thickness` and `rim_thickness`.
+- No `gear_dist()` in MCAD — compute manually.
+- Rotation phase is mandatory for proper meshing: `rotate([0,0,180/teeth])` on one gear.
+- Default pressure angle is 28°; MCAD uses `circular_pitch` (not module).
+- NEMA motors: shaft points down (−Z). Place shaft accessories below motor (negative Z).
+
+Core formulas:
+```openscad
+center_distance = (t1 + t2) * circular_pitch / (2 * PI);
+pitch_radius   = (teeth * circular_pitch) / (2 * PI);
+phase_deg      = 180 / teeth;  // half tooth pitch
+```
+
+Templates:
+```openscad
+// MCAD basic gear
+use <MCAD/involute_gears.scad>
+$fa=1; $fs=0.4;
+gear(number_of_teeth=24, circular_pitch=5, gear_thickness=10, rim_thickness=10);
+
+// MCAD two meshing gears (with rotation offset)
+use <MCAD/involute_gears.scad>
+$fa=1; $fs=0.4; cp=5; t1=20; t2=30;
+cd = (t1+t2)*cp/(2*PI);
+gear(number_of_teeth=t1, circular_pitch=cp, gear_thickness=8, rim_thickness=8);
+translate([cd,0,0]) rotate([0,0,180/t2])
+    gear(number_of_teeth=t2, circular_pitch=cp, gear_thickness=8, rim_thickness=8);
+
+// MCAD NEMA17 motor
+include <MCAD/units.scad>
+include <MCAD/stepper.scad>
+$fa=1; $fs=0.4;
+motor(Nema17, NemaMedium);  // shaft downwards
+
+// MCAD bearing and box
+use <MCAD/bearing.scad>
+use <MCAD/boxes.scad>
+$fa=1; $fs=0.4;
+bearing(model=608);
+roundedBox([50,50,10], radius=2, sidesonly=false);
+
+// MCAD rack and pinion
+use <MCAD/involute_gears.scad>
+$fa=1; $fs=0.4; cp=5; pinion=15;
+pitch_r = (pinion*cp)/(2*PI);
+rack(number_of_teeth=floor(60/(cp/PI)), circular_pitch=cp, thickness=10);
+translate([3.5,pitch_r,0]) rotate([0,0,180/pinion])
+    gear(number_of_teeth=pinion, circular_pitch=cp, gear_thickness=10, rim_thickness=10);
+```
+
+Motor/bearing alignment tips:
+- Typical NEMA17 shaft diameter is 5mm; align attached gear bore accordingly.
+- For support plates, center boxes and pattern motor holes at 31mm spacing (±15.5mm in X/Y).
+
+---
+
+## Cross‑Library Integration
+- MCAD motor + BOSL2 gear: include both libraries; mount gear below motor (−Z) and size `shaft_diam` to motor shaft.
+- Compound trains: use BOSL2 `gear_dist()` for distances; stack coaxial gears with `translate([0,0,offset])` in Z.
+- Racks: place pinion at pitch radius above rack centerline; phase 180/teeth to mesh tooth‑to‑gap.
+
+Example:
+```openscad
+include <MCAD/units.scad>
+include <MCAD/stepper.scad>
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa=1; $fs=0.4; cp=5;
+motor(Nema17, NemaMedium);
+translate([0,0,-10]) spur_gear(circ_pitch=cp, teeth=20, thickness=8, shaft_diam=5);
+```
+
+---
+
+## Validation and Debugging
+- Always prefer `render_scad_multi(code)` for assemblies.
+- Inspect `get_view('front')` for meshing collisions and `get_view('top')` for center distances.
+- If collision occurs: verify center distance, then apply phase (`180/teeth`) or small backlash.
+- Use modifier characters to debug: `#` to highlight, `%` for ghosted subtraction parts.
+
+---
+
+## Common Pitfalls (avoid these)
+- Forgetting `include <MCAD/units.scad>` before `stepper.scad` (motors render incorrectly).
+- Missing `rim_thickness` for MCAD gears.
+- Using module instead of `circular_pitch` in MCAD.
+- Assuming 20° pressure angle in MCAD (default is 28°).
+- Not phasing MCAD gears (`rotate([0,0,180/teeth])`) — causes tooth collision.
+- Misplacing parts relative to motor: NEMA shafts point down (−Z); accessories go below.
+- Using reserved identifier `module` as a variable name.
+
+---
+
+## Response Shape for Bench Tasks
+- Begin with a one‑line plan and confirm library choice.
+- Call MCP tools: `list_openscad_libraries()` (first task or on ambiguity), `openscad_doc_search()` (if needed), then `render_scad`/`render_scad_multi` and `get_view('front'|'top')`.
+- Provide a single self‑contained OpenSCAD code block that solves the prompt.
+- Briefly note key calculations (center distance, pitch radius, phases) and summarize tool outcomes.
+- You do not have to attach the render. But do not finalize without rendering.

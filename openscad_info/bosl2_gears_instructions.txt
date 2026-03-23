@@ -1,0 +1,348 @@
+# OpenSCAD BOSL2 Gear Generation Agent Guide
+
+## Overview
+This guide helps OpenSCAD agents generate gears using the BOSL2 library, which provides superior gear generation capabilities compared to parameterizable_gears. BOSL2 features English parameter names, built-in meshing helpers, profile shifting support, and comprehensive documentation.
+
+## 🔧 Available Tools Quick Reference
+
+### Essential MCP Tools for BOSL2 Gear Generation
+```
+get_bosl2_gear_docs()     # Get BOSL2 gear library reference and examples
+list_openscad_libraries() # Check if BOSL2 is available
+openscad_doc_search()     # Search for specific BOSL2 gear documentation
+render_scad()             # Render and visualize gear designs
+get_instructions()        # OpenSCAD best practices
+```
+
+## 📋 BOSL2 Gear Generation Workflow
+
+### Step 1: Initial Assessment
+**First, always call:**
+```
+get_bosl2_gear_docs()
+```
+This provides you with:
+- Complete BOSL2 gear library reference with all gear types
+- English parameter names and their meanings
+- Working parameter examples for 3D printing
+- Gear positioning and meshing helper functions
+- Profile shifting and undercutting prevention
+- Advanced features like herringbone and helical gears
+
+### Step 2: User Information Gathering
+Ask these questions in **this exact order** for optimal results:
+
+#### Critical Measurements (Always Required)
+1. **"Can you tell me what type of gear you need to create?"**
+   - Options: spur gear (most common), ring gear, rack, bevel gear, crown gear, worm/worm gear
+   - If unsure, assume spur gear (straight teeth)
+
+2. **"How many teeth does your gear need?"**
+   - This determines gear ratio and size relationships
+   - Minimum 9 teeth for 25° pressure angle, 13 teeth for 20°
+
+3. **"What should the circular pitch be, or do you have a pitch diameter/outside diameter?"**
+   - BOSL2 uses `circ_pitch` instead of `modul`
+   - If they have outside diameter: `circ_pitch ≈ (outside_diameter × π) / teeth`
+
+4. **"What should the gear thickness be in mm?"**
+   - Face width of the gear
+   - Critical for strength calculations
+
+5. **"What is the shaft diameter in mm?"**
+   - Center hole diameter
+   - Include any keyway or spline requirements
+
+#### Application Context (Required for Proper Design)
+6. **"What is this gear used for?"** 
+   - Examples: robot drive, machine repair, prototype, functional part
+   - Determines load requirements and material selection
+
+7. **"What gear will this mesh with?"**
+   - Number of teeth on mating gear
+   - Helps verify compatibility and calculate center distance
+
+8. **"Do you need helical teeth or special features?"**
+   - Helical angle for smoother operation
+   - Herringbone to eliminate axial thrust
+   - Profile shifting for small tooth counts
+
+#### 3D Printing Specific
+9. **"What 3D printing material will you use?"**
+   - PLA: Good for prototypes, limited temperature
+   - PETG: Better durability
+   - Nylon: Best for functional gears
+   - ABS: Heat resistant option
+
+10. **"What is your printer's layer height and nozzle diameter?"**
+    - Usually 0.4mm nozzle, affects minimum feature sizes
+
+### Step 3: Parameter Calculation and Validation
+
+**Key BOSL2 Parameter Relationships:**
+```javascript
+// Circular pitch calculation (BOSL2's primary parameter)
+circ_pitch = (outside_diameter × π) / teeth
+// OR if you know module: circ_pitch = module × π
+
+// Pitch diameter
+pitch_diameter = (teeth × circ_pitch) / π
+
+// Center distance for meshing gears (use BOSL2's gear_dist function)
+center_distance = gear_dist(circ_pitch=cp, teeth1=t1, teeth2=t2)
+
+// Validate minimum teeth (avoid undercutting)
+min_teeth_20deg = 13
+min_teeth_25deg = 9  // Preferred for 3D printing
+
+// Auto profile shift for small tooth counts
+profile_shift = "auto"  // Let BOSL2 calculate automatically
+```
+
+### Step 4: Generate OpenSCAD Code
+
+**Use this template structure:**
+
+```openscad
+// Quality settings - ALWAYS include at top
+$fa = 1;
+$fs = 0.4;
+$fn = 64;  // Smooth curves for gears
+
+// Use BOSL2 library
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+
+// Parameters (calculated from user inputs)
+circ_pitch = [calculated_value];       // Circular pitch (replaces modul)
+teeth = [user_provided];              // Number of teeth  
+thickness = [user_provided];          // Face width
+shaft_diam = [user_provided];         // Center hole diameter
+pressure_angle = 25;                  // 25° preferred for 3D printing
+helical = 0;                         // 0° for spur, non-zero for helical
+profile_shift = "auto";              // Auto-calculate to prevent undercutting
+
+// Generate the spur gear
+spur_gear(
+    circ_pitch = circ_pitch,
+    teeth = teeth,
+    thickness = thickness,
+    shaft_diam = shaft_diam,
+    pressure_angle = pressure_angle,
+    helical = helical,
+    profile_shift = profile_shift
+);
+```
+
+**For meshing gears:**
+```openscad
+// Meshing gear pair with automatic positioning
+circ_pitch = 5;
+teeth1 = 20;
+teeth2 = 30;
+
+// Calculate center distance automatically
+center_dist = gear_dist(circ_pitch=circ_pitch, teeth1=teeth1, teeth2=teeth2);
+
+// First gear at origin
+spur_gear(circ_pitch=circ_pitch, teeth=teeth1, thickness=8, shaft_diam=5);
+
+// Second gear positioned automatically
+translate([center_dist, 0, 0])
+    spur_gear(circ_pitch=circ_pitch, teeth=teeth2, thickness=8, shaft_diam=5);
+```
+
+### Step 5: Render and Iterate
+1. **Call `render_scad()` with the generated code**
+2. **Examine the rendered result**
+3. **Ask user for feedback**: "Does this look correct? Any adjustments needed?"
+4. **Iterate based on feedback**
+
+## 🎯 BOSL2 Gear Type Specific Guidelines
+
+### Spur Gears (Most Common - 80% of applications)
+- Use `spur_gear()` function
+- Set `helical = 0` for straight teeth
+- Standard pressure angle: 20° or 25° (prefer 25° for 3D printing)
+- **Function:** `spur_gear(circ_pitch, teeth, thickness, shaft_diam, pressure_angle, helical, profile_shift)`
+
+### Helical Gears (Smooth Operation)
+- Use `spur_gear()` function with helical angle
+- Set `helical` between 15-30°
+- Creates axial thrust - requires thrust bearings
+- For meshing helical gears on parallel shafts: use opposite helical angles
+
+### Herringbone Gears (No Axial Thrust)
+- Use `spur_gear()` with `herringbone = true`
+- Set `helical` between 15-30°
+- Eliminates axial thrust forces
+- More complex manufacturing - consider for high-power applications
+
+### Ring Gears (Internal Gears)
+- Use `ring_gear()` function
+- Higher tooth count than mating external gear
+- **Function:** `ring_gear(circ_pitch, teeth, thickness, backing, pressure_angle, helical, profile_shift)`
+- `backing` parameter controls rim thickness
+
+### Racks (Linear Gears)
+- Use `rack()` function for linear motion conversion
+- **Function:** `rack(pitch, teeth, thickness, backing, width, pressure_angle, helical)`
+- `pitch` should equal `circ_pitch` of mating pinion
+
+### Bevel Gears (Right-angle drives)
+- Use `bevel_gear()` function
+- **Function:** `bevel_gear(teeth, mate_teeth, shaft_angle, face_width, thickness, shaft_diam, pressure_angle, spiral)`
+- `shaft_angle` typically 90° for right-angle drives
+- Complex geometry - suggest professional manufacturing for critical applications
+
+### Crown Gears (Face gears)
+- Use `crown_gear()` function
+- **Function:** `crown_gear(circ_pitch, teeth, backing, face_width, pressure_angle, profile_shift)`
+- Meshes with spur gears at 90° angle
+
+### Worm Gears (High Reduction)
+- Use `worm()` for worm screw and `worm_gear()` for worm wheel
+- **Functions:**
+  - `worm(d, mate_teeth, circ_pitch, starts, left_handed, pressure_angle)`
+  - `worm_gear(circ_pitch, teeth, worm_diam, worm_starts, pressure_angle, profile_shift)`
+- **Reduction ratio:** `teeth / starts`
+- Self-locking when lead angle < 5°
+
+## 🔧 BOSL2 Gear Helper Functions
+
+### gear_dist() - Automatic Center Distance
+```openscad
+// Calculate center distance for meshing gears
+dist = gear_dist(circ_pitch=5, teeth1=20, teeth2=30);
+// Accounts for profile shift automatically
+```
+
+### auto_profile_shift() - Prevent Undercutting
+```openscad
+// Automatically prevent undercutting for small tooth counts
+spur_gear(circ_pitch=5, teeth=9, thickness=8, profile_shift="auto");
+```
+
+### gear_shorten() - Prevent Tip Interference
+```openscad
+// Calculate tip shortening to prevent interference
+shorten = gear_shorten(circ_pitch=5, teeth=20, profile_shift=0.5);
+```
+
+## ⚠️ Critical Validation Checks
+
+### Before Generating Code:
+1. **Minimum teeth check**: Ensure teeth ≥ 9 for 25° pressure angle, ≥ 13 for 20°
+2. **Circular pitch reasonableness**: Typical range 3-15 for most applications
+3. **Parameter compatibility**: All meshing gears must have same circ_pitch
+
+### After Rendering:
+1. **Visual inspection**: "Does the tooth shape look correct?"
+2. **Size verification**: "Does the size look right for your application?"
+3. **Feature clarity**: "Are the teeth well-defined and properly shaped?"
+4. **Meshing check**: "Do the gears mesh properly without interference?"
+
+## 🔍 Troubleshooting Guide
+
+### Common Issues and Solutions:
+
+**"Teeth look too small/large"**
+- Recalculate circular pitch: `circ_pitch = (outside_diameter × π) / teeth`
+- Check if user provided correct outside diameter
+
+**"Gears don't mesh properly"**
+- Use `gear_dist()` function for center distance calculation
+- Ensure both gears have same `circ_pitch`
+- Check for proper profile shift compensation
+
+**"Gear looks too thick/thin"**
+- Adjust `thickness` parameter
+- Consider application loads and 3D printing constraints
+
+**"Center hole too small/large"**
+- Adjust `shaft_diam` parameter
+- Add 0.1-0.2mm clearance for 3D printing tolerances
+
+**"Library not found error"**
+- Call `list_openscad_libraries()` to verify BOSL2 installation
+- Ensure correct include statements: `include <BOSL2/std.scad>` and `include <BOSL2/gears.scad>`
+
+**"Rendering fails"**
+- Check for syntax errors in BOSL2 function calls
+- Ensure all parameters are positive numbers
+- Verify parameter names match BOSL2 conventions
+
+## 📚 Knowledge Base Queries
+
+Use `openscad_doc_search()` for these common queries:
+- "BOSL2 gear functions"
+- "circular pitch calculation" 
+- "gear meshing distance BOSL2"
+- "profile shift undercutting"
+- "helical gear BOSL2"
+
+## 🎨 BOSL2-Specific Design Optimization
+
+### For 3D Printing Success:
+1. **Use 25° pressure angle** (stronger teeth)
+2. **Set profile_shift = "auto"** (prevents undercutting automatically)
+3. **Orient flat on build bed** (teeth in XY plane)
+4. **Include 0.15mm clearance** using `backlash` parameter
+5. **Use gear_dist()** for precise positioning
+
+### For Functional Applications:
+1. **Use gear_dist()** for perfect meshing
+2. **Apply profile_shift** for small tooth counts
+3. **Consider helical gears** for smoother operation
+4. **Use backlash parameter** for proper clearances
+
+## 📋 Final Checklist
+
+Before delivering final BOSL2 gear design:
+- ✅ All user measurements incorporated
+- ✅ Circular pitch calculated correctly
+- ✅ Minimum teeth requirements met (use profile_shift="auto" if needed)
+- ✅ Rendered successfully without errors
+- ✅ Visual inspection confirms proper tooth shape
+- ✅ Used gear_dist() for meshing gears
+- ✅ User confirms size and appearance
+- ✅ 3D printing considerations addressed
+- ✅ Code includes quality settings ($fa, $fs, $fn)
+- ✅ Proper BOSL2 includes (std.scad and gears.scad)
+
+## 🚀 Example BOSL2 Interaction Flow
+
+```
+1. get_bosl2_gear_docs()         # Load BOSL2 gear library info
+2. Ask user questions 1-10       # Gather requirements
+3. Calculate parameters          # Circular pitch, center distances, etc.
+4. Generate OpenSCAD code       # Using BOSL2 gear functions
+5. render_scad(code)            # Visualize result
+6. Review with user             # Get feedback
+7. Iterate if needed            # Adjust parameters
+8. Provide final code           # Ready for printing
+```
+
+## 💡 BOSL2 Pro Tips
+
+- **Always start with `get_bosl2_gear_docs()`** to understand available parameters
+- **Use `circ_pitch` instead of `modul`** (circ_pitch = modul × π)
+- **Use `gear_dist()` for automatic positioning** instead of manual calculations
+- **Set `profile_shift="auto"`** for gears with < 13 teeth
+- **Use English parameter names** (thickness vs breite, shaft_diam vs bohrung)
+- **Leverage BOSL2's attachment system** for complex assemblies
+- **Test print small gears first** to verify printer capabilities
+
+## Key Parameter Conversion from parameterizable_gears:
+
+| parameterizable_gears | BOSL2 | Notes |
+|----------------------|-------|--------|
+| `modul` | `circ_pitch` | circ_pitch = modul × π |
+| `zahnzahl` | `teeth` | Same |
+| `breite` | `thickness` | Same meaning |
+| `bohrung` | `shaft_diam` | Same meaning |
+| `eingriffswinkel` | `pressure_angle` | Same meaning |
+| `schraegungswinkel` | `helical` | Same meaning |
+| Manual positioning | `gear_dist()` | BOSL2 calculates automatically |
+
+This workflow ensures you leverage BOSL2's superior capabilities for professional gear generation with English parameter names, automatic meshing, and advanced features.

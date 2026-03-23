@@ -1,0 +1,557 @@
+# BOSL2 Gear Library - Practical Examples
+
+## Library Overview
+**BOSL2 Gear Library** provides comprehensive gear generation with English parameter names, automatic meshing calculations, and advanced features like profile shifting. This file contains working examples for all major gear types.
+
+## Basic Setup (Always Required)
+```openscad
+// Quality settings - MANDATORY for all gear designs
+$fa = 1;    // minimum angle
+$fs = 0.4;  // minimum size  
+$fn = 64;   // fragments for smooth gear teeth
+
+// Include BOSL2 libraries
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+```
+
+## 1. Spur Gears (Most Common)
+
+### Basic Spur Gear
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Basic spur gear - 20 teeth, moderate size
+spur_gear(
+    circ_pitch = 5,        // Circular pitch (replaces modul × π)
+    teeth = 20,            // Number of teeth
+    thickness = 8,         // Gear thickness
+    shaft_diam = 5,        // Center hole diameter
+    pressure_angle = 25    // 25° recommended for 3D printing
+);
+```
+
+### Small Spur Gear with Profile Shift
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Small gear (9 teeth) with auto profile shift to prevent undercutting
+spur_gear(
+    circ_pitch = 4,
+    teeth = 9,             // Below normal minimum, needs profile shift
+    thickness = 6,
+    shaft_diam = 3,
+    pressure_angle = 25,
+    profile_shift = "auto" // BOSL2 automatically prevents undercutting
+);
+```
+
+### Meshing Spur Gear Pair
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Parameters for gear pair
+circ_pitch = 5;
+teeth1 = 15;  // Pinion (small gear)
+teeth2 = 45;  // Gear (large gear) - 3:1 ratio
+
+// Calculate center distance automatically
+center_dist = gear_dist(circ_pitch=circ_pitch, teeth1=teeth1, teeth2=teeth2);
+
+// First gear at origin
+spur_gear(
+    circ_pitch = circ_pitch,
+    teeth = teeth1,
+    thickness = 8,
+    shaft_diam = 4
+);
+
+// Second gear positioned automatically for perfect meshing
+translate([center_dist, 0, 0])
+    spur_gear(
+        circ_pitch = circ_pitch,
+        teeth = teeth2,
+        thickness = 8,
+        shaft_diam = 6
+    );
+```
+
+## 2. Helical Gears (Smooth Operation)
+
+### Helical Gear
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Helical gear with 20° helix angle
+spur_gear(
+    circ_pitch = 5,
+    teeth = 24,
+    thickness = 10,
+    shaft_diam = 5,
+    pressure_angle = 25,
+    helical = 20           // Helix angle for smoother operation
+);
+```
+
+### Meshing Helical Gear Pair
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Helical gears on parallel shafts must have opposite helix angles
+circ_pitch = 6;
+teeth1 = 18;
+teeth2 = 36;
+helix_angle = 15;
+
+center_dist = gear_dist(circ_pitch=circ_pitch, teeth1=teeth1, teeth2=teeth2);
+
+// First gear - positive helix angle
+spur_gear(
+    circ_pitch = circ_pitch,
+    teeth = teeth1,
+    thickness = 12,
+    shaft_diam = 5,
+    helical = helix_angle
+);
+
+// Second gear - negative helix angle for proper meshing
+translate([center_dist, 0, 0])
+    spur_gear(
+        circ_pitch = circ_pitch,
+        teeth = teeth2,
+        thickness = 12,
+        shaft_diam = 8,
+        helical = -helix_angle  // Opposite angle
+    );
+```
+
+## 3. Herringbone Gears (No Axial Thrust)
+
+### Herringbone Gear
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Herringbone gear eliminates axial thrust
+spur_gear(
+    circ_pitch = 5,
+    teeth = 30,
+    thickness = 16,        // Needs extra thickness for V-pattern
+    shaft_diam = 6,
+    pressure_angle = 25,
+    helical = 20,
+    herringbone = true     // Creates V-shaped teeth
+);
+```
+
+## 4. Ring Gears (Internal Gears)
+
+### Basic Ring Gear
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Ring gear for planetary systems
+ring_gear(
+    circ_pitch = 4,
+    teeth = 60,            // Must be larger than mating external gear
+    thickness = 10,
+    backing = 5,           // Rim thickness beyond root circle
+    pressure_angle = 25
+);
+```
+
+### Ring Gear with External Spur Gear
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Internal/external gear pair
+circ_pitch = 4;
+external_teeth = 20;
+internal_teeth = 60;
+
+// Ring gear
+ring_gear(
+    circ_pitch = circ_pitch,
+    teeth = internal_teeth,
+    thickness = 8,
+    backing = 4
+);
+
+// Internal spur gear positioned for meshing
+// Note: For internal gears, center distance is calculated differently
+internal_dist = gear_dist(circ_pitch=circ_pitch, teeth1=external_teeth, 
+                         teeth2=internal_teeth, internal2=true);
+translate([internal_dist, 0, 0])
+    spur_gear(
+        circ_pitch = circ_pitch,
+        teeth = external_teeth,
+        thickness = 8,
+        shaft_diam = 4
+    );
+```
+
+## 5. Racks (Linear Gears)
+
+### Basic Rack
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Gear rack for linear motion
+rack(
+    pitch = 5,             // Linear pitch (matches circ_pitch of mating pinion)
+    teeth = 20,            // Number of teeth along the rack
+    thickness = 8,         // Depth of teeth
+    backing = 5,           // Base thickness
+    width = 10,            // Width of rack
+    pressure_angle = 25
+);
+```
+
+### Rack and Pinion System
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Complete rack and pinion system
+pitch_value = 5;
+pinion_teeth = 16;
+
+// Rack
+rack(
+    pitch = pitch_value,
+    teeth = 15,
+    thickness = 6,
+    backing = 4,
+    width = 8,
+    pressure_angle = 25
+);
+
+// Pinion positioned for proper meshing
+// Pinion center must be at pitch radius above rack pitch line
+pitch_radius = (pinion_teeth * pitch_value) / (2 * PI);
+translate([0, pitch_radius, 0])
+    spur_gear(
+        circ_pitch = pitch_value,
+        teeth = pinion_teeth,
+        thickness = 8,
+        shaft_diam = 4,
+        pressure_angle = 25
+    );
+```
+
+## 6. Bevel Gears (Right-Angle Drives)
+
+### Basic Bevel Gear
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Single bevel gear
+bevel_gear(
+    teeth = 20,
+    mate_teeth = 20,       // Teeth on mating gear (affects cone angle)
+    shaft_angle = 90,      // Angle between shafts (usually 90°)
+    face_width = 8,        // Width of gear teeth
+    thickness = 12,        // Total gear thickness
+    shaft_diam = 5,
+    pressure_angle = 25,
+    spiral = 0             // 0 for straight, >0 for spiral bevel
+);
+```
+
+### Bevel Gear Pair
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Matched bevel gear pair for 90° drive
+teeth1 = 16;
+teeth2 = 24;  // 1.5:1 ratio
+
+// First bevel gear
+bevel_gear(
+    teeth = teeth1,
+    mate_teeth = teeth2,
+    shaft_angle = 90,
+    face_width = 6,
+    thickness = 10,
+    shaft_diam = 4
+);
+
+// Second bevel gear - positioned at 90°
+// Note: Proper positioning for bevel gears requires complex calculations
+// This is a simplified example
+rotate([0, 90, 0])
+translate([0, 0, 8])
+    bevel_gear(
+        teeth = teeth2,
+        mate_teeth = teeth1,
+        shaft_angle = 90,
+        face_width = 6,
+        thickness = 10,
+        shaft_diam = 5
+    );
+```
+
+## 7. Crown Gears (Face Gears)
+
+### Crown Gear
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Crown gear meshes with spur gear at 90°
+crown_gear(
+    circ_pitch = 5,
+    teeth = 36,
+    backing = 4,           // Thickness of crown gear base
+    face_width = 6,        // Width of teeth (radial direction)
+    pressure_angle = 25
+);
+```
+
+## 8. Worm Gears (High Reduction)
+
+### Worm Screw
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Worm screw for high-reduction drive
+worm(
+    d = 20,                // Pitch diameter of worm
+    mate_teeth = 40,       // Teeth on mating worm gear
+    circ_pitch = 4,
+    starts = 2,            // Number of thread starts (1-4 typical)
+    left_handed = false,
+    pressure_angle = 20
+);
+```
+
+### Worm Gear (Worm Wheel)
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Worm gear (wheel) that meshes with worm
+worm_gear(
+    circ_pitch = 4,
+    teeth = 40,
+    worm_diam = 20,        // Pitch diameter of mating worm
+    worm_starts = 2,       // Must match worm starts
+    pressure_angle = 20,
+    shaft_diam = 8
+);
+```
+
+### Complete Worm Drive System
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Complete worm drive - 20:1 reduction (40 teeth ÷ 2 starts)
+circ_pitch_val = 4;
+worm_diameter = 16;
+worm_starts = 2;
+gear_teeth = 40;
+
+// Worm screw
+worm(
+    d = worm_diameter,
+    mate_teeth = gear_teeth,
+    circ_pitch = circ_pitch_val,
+    starts = worm_starts,
+    pressure_angle = 20
+);
+
+// Worm gear positioned perpendicular to worm
+rotate([0, 90, 0])
+translate([worm_diameter/2 + gear_teeth*circ_pitch_val/(2*PI), 0, 20])
+    worm_gear(
+        circ_pitch = circ_pitch_val,
+        teeth = gear_teeth,
+        worm_diam = worm_diameter,
+        worm_starts = worm_starts,
+        pressure_angle = 20,
+        shaft_diam = 6
+    );
+```
+
+## 9. Planetary Gear Systems
+
+### Basic Planetary System
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Planetary gear system: sun + planets + ring
+// Rule: ring_teeth = sun_teeth + 2 × planet_teeth
+circ_pitch_val = 3;
+sun_teeth = 12;
+planet_teeth = 18;
+ring_teeth = sun_teeth + 2 * planet_teeth;  // = 48
+num_planets = 3;
+
+// Sun gear at center
+spur_gear(
+    circ_pitch = circ_pitch_val,
+    teeth = sun_teeth,
+    thickness = 8,
+    shaft_diam = 4,
+    profile_shift = "auto"
+);
+
+// Planet gears positioned around sun
+planet_center_dist = gear_dist(circ_pitch=circ_pitch_val, 
+                              teeth1=sun_teeth, teeth2=planet_teeth);
+for (i = [0 : num_planets-1]) {
+    angle = i * 360 / num_planets;
+    rotate([0, 0, angle])
+    translate([planet_center_dist, 0, 0])
+        spur_gear(
+            circ_pitch = circ_pitch_val,
+            teeth = planet_teeth,
+            thickness = 8,
+            shaft_diam = 3
+        );
+}
+
+// Ring gear (internal)
+ring_gear(
+    circ_pitch = circ_pitch_val,
+    teeth = ring_teeth,
+    thickness = 8,
+    backing = 4
+);
+```
+
+## 10. Advanced Examples
+
+### Compound Gear Train
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Two-stage gear train: 10:30 then 15:45 = 9:1 total ratio
+circ_pitch_val = 4;
+
+// Stage 1: Input gear (10 teeth)
+spur_gear(
+    circ_pitch = circ_pitch_val,
+    teeth = 10,
+    thickness = 6,
+    shaft_diam = 3,
+    profile_shift = "auto"
+);
+
+// Stage 1: Intermediate gear (30 teeth)
+stage1_dist = gear_dist(circ_pitch=circ_pitch_val, teeth1=10, teeth2=30);
+translate([stage1_dist, 0, 0]) {
+    spur_gear(
+        circ_pitch = circ_pitch_val,
+        teeth = 30,
+        thickness = 6,
+        shaft_diam = 5
+    );
+    
+    // Stage 2: Second pinion (15 teeth) on same shaft
+    translate([0, 0, 8])
+        spur_gear(
+            circ_pitch = circ_pitch_val,
+            teeth = 15,
+            thickness = 6,
+            shaft_diam = 5
+        );
+}
+
+// Stage 2: Output gear (45 teeth)
+stage2_dist = gear_dist(circ_pitch=circ_pitch_val, teeth1=15, teeth2=45);
+translate([stage1_dist + stage2_dist, 0, 8])
+    spur_gear(
+        circ_pitch = circ_pitch_val,
+        teeth = 45,
+        thickness = 6,
+        shaft_diam = 6
+    );
+```
+
+### Variable Module Gears (Different Sizes)
+```openscad
+include <BOSL2/std.scad>
+include <BOSL2/gears.scad>
+$fa = 1; $fs = 0.4; $fn = 64;
+
+// Demonstration of different gear sizes using different circular pitches
+// Small precision gear
+spur_gear(
+    circ_pitch = 2,        // Fine pitch
+    teeth = 20,
+    thickness = 4,
+    shaft_diam = 2
+);
+
+// Medium gear
+translate([30, 0, 0])
+    spur_gear(
+        circ_pitch = 4,    // Medium pitch
+        teeth = 20,
+        thickness = 6,
+        shaft_diam = 4
+    );
+
+// Large gear
+translate([70, 0, 0])
+    spur_gear(
+        circ_pitch = 8,    // Coarse pitch
+        teeth = 20,
+        thickness = 10,
+        shaft_diam = 8
+    );
+```
+
+## Key BOSL2 Advantages Demonstrated
+
+1. **English Parameters**: `circ_pitch`, `teeth`, `thickness`, `shaft_diam`
+2. **Automatic Meshing**: `gear_dist()` function calculates perfect center distances  
+3. **Profile Shift**: `profile_shift="auto"` prevents undercutting automatically
+4. **Comprehensive Types**: All gear types in one library
+5. **Helper Functions**: Automatic calculations for complex geometries
+6. **3D Printing Optimized**: Built-in clearances and tolerances
+
+## Parameter Conversion Guide
+
+From parameterizable_gears to BOSL2:
+- `modul` → `circ_pitch` (multiply by π: circ_pitch = modul × π)
+- `zahnzahl` → `teeth` (same)
+- `breite` → `thickness` (same)
+- `bohrung` → `shaft_diam` (same)
+- `eingriffswinkel` → `pressure_angle` (same)
+- `schraegungswinkel` → `helical` (same)
+
+Use these examples as starting points for your gear designs. BOSL2's automatic calculations and English parameters make gear design much more accessible and reliable.
