@@ -65,6 +65,10 @@ except ImportError:
     LANGSMITH_AVAILABLE = False
     logger.info("💡 For advanced tracing, install LangSmith: pip install langsmith")
 
+# Disable LangSmith tracing if no API key is configured to avoid 403 warnings
+if not os.getenv("LANGCHAIN_API_KEY"):
+    os.environ["LANGCHAIN_TRACING_V2"] = "false"
+
 # 3D processing imports
 try:
     import trimesh
@@ -379,7 +383,8 @@ class Enhanced3DOpenSCADChat:
             return ChatAnthropic(
                 model=model_name,
                 # temperature=0.7,
-                max_tokens=4096
+                max_tokens=4096,
+                streaming=True
             )
         elif provider == "google":
             if not GOOGLE_GENAI_AVAILABLE:
@@ -389,7 +394,8 @@ class Enhanced3DOpenSCADChat:
                 model=model_name,
                 # temperature=0.7,
                 max_tokens=4096,
-                thinking_budget=512  # Control thinking output to prevent contamination
+                thinking_budget=512,  # Control thinking output to prevent contamination
+                streaming=True
             )
         elif provider == "openrouter":
             # OpenRouter configuration
@@ -409,13 +415,15 @@ class Enhanced3DOpenSCADChat:
                 default_headers={
                     'HTTP-Referer': site_url,
                     'X-Title': site_name,
-                }
+                },
+                streaming=True
             )
         else:  # OpenAI
             logger.info(f"🤖 Initializing OpenAI model: {model_name}")
             return ChatOpenAI(
                 model=model_name,
                 #temperature=0.7
+                streaming=True
             )
 
     def _load_system_prompt(self, force_instructions: bool = False) -> str:
@@ -623,6 +631,25 @@ class Enhanced3DOpenSCADChat:
             
         return value
         
+    def _normalize_ai_content(self, content):
+        """Normalize AI message content to a plain string.
+
+        Anthropic returns content as a list of blocks like:
+        [{'text': '...', 'type': 'text', 'index': 0}]
+        Gradio needs plain strings in chat history to avoid path-checking errors.
+        """
+        if isinstance(content, str):
+            return content
+        if isinstance(content, list):
+            parts = []
+            for block in content:
+                if isinstance(block, dict) and block.get("type") == "text":
+                    parts.append(block.get("text", ""))
+                elif isinstance(block, str):
+                    parts.append(block)
+            return "".join(parts)
+        return str(content)
+
     def _clear_current_outputs(self):
         """Clear current outputs to ensure fresh updates"""
         if self.current_image:
@@ -743,12 +770,12 @@ class Enhanced3DOpenSCADChat:
             # Check for tool calls (to get code)
             if hasattr(msg, "tool_calls"):
                 for tool_call in msg.tool_calls:
-                    if tool_call["name"] == "render_scad":
+                    if tool_call["name"] in ("render_scad", "render_scad_multi"):
                         self.current_code = tool_call["args"].get("code", "")
                         logger.info(f"✅ Extracted code from tool call")
 
             # Check tool responses for images and errors
-            if hasattr(msg, "name") and msg.name == "render_scad":
+            if hasattr(msg, "name") and msg.name in ("render_scad", "render_scad_multi"):
                 content = msg.content
                 logger.info(f"🔍 Found render_scad response with content: {type(content)}")
 
@@ -803,9 +830,10 @@ class Enhanced3DOpenSCADChat:
             logger.info(f"🤖 Invoking agent with {len(agent_messages)} messages")
 
             # Invoke agent with proper message history
-            response = await self.agent.ainvoke({
-                "messages": agent_messages
-            })
+            response = await self.agent.ainvoke(
+                {"messages": agent_messages},
+                config={"recursion_limit": 50}
+            )
 
             # Log tool usage
             self._log_tool_usage(response.get("messages", []))
@@ -818,12 +846,12 @@ class Enhanced3DOpenSCADChat:
                     break
 
             if latest_ai_message:
-                ai_content = latest_ai_message.content
-                
+                ai_content = self._normalize_ai_content(latest_ai_message.content)
+
                 # Log if Gemini thinking content is detected but don't filter chat content
                 if isinstance(ai_content, str) and any(section in ai_content for section in ["### CRITIQUE", "### THOUGHT", "### PLAN"]):
                     logger.warning("🧠 Detected Gemini thinking content in response - filtering will be applied to file paths only")
-                
+
                 self.conversation_history.append(AIMessage(content=ai_content))
                 # Update the last message with the actual response
                 history[-1] = {"role": "assistant", "content": ai_content}
@@ -880,6 +908,153 @@ class Enhanced3DOpenSCADChat:
             self.current_code or "",
             self.current_measurements,
         )
+
+    async def chat_stream(self, message: str, history: List):
+        """Streaming chat — yields updated history progressively."""
+        if not self.agent:
+            history = history + [
+                {"role": "user", "content": message},
+                {"role": "assistant", "content": "❌ Not initialized!"}
+            ]
+            yield history
+            return
+
+        logger.info(f"💬 [stream] User message: {message}")
+
+        # Clear previous outputs
+        self._clear_current_outputs()
+
+        # Add user message + placeholder to chat history
+        history = history + [
+            {"role": "user", "content": message},
+            {"role": "assistant", "content": "🤔 Thinking..."}
+        ]
+        yield history
+
+        try:
+            # Add user message to conversation history
+            self.conversation_history.append(HumanMessage(content=message))
+            agent_messages = self._get_conversation_messages()
+
+            logger.info(f"🤖 [stream] Invoking agent with {len(agent_messages)} messages")
+
+            accumulated_text = ""
+            status_prefix = ""
+            full_response_messages = []
+
+            async for event in self.agent.astream_events(
+                {"messages": agent_messages},
+                config={"recursion_limit": 50},
+                version="v2"
+            ):
+                kind = event["event"]
+
+                if kind == "on_chat_model_stream":
+                    # Extract token text from the chunk
+                    chunk = event.get("data", {}).get("chunk")
+                    if chunk:
+                        token = ""
+                        if hasattr(chunk, "content"):
+                            content = chunk.content
+                            if isinstance(content, str):
+                                token = content
+                            elif isinstance(content, list):
+                                # Some providers return list of content blocks
+                                for block in content:
+                                    if isinstance(block, dict) and block.get("type") == "text":
+                                        token = block.get("text", "")
+                                    elif isinstance(block, str):
+                                        token = block
+                        if token:
+                            accumulated_text += token
+                            history[-1] = {"role": "assistant", "content": status_prefix + accumulated_text}
+                            yield history
+
+                elif kind == "on_tool_start":
+                    tool_name = event.get("name", "unknown")
+                    status_prefix = f"🔧 Calling `{tool_name}`...\n\n"
+                    # Reset accumulated text for new agent step
+                    accumulated_text = ""
+                    history[-1] = {"role": "assistant", "content": status_prefix}
+                    logger.info(f"🔧 [stream] Tool start: {tool_name}")
+                    yield history
+
+                elif kind == "on_tool_end":
+                    tool_name = event.get("name", "unknown")
+                    status_prefix = ""
+                    # Reset accumulated text — next LLM step will produce new tokens
+                    accumulated_text = ""
+                    logger.info(f"📤 [stream] Tool end: {tool_name}")
+
+                elif kind == "on_chain_end" and event.get("name") == "LangGraph":
+                    # Capture final messages from the completed graph run
+                    output = event.get("data", {}).get("output", {})
+                    if isinstance(output, dict) and "messages" in output:
+                        full_response_messages = output["messages"]
+
+            # --- Post-stream processing (same as chat()) ---
+
+            # Extract final AI response from full_response_messages
+            latest_ai_message = None
+            messages_to_process = full_response_messages or []
+            for msg in reversed(messages_to_process):
+                if isinstance(msg, AIMessage):
+                    latest_ai_message = msg
+                    break
+
+            if latest_ai_message:
+                ai_content = self._normalize_ai_content(latest_ai_message.content)
+                self.conversation_history.append(AIMessage(content=ai_content))
+                # Use the clean final content (not streamed tokens)
+                history[-1] = {"role": "assistant", "content": ai_content}
+                logger.info(f"🤖 [stream] Final response: {str(ai_content)[:200]}...")
+            elif accumulated_text:
+                # Fallback: provider didn't emit on_chain_end with messages
+                self.conversation_history.append(AIMessage(content=accumulated_text))
+                history[-1] = {"role": "assistant", "content": accumulated_text}
+                logger.info(f"🤖 [stream] Using accumulated text as response")
+            else:
+                history[-1] = {"role": "assistant", "content": "❌ No response generated"}
+                logger.warning("⚠️ [stream] No AI response generated")
+
+            # Log tool usage
+            if full_response_messages:
+                self._log_tool_usage(full_response_messages)
+
+            # Extract outputs (images, code, 3D models)
+            if full_response_messages:
+                self._extract_outputs(full_response_messages)
+
+            # Direct MCP re-render if we have code
+            if self.current_code:
+                logger.info("🔧 [stream] Attempting direct MCP call for immediate rendering")
+                try:
+                    direct_result = await self.mcp_session.call_tool(
+                        "render_scad",
+                        arguments={"code": self.current_code}
+                    )
+                    if hasattr(direct_result, 'content') and direct_result.content:
+                        self._process_image_content(direct_result.content)
+                    await asyncio.sleep(1)
+                    self._process_3d_output()
+                except Exception as e:
+                    error_msg = str(e)
+                    logger.error(f"❌ [stream] Direct MCP call failed: {error_msg}")
+                    if "OpenSCAD" in error_msg and ("failed" in error_msg or "error" in error_msg.lower()):
+                        error_response = f"❌ OpenSCAD Error: {error_msg}\n\nPlease check your code and try again."
+                        history[-1] = {"role": "assistant", "content": error_response}
+
+            logger.info(f"📊 [stream] Complete - 3D: {'✅' if self.current_3d_model else '❌'}, "
+                       f"Code: {'✅' if self.current_code else '❌'}, "
+                       f"Measurements: {'✅' if self.current_measurements.get('available') else '❌'}")
+
+        except Exception as e:
+            error_msg = f"❌ Error: {str(e)}"
+            history[-1] = {"role": "assistant", "content": error_msg}
+            logger.error(f"💥 [stream] Chat processing error: {str(e)}")
+
+        # Final yield with clean response and all current_* attributes set
+        yield history
 
     def _log_tool_usage(self, messages: List) -> None:
         """Log tool usage from agent messages"""
@@ -1049,14 +1224,13 @@ def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
 
 
         async def handle_message_chat_only(message, history):
-            """Handle message and update only chat history (no loading on 3D/code)"""
+            """Handle message with streaming updates to chat history"""
             if not message:
-                return "", history
+                yield "", history
+                return
 
-            # Process the message
-            updated_history, model_3d_path, code, measurements = await chat_assistant.chat(message, history)
-
-            return "", updated_history
+            async for updated_history in chat_assistant.chat_stream(message, history):
+                yield "", updated_history
 
         async def update_3d_model():
             """Update 3D model separately (shows loading only when needed)"""
@@ -1123,7 +1297,6 @@ def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
             handle_message_chat_only,
             [msg, chatbot],
             [msg, chatbot],
-            queue=False  # No loading state for chat updates
         ).then(
             update_3d_model,
             outputs=model_3d
@@ -1143,7 +1316,6 @@ def create_enhanced_app(default_model="gpt-4o", force_instructions=False):
             handle_message_chat_only,
             [msg, chatbot],
             [msg, chatbot],
-            queue=False  # No loading state for chat updates
         ).then(
             update_3d_model,
             outputs=model_3d

@@ -4,23 +4,65 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an OpenSCAD Model Collaborative Programming (MCP) system that provides an intelligent assistant for 3D modeling with OpenSCAD and 3D printing workflows. The system integrates with Claude/ChatGPT via MCP (Model Context Protocol) to enable natural language 3D design conversations.
+This is an OpenSCAD Model Collaborative Programming (MCP) system with two purposes:
+
+1. **Interactive 3D Modeling Assistant**: Natural language 3D design via MCP (Model Context Protocol), integrating with multiple LLM providers
+2. **LLM Benchmarking Platform (GearSet Benchmark)**: Evaluates LLM capabilities on OpenSCAD gear generation tasks across difficulty levels
 
 ### Core Architecture
 
 The project consists of two main components:
 
-1. **MCP Server** (`openscad_fastmcp_server.py`): FastMCP-based server that provides OpenSCAD tools, knowledge retrieval, and 3D printing pipeline integration
-2. **Gradio Chat App** (`gradio_app/app.py`): Web-based chat interface with 3D visualization, smart camera positioning, and auto-rotation features
+1. **MCP Server** (`openscad_fastmcp_server.py`): FastMCP-based server providing 14 tools for OpenSCAD rendering, knowledge retrieval, and 3D printing pipeline integration
+2. **Gradio Chat App** (`gradio_app/app.py`): Web-based chat interface with 3D visualization, multi-view rendering, smart camera positioning, auto-rotation, and support for 4 LLM providers (OpenAI, Anthropic, Google, OpenRouter)
 
 ### Key Directories
 
 - `gradio_app/`: Web interface with chat, 3D viewer, and model configuration
 - `openscad_documentation/`: Comprehensive OpenSCAD library documentation and tutorials
 - `library_configs/`: JSON configs for OpenSCAD libraries (BOSL, BOLTS, etc.)
-- `openscad_info/`: Text-based reference materials and instructions
+- `openscad_info/`: Reference materials, instructions, and BOSL2 gear documentation
 - `output/`: Generated 3D models, renders, and G-code files
-- `archiv/`: Legacy code and experimental features
+- `archiv/`: Legacy code, benchmark plans (`benchmarkin_plan.md`), and BOSL2 migration plan
+
+## MCP Server Tools (14 tools)
+
+### Knowledge & Documentation (7)
+- `openscad_doc_search` — FAISS semantic search of OpenSCAD documentation
+- `list_openscad_libraries` — Library listing with function signatures
+- `get_instructions` — System instructions for the assistant
+- `get_bosl_examples` — BOSL library examples
+- `get_bosl2_gear_docs` — BOSL2 gear module documentation
+- `get_gear_parameter` — Gear parameter reference
+- `get_gear_generation_instructions` — Step-by-step gear generation guide
+
+### Rendering (4)
+- `render_scad` — Single-view render with auto-fix and optional camera params
+- `render_scad_multi` — Multi-view render (7 camera angles)
+- `get_available_views` — List views from a multi-view session
+- `get_view` — Retrieve a specific view image by ID
+
+### 3D Printing (3)
+- `generate_gcode` — G-code generation via PrusaSlicer
+- `print_last_gcode` — Send last generated G-code to printer
+- `get_printing_presets` — Available printing configurations
+
+## Supported LLM Providers & Models
+
+| Provider | Key | Models |
+|----------|-----|--------|
+| **OpenAI** | `OPENAI_API_KEY` | GPT-5, GPT-5 Mini, GPT-OSS 120B |
+| **Anthropic** | `ANTHROPIC_API_KEY` | Claude Opus 4.6, Claude Sonnet 4.6, Claude Haiku 4.5, Claude 4 Sonnet (default), Claude 4 Opus |
+| **Google** | `GOOGLE_API_KEY` | Gemini 2.5 Pro, Gemini 2.5 Flash |
+| **OpenRouter** | `OPENROUTER_API_KEY` | Gemini 3.1, Claude Sonnet/Opus 4.6, Qwen3-Coder (Next/480B/Free), Qwen3, Claude 3 Sonnet, Llama 3 70B, Codestral Mamba, DeepSeek Coder |
+
+## GearSet Benchmark
+
+Evaluates LLMs on OpenSCAD gear generation across 3 difficulty levels (12 prompts total). **BOSL2 is the preferred gear library** — models should use `include <BOSL2/std.scad>` and `include <BOSL2/gears.scad>`.
+
+**Metrics**: Success Rate (SR@k), Parameter Accuracy (PA), Code Validity Rate (CVR), Aesthetic/Instruction Score (AIS), Spatial Correctness Assessment (SCA).
+
+See `archiv/benchmarkin_plan.md` for the full benchmark specification.
 
 ## Development Commands
 
@@ -31,9 +73,10 @@ The project consists of two main components:
 cd gradio_app
 python app.py
 
-# Or with specific AI model
-python app.py --model gpt-4o
-python app.py --model claude-4-opus
+# With a specific model
+python app.py --model claude-4-sonnet
+python app.py --model gemini-2.5-pro
+python app.py --model qwen3-coder
 ```
 
 ### Testing
@@ -41,6 +84,9 @@ python app.py --model claude-4-opus
 ```bash
 # Test the MCP server directly
 python test_fastmcp_server.py
+
+# Test multi-view rendering
+python test_multiview.py
 
 # Verify server configuration
 python verify_server.py
@@ -56,7 +102,6 @@ python build_knowledge_base.py
 ### Dependencies
 
 ```bash
-# Install all dependencies
 pip install -r requirements.txt
 
 # For virtual environment setup
@@ -81,28 +126,7 @@ Key environment variables (defined in config.json env section):
 - `PRUSASLICER_PATH`: Path to PrusaSlicer for G-code generation
 - `FAISS_INDEX_PATH`: Vector database location for knowledge retrieval
 - `EMBEDDING_PROVIDER`: "openai", "local", or "auto"
-- API keys: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`
-
-## Code Architecture
-
-### MCP Server Tools
-The server provides these main tool categories:
-- **OpenSCAD Operations**: Code generation, rendering, STL export
-- **Knowledge Retrieval**: FAISS-based semantic search of documentation
-- **3D Printing**: G-code generation via PrusaSlicer integration
-- **Library Management**: Dynamic loading of OpenSCAD library configs
-
-### Chat Application Features
-- **LangGraph Agent**: React-style agent for multi-step reasoning
-- **Smart Camera System**: Automatic optimal camera positioning for 3D models
-- **Auto-rotation**: Turntable effect for better model visualization
-- **Multi-model Support**: OpenAI GPT and Anthropic Claude models
-
-### Knowledge Base
-Uses FAISS vector store with:
-- OpenSCAD documentation (manuals, tutorials, libraries)
-- Semantic search for contextual help
-- API-based embeddings (OpenAI) with local fallback (HuggingFace)
+- API keys: `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GOOGLE_API_KEY`, `OPENROUTER_API_KEY`
 
 ## Important File Patterns
 
@@ -110,6 +134,7 @@ Uses FAISS vector store with:
 - `*.stl`: 3D mesh files for printing
 - `*.gcode`: 3D printer instruction files
 - `library_configs/*.json`: OpenSCAD library configurations
+- `system_prompt*.xml`: System prompt templates for the assistant
 - `output/*/`: Generated files organized by session UUID
 
 ## Testing Approach
@@ -119,4 +144,6 @@ Run `test_fastmcp_server.py` to verify:
 - Knowledge base retrieval
 - File generation and cleanup
 
-No formal test framework is used - testing is done through direct script execution and manual verification of outputs.
+Run `test_multiview.py` to verify multi-view rendering pipeline.
+
+No formal test framework is used — testing is done through direct script execution and manual verification of outputs.
