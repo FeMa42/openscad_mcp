@@ -53,7 +53,7 @@ The project consists of two main components:
 |----------|-----|--------|
 | **OpenAI** | `OPENAI_API_KEY` | GPT-5, GPT-5 Mini, GPT-OSS 120B |
 | **Anthropic** | `ANTHROPIC_API_KEY` | Claude Opus 4.6, Claude Sonnet 4.6, Claude Haiku 4.5, Claude 4 Sonnet (default), Claude 4 Opus |
-| **Google** | `GOOGLE_API_KEY` | Gemini 2.5 Pro, Gemini 2.5 Flash |
+| **Google** | `GOOGLE_API_KEY` | Gemini 2.5 Pro, Gemini 2.5 Flash, Gemini 2.5 Flash Lite, Gemini 3.1 Pro (Preview), Gemini 3.1 Flash (Preview), Gemini 3.1 Flash Lite (Preview) |
 | **OpenRouter** | `OPENROUTER_API_KEY` | Gemini 3.1, Claude Sonnet/Opus 4.6, Qwen3-Coder (Next/480B/Free), Qwen3, Claude 3 Sonnet, Llama 3 70B, Codestral Mamba, DeepSeek Coder |
 
 ## GearSet Benchmark

@@ -50,11 +50,6 @@ OpenSCAD is the core 3D modeling software required for this application.
    - Open the `.dmg` file and drag OpenSCAD to Applications folder
    - Executable location: `/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD`
 
-3. **Option C - MacPorts:**
-   ```bash
-   sudo port install openscad
-   ```
-
 #### Linux:
 
 **Ubuntu/Debian:**
@@ -66,103 +61,7 @@ sudo apt install openscad
 # Executable location: /usr/bin/openscad
 ```
 
-**Fedora:**
-```bash
-sudo dnf install openscad
-# For MCAD library:
-sudo dnf install openscad-MCAD
-```
-
-**Arch Linux:**
-```bash
-sudo pacman -S openscad
-```
-
-**Universal Linux (AppImage):**
-```bash
-# Download AppImage from https://openscad.org/downloads.html
-wget https://files.openscad.org/snapshots/OpenSCAD-x86_64.AppImage
-chmod +x OpenSCAD-x86_64.AppImage
-./OpenSCAD-x86_64.AppImage
-```
-
-**Alternative Package Managers:**
-```bash
-# Snap
-sudo snap install openscad
-
-# Flatpak
-flatpak install flathub org.openscad.OpenSCAD
-```
-
-### 3. Install PrusaSlicer
-
-PrusaSlicer is required for G-code generation and 3D printing workflow.
-
-#### Windows:
-1. **Download:**
-   - Go to [PrusaSlicer Downloads](https://www.prusa3d.com/page/prusaslicer_424/) or [GitHub Releases](https://github.com/prusa3d/PrusaSlicer/releases)
-   - Download the latest Windows version (e.g., `PrusaSlicer-2.9.0+win64.zip`)
-   - File size: ~80-90MB
-
-2. **Install Option A - Installer:**
-   - If downloading the `.exe` installer, run it and follow the setup wizard
-   - Default location: `C:\Program Files\PrusaSlicer\`
-
-3. **Install Option B - Portable:**
-   - If downloading the `.zip` file, extract to a folder (e.g., `C:\PrusaSlicer\`)
-   - Run `prusa-slicer.exe` from the extracted folder
-
-4. **Find executable path:**
-   - Installer: `C:\Program Files\PrusaSlicer\prusa-slicer.exe`
-   - Portable: `C:\PrusaSlicer\prusa-slicer.exe` (or your chosen folder)
-
-#### macOS:
-1. **Download:**
-   - Download the `.dmg` file from [PrusaSlicer Downloads](https://www.prusa3d.com/page/prusaslicer_424/)
-   - File size: ~100MB
-
-2. **Install:**
-   - Open the `.dmg` file
-   - Drag PrusaSlicer to the Applications folder
-   - If you see a security warning, go to System Preferences > Security & Privacy > Click "Open Anyway"
-
-3. **Executable location:**
-   - `/Applications/PrusaSlicer.app/Contents/MacOS/PrusaSlicer`
-
-#### Linux:
-**Flatpak (Recommended for most distributions):**
-```bash
-# Install Flatpak if not already installed
-sudo apt install flatpak  # Ubuntu/Debian
-sudo dnf install flatpak  # Fedora
-
-# Add Flathub repository
-flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-
-# Install PrusaSlicer
-flatpak install flathub com.prusa3d.PrusaSlicer
-
-# Run PrusaSlicer
-flatpak run com.prusa3d.PrusaSlicer
-
-# Executable for scripts: flatpak run com.prusa3d.PrusaSlicer
-```
-
-**AppImage (Alternative):**
-```bash
-# Download from GitHub releases
-wget https://github.com/prusa3d/PrusaSlicer/releases/download/version_2.9.0/PrusaSlicer-2.9.0+linux-x64.AppImage
-chmod +x PrusaSlicer-2.9.0+linux-x64.AppImage
-./PrusaSlicer-2.9.0+linux-x64.AppImage
-```
-
-**Without superuser privileges:**
-```bash
-# Install Flatpak for current user only
-flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak install --user flathub com.prusa3d.PrusaSlicer
-```
+**Linux Instructions:** [OpenSCAD Linux](https://openscad.org/downloads.html#linux)
 
 ## Installation
 
@@ -326,11 +225,17 @@ The application supports multiple AI models. You need at least one API key:
 
 #### Option A: Environment Variables (Recommended)
 ```bash
-# For OpenAI models (gpt-4o, gpt-4o-mini, gpt-4-turbo)
+# For OpenAI models (gpt-5, gpt-5-mini, gpt-oss)
 export OPENAI_API_KEY="your-openai-api-key-here"
 
-# For Anthropic Claude models (claude-4-sonnet, claude-4-opus)
+# For Anthropic Claude models (claude-4-sonnet, claude-4-opus, etc.)
 export ANTHROPIC_API_KEY="your-anthropic-api-key-here"
+
+# For Google Gemini models (gemini-2.5-pro, gemini-3.1-pro, etc.)
+export GOOGLE_API_KEY="your-google-api-key-here"
+
+# For OpenRouter models (Qwen3, Llama, DeepSeek, etc.)
+export OPENROUTER_API_KEY="your-openrouter-api-key-here"
 ```
 
 **Make it permanent:**
@@ -343,6 +248,8 @@ export ANTHROPIC_API_KEY="your-anthropic-api-key-here"
 # Add to your shell profile (~/.bashrc, ~/.zshrc, ~/.bash_profile)
 echo 'export OPENAI_API_KEY="your-key-here"' >> ~/.bashrc
 echo 'export ANTHROPIC_API_KEY="your-key-here"' >> ~/.bashrc
+echo 'export GOOGLE_API_KEY="your-key-here"' >> ~/.bashrc
+echo 'export OPENROUTER_API_KEY="your-key-here"' >> ~/.bashrc
 source ~/.bashrc
 ```
 
@@ -351,11 +258,15 @@ Create a `.env` file in the project root:
 ```
 OPENAI_API_KEY=your-openai-api-key-here
 ANTHROPIC_API_KEY=your-anthropic-api-key-here
+GOOGLE_API_KEY=your-google-api-key-here
+OPENROUTER_API_KEY=your-openrouter-api-key-here
 ```
 
 **Getting API Keys:**
 - **OpenAI:** [platform.openai.com](https://platform.openai.com/api-keys)
 - **Anthropic:** [console.anthropic.com](https://console.anthropic.com/)
+- **Google:** [aistudio.google.com](https://aistudio.google.com/apikey)
+- **OpenRouter:** [openrouter.ai](https://openrouter.ai/keys)
 
 ## Running the Application
 
@@ -379,64 +290,19 @@ cd gradio_app
 python app.py
 
 # Or specify a different model
-python app.py --model gpt-4o
-python app.py --model claude-4-opus
-python app.py --model gpt-4o-mini
+python app.py --model claude-4-sonnet
+python app.py --model gemini-2.5-pro
+python app.py --model qwen3-coder
 ```
 
-**Available models:**
-- `claude-4-sonnet` (default) - Most capable for 3D modeling
-- `claude-4-opus` - Maximum capability but more expensive
-- `gpt-4o` - OpenAI's latest
-- `gpt-4o-mini` - Faster, more economical
+**Available models by provider:**
+- **OpenAI**: `gpt-5`, `gpt-5-mini`, `gpt-oss`
+- **Anthropic**: `claude-4-sonnet` (default), `claude-4-opus`, `claude-opus-4-6`, `claude-sonnet-4-6`, `claude-haiku-4-5-20251001`
+- **Google**: `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.5-flash-lite`, `gemini-3.1-pro`, `gemini-3.1-flash`, `gemini-3.1-flash-lite`
+- **OpenRouter**: `qwen3-coder`, `qwen3-coder-free`, `qwen3`, `gemini-3.1-or`, `llama-3-70b`, `deepseek-coder`, `codestral`, etc.
 
 ### 3. Access the Web Interface
 
 1. The application will start and display a URL in the terminal (typically `http://localhost:7861/`)
 2. Open this URL in your web browser
-3. Wait for the application to load completely (this may take 30-60 seconds on first startup)
-
-## Troubleshooting
-
-### Common Issues
-
-**1. "Command not found" errors:**
-- Make sure you've activated the virtual environment
-- Check that all paths in `config.json` are correct and use full absolute paths
-- On Windows, use backslashes (`\`) or double backslashes (`\\`) in JSON
-
-**2. "Permission denied" errors:**
-- On macOS/Linux, make sure executable files have proper permissions:
-  ```bash
-  chmod +x /path/to/openscad
-  chmod +x /path/to/prusaslicer
-  ```
-
-**3. "API key not found" errors:**
-- Verify that environment variables are set: `echo $OPENAI_API_KEY`
-- Check that you have sufficient API credits
-- Try restarting your terminal after setting environment variables
-
-**4. "Module not found" errors:**
-- Make sure virtual environment is activated
-- Try reinstalling dependencies: `pip install -r requirements.txt --force-reinstall`
-
-**5. Application won't start:**
-- Check Python version: `python --version` (must be 3.8+)
-- Try running with verbose output: `python app.py --verbose`
-- Check system requirements (minimum 4GB RAM recommended)
-
-**6. OpenSCAD/PrusaSlicer not found:**
-- Verify installation by running the software manually first
-- Check the exact executable path and update `config.json`
-- On Linux with Flatpak, use the full command: `flatpak run com.prusa3d.PrusaSlicer`
-
-## Features
-
-- **AI-Powered 3D Modeling:** Chat naturally about 3D designs with advanced AI models
-- **Real-time Visualization:** See your designs rendered in 2D and 3D as you build them
-- **Smart Camera Positioning:** Automatic optimal camera angles for 3D model viewing
-- **Parametric Design:** Create customizable, parameter-driven models
-- **3D Printing Integration:** Generate G-code and manage printing workflows
-- **Comprehensive Libraries:** Access to BOSL, BOLTS, and other OpenSCAD libraries
-- **Multi-Model Support:** Choose from various AI models for different use cases
+3. Wait for the application to load completely (this may take a few seconds on first startup)

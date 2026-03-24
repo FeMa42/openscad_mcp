@@ -349,6 +349,10 @@ class Enhanced3DOpenSCADChat:
             # Google Gemini models
             "gemini-2.5-pro": {"provider": "google", "model": "gemini-2.5-pro", "display": "Gemini 2.5 Pro"},
             "gemini-2.5-flash": {"provider": "google", "model": "gemini-2.5-flash", "display": "Gemini 2.5 Flash"},
+            "gemini-2.5-flash-lite": {"provider": "google", "model": "gemini-2.5-flash-lite", "display": "Gemini 2.5 Flash Lite"},
+            "gemini-3.1-pro": {"provider": "google", "model": "gemini-3.1-pro-preview", "display": "Gemini 3.1 Pro (Preview)"},
+            "gemini-3.1-flash": {"provider": "google", "model": "gemini-3.1-flash-preview", "display": "Gemini 3.1 Flash (Preview)"},
+            "gemini-3.1-flash-lite": {"provider": "google", "model": "gemini-3.1-flash-lite-preview", "display": "Gemini 3.1 Flash Lite (Preview)"},
             
             # OpenRouter models
             "gemini-3.1-or": {"provider": "openrouter", "model": "google/gemini-3.1-pro-preview", "display": "Gemini 3.1 (OR)"},
@@ -390,12 +394,16 @@ class Enhanced3DOpenSCADChat:
             if not GOOGLE_GENAI_AVAILABLE:
                 raise ImportError("Google Gemini models require: pip install langchain-google-genai")
             logger.info(f"🤖 Initializing Google Gemini model: {model_name}")
+            thinking_kwargs = {}
+            if model_name.startswith("gemini-3"):
+                thinking_kwargs["thinking_level"] = "low"
+            else:
+                thinking_kwargs["thinking_budget"] = 512
             return ChatGoogleGenerativeAI(
                 model=model_name,
-                # temperature=0.7,
                 max_tokens=4096,
-                thinking_budget=512,  # Control thinking output to prevent contamination
-                streaming=True
+                streaming=True,
+                **thinking_kwargs
             )
         elif provider == "openrouter":
             # OpenRouter configuration

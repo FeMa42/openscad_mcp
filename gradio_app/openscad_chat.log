@@ -9656,3 +9656,532 @@ $fa = 1; $fs = 0.4...
 2026-03-24 16:21:29,816 - __main__ - INFO - 🔧 [stream] Tool start: get_available_views
 2026-03-24 16:21:29,822 - __main__ - INFO - 📤 [stream] Tool end: get_available_views
 2026-03-24 16:21:30,526 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:21:33,162 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:21:33,512 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:21:33,534 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:21:34,252 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:21:35,613 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:21:35,663 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:21:35,674 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:21:36,385 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:21:37,744 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:21:37,781 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:21:37,792 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:21:38,486 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:21:39,641 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:22:12,059 - __main__ - INFO - 🔧 [stream] Tool start: render_scad_multi
+2026-03-24 16:22:12,759 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:22:13,530 - __main__ - INFO - 📤 [stream] Tool end: render_scad_multi
+2026-03-24 16:22:14,240 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:22:15,648 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:22:15,955 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:22:15,980 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:22:16,701 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:22:18,325 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:22:18,371 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:22:18,396 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:22:19,133 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:22:20,199 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:22:20,237 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:22:20,251 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:22:20,982 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:22:21,862 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:22:32,174 - __main__ - INFO - 🤖 [stream] Final response: The **Parametric Phone Stand** has been designed and rendered successfully! Here's the complete breakdown:
+
+---
+
+## 📱 Parametric Phone Stand — Design Summary
+
+### 🔧 Key Features
+| Feature | Detail |
+|...
+2026-03-24 16:22:32,174 - __main__ - INFO - 🔧 Tool call: render_scad_multi with args: ['code', 'iteration']
+2026-03-24 16:22:32,174 - __main__ - INFO - 📤 Tool response: render_scad_multi returned str
+2026-03-24 16:22:32,174 - __main__ - INFO - 🔧 Tool call: get_available_views with args: []
+2026-03-24 16:22:32,174 - __main__ - INFO - 📤 Tool response: get_available_views returned str
+2026-03-24 16:22:32,174 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:22:32,174 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:22:32,174 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:22:32,174 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:22:32,174 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:22:32,174 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:22:32,174 - __main__ - INFO - 🔧 Tool call: render_scad_multi with args: ['code', 'iteration']
+2026-03-24 16:22:32,174 - __main__ - INFO - 📤 Tool response: render_scad_multi returned str
+2026-03-24 16:22:32,174 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:22:32,174 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:22:32,174 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:22:32,174 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:22:32,174 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:22:32,174 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:22:32,174 - __main__ - INFO - 🛠️  Total tool calls in this conversation: render_scad_multi(['code', 'iteration']), get_available_views([]), get_view(['view_id']), get_view(['view_id']), get_view(['view_id']), render_scad_multi(['code', 'iteration']), get_view(['view_id']), get_view(['view_id']), get_view(['view_id'])
+2026-03-24 16:22:32,174 - __main__ - INFO - 📨 Total tool responses: render_scad_multi(str), get_available_views(str), get_view(str), get_view(str), get_view(str), render_scad_multi(str), get_view(str), get_view(str), get_view(str)
+2026-03-24 16:22:32,174 - __main__ - INFO - 🔍 _extract_outputs: Processing 25 messages
+2026-03-24 16:22:32,175 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-24 16:22:32,175 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-24 16:22:32,175 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-24 16:22:32,175 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-24 16:22:32,177 - __main__ - INFO - Skipping old STL file: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl (age: 105057.7s)
+2026-03-24 16:22:32,177 - __main__ - INFO - Skipping old STL file: ../output/27be0f71-c73b-426b-99b2-9750996645c6/0/output.stl (age: 17020295.2s)
+2026-03-24 16:22:32,177 - __main__ - INFO - Skipping old STL file: ../output/b6412a2f-f65e-4c48-82fa-af2ef79a4dcb/0/output.stl (age: 17019366.1s)
+2026-03-24 16:22:32,177 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/0/output.stl (age: 102161.7s)
+2026-03-24 16:22:32,177 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/1/output.stl (age: 102559.2s)
+2026-03-24 16:22:32,177 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/3/output.stl (age: 102541.0s)
+2026-03-24 16:22:32,178 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/2/output.stl (age: 102545.7s)
+2026-03-24 16:22:32,178 - __main__ - INFO - Skipping old STL file: ../output/579ec65e-448a-484e-98ec-9b621c70c419/0/output.stl (age: 17904088.2s)
+2026-03-24 16:22:32,178 - __main__ - INFO - Skipping old STL file: ../output/cbc968a6-440c-4a8b-abff-62b611649272/0/output.stl (age: 16621631.4s)
+2026-03-24 16:22:32,178 - __main__ - INFO - Skipping old STL file: ../output/1a8c5f57-90da-45e4-b4c9-0157d5425b1e/0/output.stl (age: 16858240.8s)
+2026-03-24 16:22:32,178 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/0/output.stl (age: 95930.6s)
+2026-03-24 16:22:32,178 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/1/output.stl (age: 96014.3s)
+2026-03-24 16:22:32,179 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/3/output.stl (age: 95964.1s)
+2026-03-24 16:22:32,179 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/2/output.stl (age: 95980.4s)
+2026-03-24 16:22:32,179 - __main__ - INFO - Skipping old STL file: ../output/7707318b-c1ce-4aa3-880f-f0647548182b/0/output.stl (age: 16877525.4s)
+2026-03-24 16:22:32,180 - __main__ - INFO - Skipping old STL file: ../output/b15998d4-1bde-4d99-b17d-4304ebe62a25/0/output.stl (age: 16779901.6s)
+2026-03-24 16:22:32,180 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/0/output.stl (age: 321.0s)
+2026-03-24 16:22:32,180 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/1/output.stl (age: 475.1s)
+2026-03-24 16:22:32,180 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/3/output.stl (age: 339.0s)
+2026-03-24 16:22:32,180 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/2/output.stl (age: 348.3s)
+2026-03-24 16:22:32,181 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/0/output.stl (age: 96880.4s)
+2026-03-24 16:22:32,181 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/1/output.stl (age: 96905.8s)
+2026-03-24 16:22:32,181 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/3/output.stl (age: 96888.8s)
+2026-03-24 16:22:32,181 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/2/output.stl (age: 96893.5s)
+2026-03-24 16:22:32,181 - __main__ - INFO - Skipping old STL file: ../output/66fbea73-c822-4853-8ca0-8452e816523e/0/output.stl (age: 17905226.2s)
+2026-03-24 16:22:32,181 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/9/output.stl (age: 94513.8s)
+2026-03-24 16:22:32,182 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/0/output.stl (age: 94397.5s)
+2026-03-24 16:22:32,182 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/11/output.stl (age: 94435.6s)
+2026-03-24 16:22:32,182 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/7/output.stl (age: 94521.6s)
+2026-03-24 16:22:32,182 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/1/output.stl (age: 94648.6s)
+2026-03-24 16:22:32,182 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/8/output.stl (age: 94517.9s)
+2026-03-24 16:22:32,182 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/4/output.stl (age: 94582.4s)
+2026-03-24 16:22:32,182 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/3/output.stl (age: 94594.7s)
+2026-03-24 16:22:32,182 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/12/output.stl (age: 94432.0s)
+2026-03-24 16:22:32,182 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/2/output.stl (age: 94998.7s)
+2026-03-24 16:22:32,182 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/5/output.stl (age: 94557.2s)
+2026-03-24 16:22:32,183 - __main__ - INFO - Skipping old STL file: ../output/aeed50ff-a3cf-4477-be5d-7c2384565f3d/0/output.stl (age: 16878102.4s)
+2026-03-24 16:22:32,183 - __main__ - INFO - Skipping old STL file: ../output/7beedc2b-fb28-44a4-9b9f-626286c61a0e/0/output.stl (age: 16874302.1s)
+2026-03-24 16:22:32,183 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/0/output.stl (age: 104197.0s)
+2026-03-24 16:22:32,183 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/1/output.stl (age: 104145.9s)
+2026-03-24 16:22:32,183 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/3/output.stl (age: 104086.4s)
+2026-03-24 16:22:32,184 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/2/output.stl (age: 104135.6s)
+2026-03-24 16:22:32,184 - __main__ - INFO - Skipping old STL file: ../output/4f7e2b3a-ced3-4221-b117-92143700508e/2/output.stl (age: 16777948.7s)
+2026-03-24 16:22:32,184 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/0/output.stl (age: 17020762.1s)
+2026-03-24 16:22:32,184 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/7/output.stl (age: 17022728.3s)
+2026-03-24 16:22:32,185 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/6/output.stl (age: 17025151.8s)
+2026-03-24 16:22:32,185 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/1/output.stl (age: 17025218.7s)
+2026-03-24 16:22:32,185 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/10/output.stl (age: 17022644.2s)
+2026-03-24 16:22:32,185 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/4/output.stl (age: 17022815.9s)
+2026-03-24 16:22:32,185 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/3/output.stl (age: 17025178.9s)
+2026-03-24 16:22:32,185 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/2/output.stl (age: 17025198.3s)
+2026-03-24 16:22:32,185 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/5/output.stl (age: 17022806.2s)
+2026-03-24 16:22:32,186 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/0/output.stl (age: 17030767.1s)
+2026-03-24 16:22:32,186 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/3/output.stl (age: 17031843.2s)
+2026-03-24 16:22:32,186 - __main__ - INFO - Skipping old STL file: ../output/3840b271-5925-44f0-a9df-04f74a21a48f/0/output.stl (age: 17902736.2s)
+2026-03-24 16:22:32,186 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/9/output.stl (age: 16697337.8s)
+2026-03-24 16:22:32,186 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/0/output.stl (age: 16697860.4s)
+2026-03-24 16:22:32,186 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/11/output.stl (age: 16697240.7s)
+2026-03-24 16:22:32,186 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/7/output.stl (age: 16697462.6s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/16/output.stl (age: 16692002.2s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/6/output.stl (age: 16697769.9s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/17/output.stl (age: 16691598.2s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/1/output.stl (age: 16697847.5s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/10/output.stl (age: 16697273.9s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/8/output.stl (age: 16697408.5s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/4/output.stl (age: 16697806.3s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/15/output.stl (age: 16692162.1s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/3/output.stl (age: 16697830.3s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/12/output.stl (age: 16697169.9s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/2/output.stl (age: 16697840.2s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/13/output.stl (age: 16692793.6s)
+2026-03-24 16:22:32,187 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/14/output.stl (age: 16692205.0s)
+2026-03-24 16:22:32,188 - __main__ - INFO - Skipping old STL file: ../output/94412d63-9f20-40a3-ba7b-02ad38c6883e/0/output.stl (age: 16585575.2s)
+2026-03-24 16:22:32,188 - __main__ - INFO - Skipping old STL file: ../output/7f647177-99a7-4962-9983-6123a7c383e9/0/output.stl (age: 16589559.8s)
+2026-03-24 16:22:32,188 - __main__ - INFO - Skipping old STL file: ../output/436447ad-5851-4b9c-bfb7-2a6150845b06/0/output.stl (age: 17019014.9s)
+2026-03-24 16:22:32,189 - __main__ - WARNING - ⚠️ No recent STL files found (within last 5 minutes)
+2026-03-24 16:22:32,189 - __main__ - WARNING - ⚠️ No STL files found
+2026-03-24 16:22:32,189 - __main__ - INFO - 🔧 [stream] Attempting direct MCP call for immediate rendering
+2026-03-24 16:22:32,445 - __main__ - INFO - 🔍 Processing potential image content: <class 'list'>
+2026-03-24 16:22:32,451 - __main__ - INFO - ✅ Loaded image from ImageContent
+2026-03-24 16:22:32,892 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:22:33,456 - __main__ - INFO - Skipping old STL file: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl (age: 105059.0s)
+2026-03-24 16:22:33,457 - __main__ - INFO - Skipping old STL file: ../output/27be0f71-c73b-426b-99b2-9750996645c6/0/output.stl (age: 17020296.5s)
+2026-03-24 16:22:33,457 - __main__ - INFO - Skipping old STL file: ../output/b6412a2f-f65e-4c48-82fa-af2ef79a4dcb/0/output.stl (age: 17019367.4s)
+2026-03-24 16:22:33,457 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/0/output.stl (age: 102163.0s)
+2026-03-24 16:22:33,457 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/1/output.stl (age: 102560.5s)
+2026-03-24 16:22:33,457 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/3/output.stl (age: 102542.2s)
+2026-03-24 16:22:33,457 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/2/output.stl (age: 102547.0s)
+2026-03-24 16:22:33,458 - __main__ - INFO - Skipping old STL file: ../output/579ec65e-448a-484e-98ec-9b621c70c419/0/output.stl (age: 17904089.5s)
+2026-03-24 16:22:33,458 - __main__ - INFO - Skipping old STL file: ../output/cbc968a6-440c-4a8b-abff-62b611649272/0/output.stl (age: 16621632.7s)
+2026-03-24 16:22:33,459 - __main__ - INFO - Skipping old STL file: ../output/1a8c5f57-90da-45e4-b4c9-0157d5425b1e/0/output.stl (age: 16858242.1s)
+2026-03-24 16:22:33,459 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/0/output.stl (age: 95931.8s)
+2026-03-24 16:22:33,459 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/1/output.stl (age: 96015.6s)
+2026-03-24 16:22:33,459 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/3/output.stl (age: 95965.4s)
+2026-03-24 16:22:33,459 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/2/output.stl (age: 95981.7s)
+2026-03-24 16:22:33,460 - __main__ - INFO - Skipping old STL file: ../output/7707318b-c1ce-4aa3-880f-f0647548182b/0/output.stl (age: 16877526.7s)
+2026-03-24 16:22:33,460 - __main__ - INFO - Skipping old STL file: ../output/b15998d4-1bde-4d99-b17d-4304ebe62a25/0/output.stl (age: 16779902.8s)
+2026-03-24 16:22:33,460 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/1/output.stl (age: 476.4s)
+2026-03-24 16:22:33,460 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/3/output.stl (age: 340.2s)
+2026-03-24 16:22:33,461 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/2/output.stl (age: 349.5s)
+2026-03-24 16:22:33,461 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/0/output.stl (age: 96881.7s)
+2026-03-24 16:22:33,461 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/1/output.stl (age: 96907.1s)
+2026-03-24 16:22:33,462 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/3/output.stl (age: 96890.0s)
+2026-03-24 16:22:33,462 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/2/output.stl (age: 96894.8s)
+2026-03-24 16:22:33,463 - __main__ - INFO - Skipping old STL file: ../output/66fbea73-c822-4853-8ca0-8452e816523e/0/output.stl (age: 17905227.4s)
+2026-03-24 16:22:33,463 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/9/output.stl (age: 94515.1s)
+2026-03-24 16:22:33,463 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/0/output.stl (age: 94398.8s)
+2026-03-24 16:22:33,464 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/11/output.stl (age: 94436.9s)
+2026-03-24 16:22:33,464 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/7/output.stl (age: 94522.9s)
+2026-03-24 16:22:33,464 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/1/output.stl (age: 94649.8s)
+2026-03-24 16:22:33,464 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/8/output.stl (age: 94519.2s)
+2026-03-24 16:22:33,464 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/4/output.stl (age: 94583.6s)
+2026-03-24 16:22:33,464 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/3/output.stl (age: 94595.9s)
+2026-03-24 16:22:33,464 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/12/output.stl (age: 94433.2s)
+2026-03-24 16:22:33,465 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/2/output.stl (age: 95000.0s)
+2026-03-24 16:22:33,465 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/5/output.stl (age: 94558.4s)
+2026-03-24 16:22:33,466 - __main__ - INFO - Skipping old STL file: ../output/aeed50ff-a3cf-4477-be5d-7c2384565f3d/0/output.stl (age: 16878103.7s)
+2026-03-24 16:22:33,466 - __main__ - INFO - Skipping old STL file: ../output/7beedc2b-fb28-44a4-9b9f-626286c61a0e/0/output.stl (age: 16874303.4s)
+2026-03-24 16:22:33,466 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/0/output.stl (age: 104198.3s)
+2026-03-24 16:22:33,466 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/1/output.stl (age: 104147.2s)
+2026-03-24 16:22:33,466 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/3/output.stl (age: 104087.7s)
+2026-03-24 16:22:33,466 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/2/output.stl (age: 104136.8s)
+2026-03-24 16:22:33,467 - __main__ - INFO - Skipping old STL file: ../output/4f7e2b3a-ced3-4221-b117-92143700508e/2/output.stl (age: 16777950.0s)
+2026-03-24 16:22:33,467 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/0/output.stl (age: 17020763.4s)
+2026-03-24 16:22:33,467 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/7/output.stl (age: 17022729.6s)
+2026-03-24 16:22:33,467 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/6/output.stl (age: 17025153.1s)
+2026-03-24 16:22:33,467 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/1/output.stl (age: 17025220.0s)
+2026-03-24 16:22:33,467 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/10/output.stl (age: 17022645.5s)
+2026-03-24 16:22:33,468 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/4/output.stl (age: 17022817.2s)
+2026-03-24 16:22:33,468 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/3/output.stl (age: 17025180.2s)
+2026-03-24 16:22:33,468 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/2/output.stl (age: 17025199.6s)
+2026-03-24 16:22:33,468 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/5/output.stl (age: 17022807.5s)
+2026-03-24 16:22:33,469 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/0/output.stl (age: 17030768.4s)
+2026-03-24 16:22:33,469 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/3/output.stl (age: 17031844.5s)
+2026-03-24 16:22:33,469 - __main__ - INFO - Skipping old STL file: ../output/3840b271-5925-44f0-a9df-04f74a21a48f/0/output.stl (age: 17902737.5s)
+2026-03-24 16:22:33,469 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/9/output.stl (age: 16697339.1s)
+2026-03-24 16:22:33,469 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/0/output.stl (age: 16697861.7s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/11/output.stl (age: 16697241.9s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/7/output.stl (age: 16697463.9s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/16/output.stl (age: 16692003.5s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/6/output.stl (age: 16697771.1s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/17/output.stl (age: 16691599.5s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/1/output.stl (age: 16697848.8s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/10/output.stl (age: 16697275.1s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/8/output.stl (age: 16697409.8s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/4/output.stl (age: 16697807.6s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/15/output.stl (age: 16692163.4s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/3/output.stl (age: 16697831.6s)
+2026-03-24 16:22:33,470 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/12/output.stl (age: 16697171.1s)
+2026-03-24 16:22:33,471 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/2/output.stl (age: 16697841.4s)
+2026-03-24 16:22:33,471 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/13/output.stl (age: 16692794.9s)
+2026-03-24 16:22:33,471 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/14/output.stl (age: 16692206.3s)
+2026-03-24 16:22:33,471 - __main__ - INFO - Skipping old STL file: ../output/94412d63-9f20-40a3-ba7b-02ad38c6883e/0/output.stl (age: 16585576.4s)
+2026-03-24 16:22:33,472 - __main__ - INFO - Skipping old STL file: ../output/7f647177-99a7-4962-9983-6123a7c383e9/0/output.stl (age: 16589561.0s)
+2026-03-24 16:22:33,473 - __main__ - INFO - Skipping old STL file: ../output/436447ad-5851-4b9c-bfb7-2a6150845b06/0/output.stl (age: 17019016.2s)
+2026-03-24 16:22:33,473 - __main__ - INFO - 🔍 Found latest STL: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/0/output.stl (age: 1.2s)
+2026-03-24 16:22:33,473 - __main__ - INFO - 🎯 Processing 3D model: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/0/output.stl
+2026-03-24 16:22:33,481 - __main__ - INFO - 📏 Extracted measurements: {'length': 95.0, 'width': 106.60803853526565, 'height': 100.4146686238903}
+2026-03-24 16:22:33,481 - __main__ - INFO - Calculated optimal camera position: [228.49338477907114, 281.79740404670395, 236.77140174866]
+2026-03-24 16:22:33,481 - __main__ - INFO - Object dimensions: {'length': 95.0, 'width': 106.60803853526565, 'height': 100.4146686238903}
+2026-03-24 16:22:33,481 - __main__ - INFO - Max dimension: 106.61mm, Distance: 373.13mm
+2026-03-24 16:22:33,486 - __main__ - INFO - 🔧 Original mesh: 780 faces
+2026-03-24 16:22:33,488 - __main__ - INFO - ✅ Converted STL to GLB: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb
+2026-03-24 16:22:33,488 - __main__ - INFO - 🔍 Setting current_3d_model to: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb'
+2026-03-24 16:22:33,488 - __main__ - INFO - ✅ 3D model processed: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb
+2026-03-24 16:22:33,488 - __main__ - INFO - 📸 Camera positioned at: [228.49338477907114, 281.79740404670395, 236.77140174866]
+2026-03-24 16:22:33,488 - __main__ - INFO - 📊 [stream] Complete - 3D: ✅, Code: ✅, Measurements: ✅
+2026-03-24 16:33:08,888 - __main__ - INFO - 🔍 update_3d_model called with: <class 'str'> = '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb'
+2026-03-24 16:33:08,888 - __main__ - INFO - ✅ Valid 3D model path being returned: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb
+2026-03-24 16:33:08,888 - __main__ - INFO - 🔄 update_3d_model returning: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb'
+2026-03-24 16:35:50,710 - __main__ - INFO - 💬 [stream] User message: Create a small phone stand, Which folds vertically and is unfolded like a triangle when looked from above (without the lower edge of course). the phone can then be placed inside a cutout which is on both edges at the same distance from the top corner. 
+2026-03-24 16:35:50,710 - __main__ - INFO - 🔍 _clear_current_outputs: Setting current_3d_model to None
+2026-03-24 16:35:50,711 - __main__ - INFO - 🤖 [stream] Invoking agent with 8 messages
+2026-03-24 16:35:51,604 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:35:52,298 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:36:01,033 - __main__ - INFO - 🔧 [stream] Tool start: list_openscad_libraries
+2026-03-24 16:36:01,039 - __main__ - INFO - 📤 [stream] Tool end: list_openscad_libraries
+2026-03-24 16:36:01,799 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:36:02,574 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:36:40,452 - __main__ - INFO - 🔧 [stream] Tool start: render_scad
+2026-03-24 16:36:40,776 - __main__ - INFO - 📤 [stream] Tool end: render_scad
+2026-03-24 16:36:41,491 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:36:42,983 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:36:59,846 - __main__ - INFO - 🔧 [stream] Tool start: render_scad_multi
+2026-03-24 16:37:00,966 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:37:01,246 - __main__ - INFO - 📤 [stream] Tool end: render_scad_multi
+2026-03-24 16:37:02,057 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:37:03,040 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:37:03,172 - __main__ - INFO - 🔧 [stream] Tool start: get_available_views
+2026-03-24 16:37:03,178 - __main__ - INFO - 📤 [stream] Tool end: get_available_views
+2026-03-24 16:37:03,980 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:37:04,781 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:37:04,829 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:37:04,851 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:37:05,688 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:37:06,804 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:37:07,100 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:37:07,114 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:37:08,037 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:37:08,089 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:37:09,750 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:37:09,765 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:37:10,683 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:37:10,977 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:37:45,087 - __main__ - INFO - 🔧 [stream] Tool start: render_scad_multi
+2026-03-24 16:37:45,870 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:37:46,469 - __main__ - INFO - 📤 [stream] Tool end: render_scad_multi
+2026-03-24 16:37:47,230 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:37:48,875 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:37:49,540 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:37:49,565 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:37:50,542 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:37:52,289 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:37:52,311 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:37:52,324 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:37:53,089 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:37:53,680 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:37:53,728 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:37:53,746 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:37:54,478 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:37:55,158 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:38:29,185 - __main__ - INFO - 🔧 [stream] Tool start: render_scad_multi
+2026-03-24 16:38:30,004 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:38:30,600 - __main__ - INFO - 📤 [stream] Tool end: render_scad_multi
+2026-03-24 16:38:31,578 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:38:32,745 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:38:33,182 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:38:33,211 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:38:33,930 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:38:34,727 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:38:34,779 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:38:34,796 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:38:36,612 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:38:36,697 - __main__ - INFO - 🔧 [stream] Tool start: get_view
+2026-03-24 16:38:36,717 - __main__ - INFO - 📤 [stream] Tool end: get_view
+2026-03-24 16:38:37,662 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2026-03-24 16:38:39,839 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:38:40,664 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:38:52,639 - __main__ - INFO - 🤖 [stream] Final response: The design is complete and renders beautifully across all views! Here's the full summary:
+
+---
+
+## 📱 Parametric Folding Phone Stand — Complete Design
+
+### 🧠 Design Concept
+| View | Description |
+|---|...
+2026-03-24 16:38:52,639 - __main__ - INFO - 🔧 Tool call: list_openscad_libraries with args: []
+2026-03-24 16:38:52,639 - __main__ - INFO - 📤 Tool response: list_openscad_libraries returned str
+2026-03-24 16:38:52,639 - __main__ - INFO - 🔧 Tool call: render_scad with args: ['code', 'iteration']
+2026-03-24 16:38:52,639 - __main__ - INFO - 📤 Tool response: render_scad returned str
+2026-03-24 16:38:52,639 - __main__ - INFO - 🔧 Tool call: render_scad_multi with args: ['code', 'iteration']
+2026-03-24 16:38:52,639 - __main__ - INFO - 📤 Tool response: render_scad_multi returned str
+2026-03-24 16:38:52,639 - __main__ - INFO - 🔧 Tool call: get_available_views with args: []
+2026-03-24 16:38:52,640 - __main__ - INFO - 📤 Tool response: get_available_views returned str
+2026-03-24 16:38:52,640 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:38:52,640 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:38:52,640 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:38:52,640 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:38:52,640 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:38:52,640 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:38:52,640 - __main__ - INFO - 🔧 Tool call: render_scad_multi with args: ['code', 'iteration']
+2026-03-24 16:38:52,640 - __main__ - INFO - 📤 Tool response: render_scad_multi returned str
+2026-03-24 16:38:52,640 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:38:52,640 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:38:52,640 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:38:52,640 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:38:52,640 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:38:52,640 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:38:52,640 - __main__ - INFO - 🔧 Tool call: render_scad_multi with args: ['code', 'iteration']
+2026-03-24 16:38:52,640 - __main__ - INFO - 📤 Tool response: render_scad_multi returned str
+2026-03-24 16:38:52,640 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:38:52,640 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:38:52,640 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:38:52,641 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:38:52,641 - __main__ - INFO - 🔧 Tool call: get_view with args: ['view_id']
+2026-03-24 16:38:52,641 - __main__ - INFO - 📤 Tool response: get_view returned str
+2026-03-24 16:38:52,641 - __main__ - INFO - 🛠️  Total tool calls in this conversation: list_openscad_libraries([]), render_scad(['code', 'iteration']), render_scad_multi(['code', 'iteration']), get_available_views([]), get_view(['view_id']), get_view(['view_id']), get_view(['view_id']), render_scad_multi(['code', 'iteration']), get_view(['view_id']), get_view(['view_id']), get_view(['view_id']), render_scad_multi(['code', 'iteration']), get_view(['view_id']), get_view(['view_id']), get_view(['view_id'])
+2026-03-24 16:38:52,641 - __main__ - INFO - 📨 Total tool responses: list_openscad_libraries(str), render_scad(str), render_scad_multi(str), get_available_views(str), get_view(str), get_view(str), get_view(str), render_scad_multi(str), get_view(str), get_view(str), get_view(str), render_scad_multi(str), get_view(str), get_view(str), get_view(str)
+2026-03-24 16:38:52,641 - __main__ - INFO - 🔍 _extract_outputs: Processing 39 messages
+2026-03-24 16:38:52,641 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-24 16:38:52,641 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-24 16:38:52,641 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-24 16:38:52,641 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-24 16:38:52,641 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-24 16:38:52,641 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-24 16:38:52,641 - __main__ - INFO - ✅ Extracted code from tool call
+2026-03-24 16:38:52,641 - __main__ - INFO - 🔍 Found render_scad response with content: <class 'str'>
+2026-03-24 16:38:52,644 - __main__ - INFO - Skipping old STL file: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl (age: 106038.2s)
+2026-03-24 16:38:52,644 - __main__ - INFO - Skipping old STL file: ../output/27be0f71-c73b-426b-99b2-9750996645c6/0/output.stl (age: 17021275.7s)
+2026-03-24 16:38:52,645 - __main__ - INFO - Skipping old STL file: ../output/b6412a2f-f65e-4c48-82fa-af2ef79a4dcb/0/output.stl (age: 17020346.5s)
+2026-03-24 16:38:52,645 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/0/output.stl (age: 103142.2s)
+2026-03-24 16:38:52,645 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/1/output.stl (age: 103539.7s)
+2026-03-24 16:38:52,645 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/3/output.stl (age: 103521.4s)
+2026-03-24 16:38:52,646 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/2/output.stl (age: 103526.2s)
+2026-03-24 16:38:52,646 - __main__ - INFO - Skipping old STL file: ../output/579ec65e-448a-484e-98ec-9b621c70c419/0/output.stl (age: 17905068.7s)
+2026-03-24 16:38:52,646 - __main__ - INFO - Skipping old STL file: ../output/cbc968a6-440c-4a8b-abff-62b611649272/0/output.stl (age: 16622611.9s)
+2026-03-24 16:38:52,647 - __main__ - INFO - Skipping old STL file: ../output/1a8c5f57-90da-45e4-b4c9-0157d5425b1e/0/output.stl (age: 16859221.3s)
+2026-03-24 16:38:52,647 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/0/output.stl (age: 96911.0s)
+2026-03-24 16:38:52,647 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/1/output.stl (age: 96994.8s)
+2026-03-24 16:38:52,647 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/3/output.stl (age: 96944.6s)
+2026-03-24 16:38:52,647 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/2/output.stl (age: 96960.9s)
+2026-03-24 16:38:52,648 - __main__ - INFO - Skipping old STL file: ../output/7707318b-c1ce-4aa3-880f-f0647548182b/0/output.stl (age: 16878505.9s)
+2026-03-24 16:38:52,648 - __main__ - INFO - Skipping old STL file: ../output/b15998d4-1bde-4d99-b17d-4304ebe62a25/0/output.stl (age: 16780882.0s)
+2026-03-24 16:38:52,648 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/0/output.stl (age: 980.4s)
+2026-03-24 16:38:52,648 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/3/output.stl (age: 1319.4s)
+2026-03-24 16:38:52,649 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/2/output.stl (age: 1328.7s)
+2026-03-24 16:38:52,649 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/0/output.stl (age: 97860.9s)
+2026-03-24 16:38:52,649 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/1/output.stl (age: 97886.3s)
+2026-03-24 16:38:52,649 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/3/output.stl (age: 97869.2s)
+2026-03-24 16:38:52,649 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/2/output.stl (age: 97874.0s)
+2026-03-24 16:38:52,650 - __main__ - INFO - Skipping old STL file: ../output/66fbea73-c822-4853-8ca0-8452e816523e/0/output.stl (age: 17906206.6s)
+2026-03-24 16:38:52,650 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/9/output.stl (age: 95494.3s)
+2026-03-24 16:38:52,650 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/0/output.stl (age: 95378.0s)
+2026-03-24 16:38:52,650 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/11/output.stl (age: 95416.1s)
+2026-03-24 16:38:52,650 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/7/output.stl (age: 95502.1s)
+2026-03-24 16:38:52,650 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/1/output.stl (age: 95629.0s)
+2026-03-24 16:38:52,651 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/8/output.stl (age: 95498.4s)
+2026-03-24 16:38:52,651 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/4/output.stl (age: 95562.8s)
+2026-03-24 16:38:52,651 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/3/output.stl (age: 95575.1s)
+2026-03-24 16:38:52,651 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/12/output.stl (age: 95412.4s)
+2026-03-24 16:38:52,651 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/2/output.stl (age: 95979.2s)
+2026-03-24 16:38:52,651 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/5/output.stl (age: 95537.6s)
+2026-03-24 16:38:52,652 - __main__ - INFO - Skipping old STL file: ../output/aeed50ff-a3cf-4477-be5d-7c2384565f3d/0/output.stl (age: 16879082.9s)
+2026-03-24 16:38:52,652 - __main__ - INFO - Skipping old STL file: ../output/7beedc2b-fb28-44a4-9b9f-626286c61a0e/0/output.stl (age: 16875282.6s)
+2026-03-24 16:38:52,652 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/0/output.stl (age: 105177.5s)
+2026-03-24 16:38:52,652 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/1/output.stl (age: 105126.4s)
+2026-03-24 16:38:52,652 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/3/output.stl (age: 105066.9s)
+2026-03-24 16:38:52,653 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/2/output.stl (age: 105116.0s)
+2026-03-24 16:38:52,653 - __main__ - INFO - Skipping old STL file: ../output/4f7e2b3a-ced3-4221-b117-92143700508e/2/output.stl (age: 16778929.2s)
+2026-03-24 16:38:52,653 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/0/output.stl (age: 17021742.6s)
+2026-03-24 16:38:52,654 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/7/output.stl (age: 17023708.8s)
+2026-03-24 16:38:52,654 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/6/output.stl (age: 17026132.3s)
+2026-03-24 16:38:52,654 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/1/output.stl (age: 17026199.2s)
+2026-03-24 16:38:52,654 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/10/output.stl (age: 17023624.7s)
+2026-03-24 16:38:52,654 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/4/output.stl (age: 17023796.4s)
+2026-03-24 16:38:52,654 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/3/output.stl (age: 17026159.4s)
+2026-03-24 16:38:52,654 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/2/output.stl (age: 17026178.8s)
+2026-03-24 16:38:52,654 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/5/output.stl (age: 17023786.6s)
+2026-03-24 16:38:52,655 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/0/output.stl (age: 17031747.6s)
+2026-03-24 16:38:52,656 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/3/output.stl (age: 17032823.7s)
+2026-03-24 16:38:52,656 - __main__ - INFO - Skipping old STL file: ../output/3840b271-5925-44f0-a9df-04f74a21a48f/0/output.stl (age: 17903716.7s)
+2026-03-24 16:38:52,656 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/9/output.stl (age: 16698318.3s)
+2026-03-24 16:38:52,656 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/0/output.stl (age: 16698840.9s)
+2026-03-24 16:38:52,656 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/11/output.stl (age: 16698221.1s)
+2026-03-24 16:38:52,657 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/7/output.stl (age: 16698443.1s)
+2026-03-24 16:38:52,657 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/16/output.stl (age: 16692982.7s)
+2026-03-24 16:38:52,657 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/6/output.stl (age: 16698750.3s)
+2026-03-24 16:38:52,657 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/17/output.stl (age: 16692578.7s)
+2026-03-24 16:38:52,657 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/1/output.stl (age: 16698828.0s)
+2026-03-24 16:38:52,657 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/10/output.stl (age: 16698254.3s)
+2026-03-24 16:38:52,657 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/8/output.stl (age: 16698389.0s)
+2026-03-24 16:38:52,657 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/4/output.stl (age: 16698786.8s)
+2026-03-24 16:38:52,657 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/15/output.stl (age: 16693142.5s)
+2026-03-24 16:38:52,658 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/3/output.stl (age: 16698810.8s)
+2026-03-24 16:38:52,658 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/12/output.stl (age: 16698150.3s)
+2026-03-24 16:38:52,658 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/2/output.stl (age: 16698820.6s)
+2026-03-24 16:38:52,658 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/13/output.stl (age: 16693774.1s)
+2026-03-24 16:38:52,658 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/14/output.stl (age: 16693185.5s)
+2026-03-24 16:38:52,659 - __main__ - INFO - Skipping old STL file: ../output/94412d63-9f20-40a3-ba7b-02ad38c6883e/0/output.stl (age: 16586555.6s)
+2026-03-24 16:38:52,659 - __main__ - INFO - Skipping old STL file: ../output/7f647177-99a7-4962-9983-6123a7c383e9/0/output.stl (age: 16590540.2s)
+2026-03-24 16:38:52,659 - __main__ - INFO - Skipping old STL file: ../output/436447ad-5851-4b9c-bfb7-2a6150845b06/0/output.stl (age: 17019995.4s)
+2026-03-24 16:38:52,660 - __main__ - INFO - 🔍 Found latest STL: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/1/output.stl (age: 132.1s)
+2026-03-24 16:38:52,660 - __main__ - INFO - 🎯 Processing 3D model: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/1/output.stl
+2026-03-24 16:38:52,681 - __main__ - INFO - 📏 Extracted measurements: {'length': 170.49426487712324, 'width': 120.97804016115771, 'height': 19.5}
+2026-03-24 16:38:52,681 - __main__ - INFO - Calculated optimal camera position: [365.4209588923877, 418.66584177117215, 306.1149635349656]
+2026-03-24 16:38:52,681 - __main__ - INFO - Object dimensions: {'length': 170.49426487712324, 'width': 120.97804016115771, 'height': 19.5}
+2026-03-24 16:38:52,681 - __main__ - INFO - Max dimension: 170.49mm, Distance: 596.73mm
+2026-03-24 16:38:52,697 - __main__ - INFO - 🔧 Original mesh: 3074 faces
+2026-03-24 16:38:52,699 - __main__ - INFO - ✅ Converted STL to GLB: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb
+2026-03-24 16:38:52,699 - __main__ - INFO - 🔍 Setting current_3d_model to: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb'
+2026-03-24 16:38:52,699 - __main__ - INFO - ✅ 3D model processed: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb
+2026-03-24 16:38:52,699 - __main__ - INFO - 📸 Camera positioned at: [365.4209588923877, 418.66584177117215, 306.1149635349656]
+2026-03-24 16:38:52,699 - __main__ - INFO - 🔧 [stream] Attempting direct MCP call for immediate rendering
+2026-03-24 16:38:52,979 - __main__ - INFO - 🔍 Processing potential image content: <class 'list'>
+2026-03-24 16:38:52,984 - __main__ - INFO - ✅ Loaded image from ImageContent
+2026-03-24 16:38:53,349 - langsmith.client - WARNING - Failed to send compressed multipart ingest: langsmith.utils.LangSmithError: Failed to POST https://api.smith.langchain.com/runs/multipart in LangSmith API. HTTPError('403 Client Error: Forbidden for url: https://api.smith.langchain.com/runs/multipart', '{"error":"Forbidden"}\n')
+2026-03-24 16:38:53,989 - __main__ - INFO - Skipping old STL file: ../output/04d09017-d95a-4f8e-ac81-510e39ee1d99/0/output.stl (age: 106039.5s)
+2026-03-24 16:38:53,990 - __main__ - INFO - Skipping old STL file: ../output/27be0f71-c73b-426b-99b2-9750996645c6/0/output.stl (age: 17021277.0s)
+2026-03-24 16:38:53,990 - __main__ - INFO - Skipping old STL file: ../output/b6412a2f-f65e-4c48-82fa-af2ef79a4dcb/0/output.stl (age: 17020347.9s)
+2026-03-24 16:38:53,991 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/0/output.stl (age: 103143.5s)
+2026-03-24 16:38:53,991 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/1/output.stl (age: 103541.0s)
+2026-03-24 16:38:53,991 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/3/output.stl (age: 103522.8s)
+2026-03-24 16:38:53,991 - __main__ - INFO - Skipping old STL file: ../output/5a5775ad-f2ac-4611-b4f8-ccc3402678c7/2/output.stl (age: 103527.6s)
+2026-03-24 16:38:53,992 - __main__ - INFO - Skipping old STL file: ../output/579ec65e-448a-484e-98ec-9b621c70c419/0/output.stl (age: 17905070.0s)
+2026-03-24 16:38:53,992 - __main__ - INFO - Skipping old STL file: ../output/cbc968a6-440c-4a8b-abff-62b611649272/0/output.stl (age: 16622613.2s)
+2026-03-24 16:38:53,993 - __main__ - INFO - Skipping old STL file: ../output/1a8c5f57-90da-45e4-b4c9-0157d5425b1e/0/output.stl (age: 16859222.6s)
+2026-03-24 16:38:53,993 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/0/output.stl (age: 96912.4s)
+2026-03-24 16:38:53,993 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/1/output.stl (age: 96996.1s)
+2026-03-24 16:38:53,993 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/3/output.stl (age: 96946.0s)
+2026-03-24 16:38:53,993 - __main__ - INFO - Skipping old STL file: ../output/4e10578c-d3c4-4433-b087-fac1b7041402/2/output.stl (age: 96962.2s)
+2026-03-24 16:38:53,994 - __main__ - INFO - Skipping old STL file: ../output/7707318b-c1ce-4aa3-880f-f0647548182b/0/output.stl (age: 16878507.2s)
+2026-03-24 16:38:53,994 - __main__ - INFO - Skipping old STL file: ../output/b15998d4-1bde-4d99-b17d-4304ebe62a25/0/output.stl (age: 16780883.4s)
+2026-03-24 16:38:53,994 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/3/output.stl (age: 1320.8s)
+2026-03-24 16:38:53,994 - __main__ - INFO - Skipping old STL file: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/2/output.stl (age: 1330.1s)
+2026-03-24 16:38:53,995 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/0/output.stl (age: 97862.2s)
+2026-03-24 16:38:53,995 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/1/output.stl (age: 97887.6s)
+2026-03-24 16:38:53,996 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/3/output.stl (age: 97870.6s)
+2026-03-24 16:38:53,996 - __main__ - INFO - Skipping old STL file: ../output/45ab8c28-9131-4e41-90bd-4b057fbdb95a/2/output.stl (age: 97875.3s)
+2026-03-24 16:38:53,997 - __main__ - INFO - Skipping old STL file: ../output/66fbea73-c822-4853-8ca0-8452e816523e/0/output.stl (age: 17906208.0s)
+2026-03-24 16:38:53,997 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/9/output.stl (age: 95495.6s)
+2026-03-24 16:38:53,997 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/0/output.stl (age: 95379.3s)
+2026-03-24 16:38:53,997 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/11/output.stl (age: 95417.5s)
+2026-03-24 16:38:53,998 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/7/output.stl (age: 95503.4s)
+2026-03-24 16:38:53,998 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/1/output.stl (age: 95630.4s)
+2026-03-24 16:38:53,998 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/8/output.stl (age: 95499.8s)
+2026-03-24 16:38:53,998 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/4/output.stl (age: 95564.2s)
+2026-03-24 16:38:53,998 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/3/output.stl (age: 95576.5s)
+2026-03-24 16:38:53,998 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/12/output.stl (age: 95413.8s)
+2026-03-24 16:38:53,998 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/2/output.stl (age: 95980.5s)
+2026-03-24 16:38:53,998 - __main__ - INFO - Skipping old STL file: ../output/317cabfb-f4db-48da-b66d-5a8f302d1e28/5/output.stl (age: 95539.0s)
+2026-03-24 16:38:53,999 - __main__ - INFO - Skipping old STL file: ../output/aeed50ff-a3cf-4477-be5d-7c2384565f3d/0/output.stl (age: 16879084.2s)
+2026-03-24 16:38:54,000 - __main__ - INFO - Skipping old STL file: ../output/7beedc2b-fb28-44a4-9b9f-626286c61a0e/0/output.stl (age: 16875283.9s)
+2026-03-24 16:38:54,000 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/0/output.stl (age: 105178.8s)
+2026-03-24 16:38:54,000 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/1/output.stl (age: 105127.7s)
+2026-03-24 16:38:54,000 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/3/output.stl (age: 105068.3s)
+2026-03-24 16:38:54,000 - __main__ - INFO - Skipping old STL file: ../output/3ffa137b-0143-4684-b56b-9bb7ec7f80a7/2/output.stl (age: 105117.4s)
+2026-03-24 16:38:54,001 - __main__ - INFO - Skipping old STL file: ../output/4f7e2b3a-ced3-4221-b117-92143700508e/2/output.stl (age: 16778930.5s)
+2026-03-24 16:38:54,001 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/0/output.stl (age: 17021743.9s)
+2026-03-24 16:38:54,001 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/7/output.stl (age: 17023710.1s)
+2026-03-24 16:38:54,001 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/6/output.stl (age: 17026133.6s)
+2026-03-24 16:38:54,001 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/1/output.stl (age: 17026200.5s)
+2026-03-24 16:38:54,002 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/10/output.stl (age: 17023626.0s)
+2026-03-24 16:38:54,002 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/4/output.stl (age: 17023797.7s)
+2026-03-24 16:38:54,002 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/3/output.stl (age: 17026160.7s)
+2026-03-24 16:38:54,002 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/2/output.stl (age: 17026180.1s)
+2026-03-24 16:38:54,002 - __main__ - INFO - Skipping old STL file: ../output/9a97c9bb-b5ff-4370-a000-ec8f1a26c532/5/output.stl (age: 17023788.0s)
+2026-03-24 16:38:54,003 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/0/output.stl (age: 17031748.9s)
+2026-03-24 16:38:54,003 - __main__ - INFO - Skipping old STL file: ../output/f9af4da3-071b-478b-a138-0a2027348f5a/3/output.stl (age: 17032825.0s)
+2026-03-24 16:38:54,003 - __main__ - INFO - Skipping old STL file: ../output/3840b271-5925-44f0-a9df-04f74a21a48f/0/output.stl (age: 17903718.1s)
+2026-03-24 16:38:54,004 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/9/output.stl (age: 16698319.6s)
+2026-03-24 16:38:54,004 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/0/output.stl (age: 16698842.3s)
+2026-03-24 16:38:54,004 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/11/output.stl (age: 16698222.5s)
+2026-03-24 16:38:54,004 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/7/output.stl (age: 16698444.4s)
+2026-03-24 16:38:54,004 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/16/output.stl (age: 16692984.1s)
+2026-03-24 16:38:54,004 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/6/output.stl (age: 16698751.7s)
+2026-03-24 16:38:54,004 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/17/output.stl (age: 16692580.0s)
+2026-03-24 16:38:54,004 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/1/output.stl (age: 16698829.4s)
+2026-03-24 16:38:54,004 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/10/output.stl (age: 16698255.7s)
+2026-03-24 16:38:54,005 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/8/output.stl (age: 16698390.3s)
+2026-03-24 16:38:54,005 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/4/output.stl (age: 16698788.1s)
+2026-03-24 16:38:54,005 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/15/output.stl (age: 16693143.9s)
+2026-03-24 16:38:54,005 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/3/output.stl (age: 16698812.1s)
+2026-03-24 16:38:54,005 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/12/output.stl (age: 16698151.7s)
+2026-03-24 16:38:54,005 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/2/output.stl (age: 16698822.0s)
+2026-03-24 16:38:54,005 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/13/output.stl (age: 16693775.4s)
+2026-03-24 16:38:54,005 - __main__ - INFO - Skipping old STL file: ../output/d08f3a24-8bf1-40d4-9f76-abda6b1b0d17/14/output.stl (age: 16693186.8s)
+2026-03-24 16:38:54,006 - __main__ - INFO - Skipping old STL file: ../output/94412d63-9f20-40a3-ba7b-02ad38c6883e/0/output.stl (age: 16586557.0s)
+2026-03-24 16:38:54,006 - __main__ - INFO - Skipping old STL file: ../output/7f647177-99a7-4962-9983-6123a7c383e9/0/output.stl (age: 16590541.6s)
+2026-03-24 16:38:54,007 - __main__ - INFO - Skipping old STL file: ../output/436447ad-5851-4b9c-bfb7-2a6150845b06/0/output.stl (age: 17019996.7s)
+2026-03-24 16:38:54,007 - __main__ - INFO - 🔍 Found latest STL: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/0/output.stl (age: 1.2s)
+2026-03-24 16:38:54,007 - __main__ - INFO - 🎯 Processing 3D model: ../output/bdf1230a-d524-4cf7-aeef-0c80dcb16e39/0/output.stl
+2026-03-24 16:38:54,038 - __main__ - INFO - 📏 Extracted measurements: {'length': 174.94299663066312, 'width': 138.60134464188775, 'height': 174.0}
+2026-03-24 16:38:54,038 - __main__ - INFO - Calculated optimal camera position: [374.95594134124127, 432.2566136621851, 389.1502441036604]
+2026-03-24 16:38:54,038 - __main__ - INFO - Object dimensions: {'length': 174.94299663066312, 'width': 138.60134464188775, 'height': 174.0}
+2026-03-24 16:38:54,038 - __main__ - INFO - Max dimension: 174.94mm, Distance: 612.30mm
+2026-03-24 16:38:54,059 - __main__ - INFO - 🔧 Original mesh: 4272 faces
+2026-03-24 16:38:54,062 - __main__ - INFO - ✅ Converted STL to GLB: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb
+2026-03-24 16:38:54,062 - __main__ - INFO - 🔍 Setting current_3d_model to: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb'
+2026-03-24 16:38:54,062 - __main__ - INFO - ✅ 3D model processed: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb
+2026-03-24 16:38:54,062 - __main__ - INFO - 📸 Camera positioned at: [374.95594134124127, 432.2566136621851, 389.1502441036604]
+2026-03-24 16:38:54,062 - __main__ - INFO - 📊 [stream] Complete - 3D: ✅, Code: ✅, Measurements: ✅
+2026-03-24 16:47:42,769 - __main__ - INFO - 🔍 update_3d_model called with: <class 'str'> = '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb'
+2026-03-24 16:47:42,769 - __main__ - INFO - ✅ Valid 3D model path being returned: /var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb
+2026-03-24 16:47:42,769 - __main__ - INFO - 🔄 update_3d_model returning: '/var/folders/59/r58bsq3j6j9f_t7d4z2fbww40000gn/T/tmp12iklk5x/output.glb'
