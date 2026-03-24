@@ -299,7 +299,14 @@ python app.py --model qwen3-coder
 - **OpenAI**: `gpt-5`, `gpt-5-mini`, `gpt-oss`
 - **Anthropic**: `claude-4-sonnet` (default), `claude-4-opus`, `claude-opus-4-6`, `claude-sonnet-4-6`, `claude-haiku-4-5-20251001`
 - **Google**: `gemini-2.5-pro`, `gemini-2.5-flash`, `gemini-2.5-flash-lite`, `gemini-3.1-pro`, `gemini-3.1-flash`, `gemini-3.1-flash-lite`
-- **OpenRouter**: `qwen3-coder`, `qwen3-coder-free`, `qwen3`, `gemini-3.1-or`, `llama-3-70b`, `deepseek-coder`, `codestral`, etc.
+- **OpenRouter**: `qwen3-coder`, `qwen3-coder-free`, `qwen3`, `gemini-3.1-or`, `llama-3-70b`, `deepseek-coder`, `codestral`, `glm-5`, `minimax-m2.7`, `deepseek-v3.2`, etc.
+
+You can also use any OpenRouter model directly by passing its full model ID:
+```bash
+python app.py --model deepseek/deepseek-v3.2
+python app.py --model z-ai/glm-5
+python app.py --model mistralai/mistral-large-latest
+```
 
 ### 3. Access the Web Interface
 

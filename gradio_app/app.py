@@ -366,6 +366,11 @@ class Enhanced3DOpenSCADChat:
             "llama-3-70b": {"provider": "openrouter", "model": "meta-llama/llama-3-70b-instruct", "display": "Llama 3 70B"},
             "codestral": {"provider": "openrouter", "model": "mistralai/codestral-mamba", "display": "Codestral Mamba"},
             "deepseek-coder": {"provider": "openrouter", "model": "deepseek/deepseek-coder", "display": "DeepSeek Coder"},
+            "glm-5": {"provider": "openrouter", "model": "z-ai/glm-5", "display": "GLM-5"},
+            "glm-5-turbo": {"provider": "openrouter", "model": "z-ai/glm-5-turbo", "display": "GLM-5 Turbo"},
+            "mimo-v2-pro": {"provider": "openrouter", "model": "xiaomi/mimo-v2-pro", "display": "MiMo v2 Pro"},
+            "minimax-m2.7": {"provider": "openrouter", "model": "minimax/minimax-m2.7", "display": "MiniMax M2.7"},
+            "deepseek-v3.2": {"provider": "openrouter", "model": "deepseek/deepseek-v3.2", "display": "DeepSeek V3.2"},
         }
 
     def _create_llm(self):
@@ -376,10 +381,15 @@ class Enhanced3DOpenSCADChat:
             provider = model_config["provider"]
             model_name = model_config["model"]
         else:
-            # Default to OpenAI if model not recognized
-            logger.warning(f"⚠️ Model '{self.model}' not recognized, defaulting to gpt-4o")
-            provider = "openai"
-            model_name = "gpt-5-2025-08-07"
+            if "/" in self.model:
+                # Any string with "/" is treated as a direct OpenRouter model ID
+                logger.info(f"🤖 Using '{self.model}' as OpenRouter model ID")
+                provider = "openrouter"
+                model_name = self.model
+            else:
+                logger.warning(f"⚠️ Model '{self.model}' not recognized, defaulting to gpt-5")
+                provider = "openai"
+                model_name = "gpt-5-2025-08-07"
 
         # Create LLM based on provider
         if provider == "anthropic":
@@ -1371,7 +1381,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="OpenSCAD 3D Assistant")
     parser.add_argument('--model', type=str, default="claude-4-sonnet",
-                        help="Model to use (default: claude-4-sonnet). Available models include: gpt-5, claude-4-sonnet, qwen3-coder, qwen3-coder-free, llama-3-70b, codestral, deepseek-coder")
+                        help="Model to use (default: claude-4-sonnet). Available models include: gpt-5, claude-4-sonnet, qwen3-coder, qwen3-coder-free, llama-3-70b, codestral, deepseek-coder. Any OpenRouter model ID with '/' can be passed directly (e.g., deepseek/deepseek-v3.2)")
     parser.add_argument('--prompt-source', type=str, choices=['xml', 'instructions'], default='xml',
                         help="Source for system prompt: 'xml' for system_prompt.xml, 'instructions' for instructions.txt (default: xml)")
     parser.add_argument('--log-level', type=str, choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default='INFO',
