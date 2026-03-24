@@ -1,6 +1,13 @@
-# openscad_mcp
+# OpenSCAD MCP Server 
 
-OpenSCAD Model Collaborative Programming (MCP) - An intelligent assistant for 3D modeling with OpenSCAD and 3D printing workflow.
+OpenSCAD Model Context Protocol (MCP) - An intelligent assistant for 3D modeling with OpenSCAD and 3D printing workflow. Includes also a gradio app to test different LLMs with the Server.
+
+## Table of Contents
+
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+- [OpenSCAD Libraries](#openscad-libraries-recommended)
+- [Running the Application](#running-the-application)
 
 ## Prerequisites
 
@@ -19,7 +26,7 @@ python --version
 
 **Install Python if needed:**
 
-### 2. Install OpenSCAD
+### 2. Install OpenSCAD (Required)
 
 OpenSCAD is the core 3D modeling software required for this application.
 
@@ -219,7 +226,56 @@ The configuration file should look like this, but with paths updated for your sy
 - **Python path:** Run `which python` (macOS/Linux) or `where python` (Windows)
 - **OpenSCAD path:** Run `which openscad` (macOS/Linux) or `where openscad` (Windows)
 
-### 5. Set Up API Keys
+## OpenSCAD Libraries (Recommended)
+
+The MCP server can leverage external OpenSCAD libraries for gears, fasteners, and more. Libraries are installed by cloning them into OpenSCAD's user library directory, and the server auto-detects them on startup.
+
+**Library directory by OS:**
+
+| OS | Path |
+|----|------|
+| **macOS** | `~/Documents/OpenSCAD/libraries/` |
+| **Windows** | `%USERPROFILE%\Documents\OpenSCAD\libraries\` |
+| **Linux** | `~/.local/share/OpenSCAD/libraries/` |
+
+Create the directory if it doesn't exist, then install any of the following:
+
+### BOSL2 (Recommended)
+
+The Belfry OpenSCAD Library v2 — the most comprehensive library, and the **preferred library for gear generation**.
+
+```bash
+cd ~/Documents/OpenSCAD/libraries/   # adjust for your OS
+git clone https://github.com/BelfrySCAD/BOSL2.git
+```
+
+Usage in OpenSCAD: `include <BOSL2/std.scad>` and `include <BOSL2/gears.scad>`
+
+### MCAD
+
+Community-maintained library for motors, bearings, fasteners, and basic shapes.
+
+```bash
+cd ~/Documents/OpenSCAD/libraries/   # adjust for your OS
+git clone https://github.com/openscad/MCAD.git
+```
+
+### parameterizable_gears
+
+Parametric involute gear library (based on `sadr0b0t/pd-gears`).
+
+```bash
+cd ~/Documents/OpenSCAD/libraries/   # adjust for your OS
+git clone https://github.com/sadr0b0t/pd-gears.git parameterizable_gears
+```
+
+### Verifying Installation
+
+The MCP server logs detected libraries on startup. You can also check that the `OPENSCAD_USER_LIBRARY_PATH` in `gradio_app/config.json` points to your library directory (see [Configure Application Paths](#4-configure-application-paths) above).
+
+## Running the Application
+
+### 1. Setting up API Keys
 
 The application supports multiple AI models. You need at least one API key:
 
@@ -268,9 +324,7 @@ OPENROUTER_API_KEY=your-openrouter-api-key-here
 - **Google:** [aistudio.google.com](https://aistudio.google.com/apikey)
 - **OpenRouter:** [openrouter.ai](https://openrouter.ai/keys)
 
-## Running the Application
-
-### 1. Activate Virtual Environment (if not already active)
+### 2. Activate Virtual Environment (if not already active)
 
 ```bash
 # Windows
@@ -280,7 +334,7 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-### 2. Start the Application
+### 3. Start the Application
 
 ```bash
 # Navigate to the application directory
@@ -308,8 +362,7 @@ python app.py --model z-ai/glm-5
 python app.py --model mistralai/mistral-large-latest
 ```
 
-### 3. Access the Web Interface
+### 4. Access the Web Interface
 
 1. The application will start and display a URL in the terminal (typically `http://localhost:7861/`)
 2. Open this URL in your web browser
-3. Wait for the application to load completely (this may take a few seconds on first startup)
